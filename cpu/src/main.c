@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <utils/hello.h>
+#include <sockets/cliente.h>
 
-int main(int argc, char* argv[]) {
-    decir_hola("CPU");
+int main(void)
+{
+    int conexion = crear_conexion("127.0.0.1", "8023");
+    handshake(conexion);
+    liberar_conexion(conexion);
     return 0;
 }
