@@ -21,23 +21,15 @@ int crear_conexion(char *ip, char *puerto)
    return socket_cliente;
 }
 
-void handshake(int fd_conexion)
+// No estan manejados los posibles casos de error
+int32_t handshake(int fd_conexion, int id_modulo)
 {
+   int32_t resultado;
 
-   int32_t handshake = 1;
-   int32_t result;
+   send(fd_conexion, &id_modulo, sizeof(int32_t), 0);
+   recv(fd_conexion, &resultado, sizeof(int32_t), MSG_WAITALL);
 
-   send(fd_conexion, &handshake, sizeof(int32_t), 0);
-   recv(fd_conexion, &result, sizeof(int32_t), MSG_WAITALL);
-
-   if (result == 0)
-   {
-      printf("Ta todo OK \n");
-   }
-   else
-   {
-      printf("Ta todo como el orto \n");
-   }
+   return resultado
 }
 
 void liberar_conexion(int socket_cliente)

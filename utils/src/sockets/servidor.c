@@ -24,7 +24,6 @@ int iniciar_servidor(char *puerto)
 
 int esperar_cliente(int socket_servidor)
 {
-
    return accept(socket_servidor, NULL, NULL);
 }
 
