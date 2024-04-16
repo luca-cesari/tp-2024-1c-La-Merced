@@ -20,6 +20,7 @@ enum modules
 };
 
 int32_t iniciar_servidor(char *puerto);
-void esperar_cliente(int32_t fd_escucha, (void *)atender_cliente(int32_t));
+// void esperar_cliente(int32_t fd_escucha, void *atender_cliente);
+void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
 int32_t recibir_cliente(int32_t fd_conexion);
-// void recibir_mensaje(int fd_conexion);
+void recibir_mensaje(int fd_conexion);

@@ -23,9 +23,11 @@ int32_t iniciar_servidor(char *puerto)
    return socket_servidor;
 }
 
-void esperar_cliente(int32_t fd_escucha, (void *)atender_cliente(int32_t))
+void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 {
    pthread_t thread;
+
+   // hace falta liberarlo en algun lado??
    int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
 
    *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);
@@ -48,6 +50,13 @@ int32_t recibir_cliente(int32_t fd_conexion)
       return -1;
    }
 
+   send(fd_conexion, &resultOk, sizeof(int32_t), 0);
    return id_modulo;
 }
 
+void recibir_mensaje(int fd_conexion)
+{
+   int32_t signal;
+   recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
+   printf("mensaje recibido: %d", signal);
+}

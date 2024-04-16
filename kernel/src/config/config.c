@@ -28,5 +28,5 @@ struct MEM get_memoria_config(t_config *config)
    mem_config.ip = config_get_string_value(config, "IP_MEMORIA");
    mem_config.puerto = config_get_string_value(config, "PUERTO_MEMORIA");
 
-   return mem_config
+   return mem_config;
 }

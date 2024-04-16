@@ -7,22 +7,27 @@
 
 void escuchar_kernel(int32_t fd_kernel)
 {
-    printf("Kernel conectado");
+    printf("Kernel conectado \n");
+    recibir_mensaje(fd_kernel);
 }
 
 void escuchar_cpu(int32_t fd_cpu)
 {
-    printf("CPU conectado");
+    printf("CPU conectado \n");
+    recibir_mensaje(fd_cpu);
 }
 
-void escuchar_interfaz_es(int32_t fd_e_s)
+void escuchar_interfaz_es(int32_t fd_es)
 {
-    printf("Interfaz E/S conectada");
+    printf("Interfaz E/S conectada \n");
+    recibir_mensaje(fd_es);
 }
 
-void atender_cliente(int32_t fd_conexion)
+void atender_cliente(void *fd_ptr)
 {
-    // handsake (para saber quienes el cliente)
+    int32_t fd_conexion = *((int32_t *)fd_ptr);
+
+    // atender handsake (para saber quienes el cliente)
     uint32_t modulo_cliente = recibir_cliente(fd_conexion);
 
     switch (modulo_cliente)
@@ -49,7 +54,10 @@ int main(void)
 
     int32_t fd_escucha = iniciar_servidor(puerto_escucha);
 
-    esperar_cliente(fd_escucha, &atender_cliente);
+    while (1)
+    {
+        esperar_cliente(fd_escucha, &atender_cliente);
+    }
 
     return 0;
 }
