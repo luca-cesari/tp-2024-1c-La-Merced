@@ -1,8 +1,8 @@
 #include "servidor.h"
 
-int iniciar_servidor(char *puerto)
+int32_t iniciar_servidor(char *puerto)
 {
-   int socket_servidor;
+   int32_t socket_servidor, error;
 
    struct addrinfo hints, *servinfo;
 
@@ -11,7 +11,8 @@ int iniciar_servidor(char *puerto)
    hints.ai_socktype = SOCK_STREAM;
    hints.ai_flags = AI_PASSIVE;
 
-   getaddrinfo(NULL, puerto, &hints, &servinfo);
+   // Hacer algo en caso de error (devolverlo capaz, o un exit())
+   error = getaddrinfo(NULL, puerto, &hints, &servinfo);
 
    socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
    bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
@@ -22,26 +23,31 @@ int iniciar_servidor(char *puerto)
    return socket_servidor;
 }
 
-int esperar_cliente(int socket_servidor)
+void esperar_cliente(int32_t fd_escucha, (void *)atender_cliente(int32_t))
 {
-   return accept(socket_servidor, NULL, NULL);
+   pthread_t thread;
+   int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
+
+   *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);
+   pthread_create(&thread, NULL, atender_cliente, fd_conexion_ptr);
+
+   pthread_detach(thread);
 }
 
-void recibir_mensaje(int fd_conexion)
+int32_t recibir_cliente(int32_t fd_conexion)
 {
-   ssize_t bytes;
-
-   int32_t handshake;
+   int32_t id_modulo;
    int32_t resultOk = 0;
    int32_t resultError = -1;
 
-   bytes = recv(fd_conexion, &handshake, sizeof(int32_t), MSG_WAITALL);
-   if (handshake == 1)
+   recv(fd_conexion, &id_modulo, sizeof(int32_t), MSG_WAITALL);
+
+   if (id_modulo < 0 || id_modulo > 3) // se escapa de los modulos
    {
-      bytes = send(fd_conexion, &resultOk, sizeof(int32_t), 0);
+      send(fd_conexion, &resultError, sizeof(int32_t), 0);
+      return -1;
    }
-   else
-   {
-      bytes = send(fd_conexion, &resultError, sizeof(int32_t), 0);
-   }
+
+   return id_modulo;
 }
+

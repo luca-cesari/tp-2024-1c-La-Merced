@@ -5,38 +5,10 @@
 #include <readline/readline.h>
 
 #include <commons/log.h>
-#include <commons/config.h>
 
 #include <sockets/cliente.h>
 
-struct cpu_conn
-{
-    char *ip;
-    char *puerto_dispatch;
-    char *puerto_interrupt;
-};
-
-// struct mem
-// {
-//     char *ip;
-//     char *puerto;
-// };
-
-t_config *iniciar_config(void)
-{
-    return config_create("kernel.config");
-}
-
-struct cpu_conn get_cpu_config(t_config *config)
-{
-    struct cpu_conn cpu_config;
-
-    cpu_config.ip = config_get_string_value(config, "IP_CPU");
-    cpu_config.puerto_dispatch = config_get_string_value(config, "PUERTO_CPU_DISPATCH");
-    cpu_config.puerto_interrupt = config_get_string_value(config, "PUERTO_CPU_INTERRUPT");
-
-    return cpu_config;
-}
+#include "config/config.h"
 
 int main(void)
 {

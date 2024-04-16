@@ -8,16 +8,18 @@
 void atender_cliente(int32_t fd_conexion)
 {
     // handsake (para saber quienes el cliente)
+    uint32_t modulo_cliente = recibir_cliente(fd_conexion);
+    printf("Modulo conectado: %d", modulo_cliente);
     // ver como hacer para registrar los clientes
-    // conectados, (algun diccionario global?)
+    // conectados, (algun diccionario global? para asociar, modulo con fd)
 
-    while (1)
-    {
-        // listen
-    }
+    // listen
+    // while (1)
+    // {
+    // }
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
     t_config *config = config_create("memoria.config");
     char *puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
