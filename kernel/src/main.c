@@ -19,6 +19,15 @@ void *atender_interfaz_es(void *arg)
 int main(void)
 {
     t_config *config = iniciar_config();
+
+    char *puerto_escucha = get_puerto_escucha(config);
+    int32_t fd_escucha = iniciar_servidor(puerto_escucha);
+    esperar_cliente(fd_escucha, &atender_interfaz_es);
+
+    // Por el momento se liberan los dos sockets asi nomas
+    // porque el proceso termina, pero cuando esté el modulo de
+    // I/O, se va a quedar escuchando
+
     struct CPU cpu = get_cpu_config(config);
 
     // Deberían ser variables globales (?
@@ -40,20 +49,9 @@ int main(void)
         liberar_conexion(cpu_interrupt);
         // lo mismo, habaría que manejarlo
     }
-    
-
-    char *puerto_escucha = get_puerto_escucha(config);
-    int32_t fd_escucha = iniciar_servidor(puerto_escucha);
-    esperar_cliente(fd_escucha, &atender_interfaz_es);
-
-    // Por el momento se liberan los dos sockets asi nomas
-    // porque el proceso termina, pero cuando esté el modulo de
-    // I/O, se va a quedar escuchando
-    liberar_conexion(cpu_dispatch);
-    liberar_conexion(cpu_interrupt);
 
 
-    //conexion con memoria 
+    //conexion con memoriar
     struct MEM mem = get_memoria_config(config);
 
     int32_t mem_peticion = crear_conexion(mem.ip, mem.puerto);
@@ -64,6 +62,10 @@ int main(void)
         liberar_conexion(mem_peticion);
         // lo mismo, habaría que manejarlo
     }
+
+    liberar_conexion(cpu_dispatch);
+    liberar_conexion(cpu_interrupt);
+    liberar_conexion(cpu_interrupt);
 
     return EXIT_SUCCESS;
 }
