@@ -58,5 +58,5 @@ void recibir_mensaje(int32_t fd_conexion)
 {
    int32_t signal;
    recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
-   printf("mensaje recibido: %d", signal);
+   printf("mensaje recibido: %d \n", signal);
 }
