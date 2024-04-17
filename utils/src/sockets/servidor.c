@@ -54,7 +54,7 @@ int32_t recibir_cliente(int32_t fd_conexion)
    return id_modulo;
 }
 
-void recibir_mensaje(int fd_conexion)
+void recibir_mensaje(int32_t fd_conexion)
 {
    int32_t signal;
    recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);

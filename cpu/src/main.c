@@ -9,34 +9,44 @@
 void hablar_con_memoria(int32_t fd_memoria)
 {
     printf("Memoria conectada \n");
-    liberar_conexion(fd_memoria);
+    recibir_mensaje(fd_memoria);
 }
 
-void escuchar_dispatch(void *fd_ptr)
+void *escuchar_dispatch(void *fd_ptr)
 {
     int32_t fd_dispatch = *((int32_t *)fd_ptr);
 
     if (recibir_cliente(fd_dispatch) != KERNEL)
     {
         printf("Error de Cliente \n");
-        return;
+        return NULL;
     }
 
     printf("Kernel conectado por Dispatch \n");
     recibir_mensaje(fd_dispatch);
+
+    return NULL;
 }
 
-void escuchar_interrupt(void *fd_ptr)
+void *escuchar_interrupt(void *fd_ptr)
 {
     int32_t fd_interrupt = *((int32_t *)fd_ptr);
     if (recibir_cliente(fd_interrupt) != KERNEL)
     {
         printf("Error de Cliente \n");
-        return;
+        return NULL;
     }
 
     printf("Kernel conectado por Interrupt \n");
     recibir_mensaje(fd_interrupt);
+
+    return NULL;
+}
+
+void *fn_block(void *arg)
+{
+    printf("new connexion \n");
+    return NULL;
 }
 
 int main(void)
@@ -48,6 +58,16 @@ int main(void)
 
     t_config *config = config_create("cpu.config");
 
+    // Escuchar al Kernel
+    puerto_dispatch = config_get_string_value(config, "PUERTO_ESCUCHA_DISPATCH");
+    puerto_interrupt = config_get_string_value(config, "PUERTO_ESCUCHA_INTERRUPT");
+
+    int32_t fd_escucha_dispatch = iniciar_servidor(puerto_dispatch);
+    esperar_cliente(fd_escucha_dispatch, &escuchar_dispatch);
+
+    int32_t fd_escucha_interrupt = iniciar_servidor(puerto_interrupt);
+    esperar_cliente(fd_escucha_interrupt, &escuchar_interrupt);
+
     // Conectar con memoria
     ip_memoria = config_get_string_value(config, "IP_MEMORIA");
     puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
@@ -58,22 +78,9 @@ int main(void)
     {
         printf("Error de conexion a memoria \n");
         liberar_conexion(fd_memoria);
-        exit(1);
+        return 1;
     }
-    else
-    {
-        hablar_con_memoria(fd_memoria);
-    }
-
-    // Escuchar al Kernel
-    puerto_dispatch = config_get_string_value(config, "PUERTO_ESCUCHA_DISPATCH");
-    puerto_interrupt = config_get_string_value(config, "PUERTO_ESCUCHA_INTERRUPT");
-
-    int32_t fd_escucha_dispatch = iniciar_servidor(puerto_dispatch);
-    esperar_cliente(fd_escucha_dispatch, &escuchar_dispatch);
-
-    int32_t fd_escucha_interrupt = iniciar_servidor(puerto_interrupt);
-    esperar_cliente(fd_escucha_interrupt, &escuchar_interrupt);
+    hablar_con_memoria(fd_memoria);
 
     liberar_conexion(fd_memoria);
     return 0;
