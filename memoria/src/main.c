@@ -23,7 +23,7 @@ void escuchar_interfaz_es(int32_t fd_es)
     recibir_mensaje(fd_es);
 }
 
-void atender_cliente(void *fd_ptr)
+void *atender_cliente(void *fd_ptr)
 {
     int32_t fd_conexion = *((int32_t *)fd_ptr);
 
@@ -43,8 +43,10 @@ void atender_cliente(void *fd_ptr)
         break;
     default:
         printf("Error de Cliente \n");
-        return;
+        return NULL;
     }
+
+    return NULL;
 }
 
 int main(void)
@@ -59,6 +61,5 @@ int main(void)
         esperar_cliente(fd_escucha, &atender_cliente);
     }
 
-    
     return 0;
 }
