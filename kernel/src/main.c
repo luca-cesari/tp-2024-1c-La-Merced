@@ -40,6 +40,7 @@ int main(void)
         liberar_conexion(cpu_interrupt);
         // lo mismo, habaría que manejarlo
     }
+    
 
     char *puerto_escucha = get_puerto_escucha(config);
     int32_t fd_escucha = iniciar_servidor(puerto_escucha);
@@ -50,6 +51,19 @@ int main(void)
     // I/O, se va a quedar escuchando
     liberar_conexion(cpu_dispatch);
     liberar_conexion(cpu_interrupt);
+
+
+    //conexion con memoria 
+    struct MEM mem = get_memoria_config(config);
+
+    int32_t mem_peticion = crear_conexion(mem.ip, mem.puerto);
+    int32_t res_mem_peticion = handshake(mem_peticion, KERNEL);
+    printf("%d", res_mem_peticion);
+    if (res_mem_peticion == -1)
+    {
+        liberar_conexion(mem_peticion);
+        // lo mismo, habaría que manejarlo
+    }
 
     return EXIT_SUCCESS;
 }

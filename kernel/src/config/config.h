@@ -14,6 +14,14 @@ struct MEM
    char *ip;
    char *puerto;
 };
+/*
+struct INTERF
+{
+   char tipo_interf;
+   int block_size;
+   int block_count;
+} 
+*/
 
 t_config *iniciar_config(void);
 char *get_puerto_escucha(t_config *config);
