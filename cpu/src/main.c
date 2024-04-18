@@ -8,7 +8,9 @@
 void hablar_con_memoria(int32_t fd_memoria)
 {
     printf("Memoria conectada \n");
-    recibir_mensaje(fd_memoria);
+    enviar_mensaje(fd_memoria, 21); // mensaje de prueba
+
+    recibir_mensaje(fd_memoria); // para bloquear nd mas
 }
 
 void *escuchar_dispatch(void *fd_ptr)
@@ -22,7 +24,10 @@ void *escuchar_dispatch(void *fd_ptr)
     }
 
     printf("Kernel conectado por Dispatch \n");
-    recibir_mensaje(fd_dispatch);
+    while (1)
+    {
+        recibir_mensaje(fd_dispatch);
+    }
 
     return NULL;
 }
@@ -37,7 +42,10 @@ void *escuchar_interrupt(void *fd_ptr)
     }
 
     printf("Kernel conectado por Interrupt \n");
-    recibir_mensaje(fd_interrupt);
+    while (1)
+    {
+        recibir_mensaje(fd_interrupt);
+    }
 
     return NULL;
 }

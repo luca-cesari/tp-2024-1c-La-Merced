@@ -9,12 +9,16 @@ void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
     recibir_mensaje(fd_kernel);
+
+    recibir_mensaje(fd_kernel); // block
 }
 
 void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
     recibir_mensaje(fd_cpu);
+
+    recibir_mensaje(fd_cpu); // block
 }
 
 void escuchar_interfaz_es(int32_t fd_es)

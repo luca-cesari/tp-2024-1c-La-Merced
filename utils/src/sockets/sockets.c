@@ -95,5 +95,10 @@ void recibir_mensaje(int32_t fd_conexion)
 {
    int32_t signal;
    recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
-   printf("mensaje recibido: %d \n", signal);
+   printf("[+] Recibido: %d ", signal);
+}
+
+void enviar_mensaje(int32_t fd_conexion, int32_t signal)
+{
+   send(fd_conexion, &signal, sizeof(int32_t), 0);
 }

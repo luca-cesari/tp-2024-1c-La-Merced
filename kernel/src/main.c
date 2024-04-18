@@ -18,7 +18,6 @@ void *atender_interfaz_es(void *fd_ptr)
     if (modulo_cliente != E_S)
     {
         printf("Error de Cliente \n");
-
         return NULL;
     }
 
@@ -40,14 +39,18 @@ int main(void)
     if (res_dispatch == -1) // Hace falta?
     {
         liberar_conexion(fd_dispatch);
+        return EXIT_FAILURE;
     }
+    enviar_mensaje(fd_dispatch, 10); // mensaje de prueba
 
     int32_t fd_interrupt = crear_conexion(cpu.ip, cpu.puerto_interrupt);
     int32_t res_interrupt = handshake(fd_interrupt, KERNEL);
     if (res_interrupt == -1)
     {
         liberar_conexion(fd_interrupt);
+        return EXIT_FAILURE;
     }
+    enviar_mensaje(fd_interrupt, 11); // mensaje de prueba
 
     // Funcion para manejar la conexion con la CPU
 
@@ -59,7 +62,9 @@ int main(void)
     if (res_memoria == -1)
     {
         liberar_conexion(fd_memoria);
+        return EXIT_FAILURE;
     }
+    enviar_mensaje(fd_memoria, 12); // mensaje de prueba
 
     // Escuchar Interfaces
     char *puerto_escucha = get_puerto_escucha(config);
