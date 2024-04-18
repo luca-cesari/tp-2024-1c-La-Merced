@@ -1,19 +1,16 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <pthread.h>
 #include <readline/readline.h>
 
 #include <commons/log.h>
 
-#include <sockets/servidor.h>
-#include <sockets/cliente.h>
+#include <sockets/sockets.h>
 
 #include "config/config.h"
 
 void *atender_interfaz_es(void *fd_ptr)
 {
     int32_t fd_conexion = *((int32_t *)fd_ptr);
+    free(fd_ptr); // Hace falta?
 
     // atender handsake (para saber quienes el cliente)
     uint32_t modulo_cliente = recibir_cliente(fd_conexion);
@@ -21,6 +18,7 @@ void *atender_interfaz_es(void *fd_ptr)
     if (modulo_cliente != E_S)
     {
         printf("Error de Cliente \n");
+
         return NULL;
     }
 
@@ -35,50 +33,45 @@ int main(void)
     t_config *config = iniciar_config();
 
     // Conexion con CPU
-    struct CPU cpu = get_cpu_config(config);
+    struct cpu_config cpu = get_cpu_config(config);
 
-    // Deberían ser variables globales (?
-    // y estar en rutinas diferentes (?, o sea hilos diferentes
-    int32_t cpu_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
-    int32_t res_cpu_dispatch = handshake(cpu_dispatch, KERNEL);
-    if (res_cpu_dispatch == -1)
+    int32_t fd_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
+    int32_t res_dispatch = handshake(fd_dispatch, KERNEL);
+    if (res_dispatch == -1) // Hace falta?
     {
-        liberar_conexion(cpu_dispatch);
-        // alguna forma de avisar que falló, o no c
-        // return EXIT_FAILURE ??
+        liberar_conexion(fd_dispatch);
     }
 
-    int32_t cpu_interrupt = crear_conexion(cpu.ip, cpu.puerto_interrupt);
-    int32_t res_cpu_interrupt = handshake(cpu_interrupt, KERNEL);
-    if (res_cpu_interrupt == -1)
+    int32_t fd_interrupt = crear_conexion(cpu.ip, cpu.puerto_interrupt);
+    int32_t res_interrupt = handshake(fd_interrupt, KERNEL);
+    if (res_interrupt == -1)
     {
-        liberar_conexion(cpu_interrupt);
-        // lo mismo, habaría que manejarlo
+        liberar_conexion(fd_interrupt);
     }
+
+    // Funcion para manejar la conexion con la CPU
 
     // Conexion con Memoria
-    struct MEM mem = get_memoria_config(config);
+    struct mem_config mem = get_memoria_config(config);
 
-    int32_t mem_peticion = crear_conexion(mem.ip, mem.puerto);
-    int32_t res_mem_peticion = handshake(mem_peticion, KERNEL);
-    if (res_mem_peticion == -1)
+    int32_t fd_memoria = crear_conexion(mem.ip, mem.puerto);
+    int32_t res_memoria = handshake(fd_memoria, KERNEL);
+    if (res_memoria == -1)
     {
-        liberar_conexion(mem_peticion);
-        // lo mismo, habaría que manejarlo
+        liberar_conexion(fd_memoria);
     }
 
     // Escuchar Interfaces
     char *puerto_escucha = get_puerto_escucha(config);
     int32_t fd_escucha = iniciar_servidor(puerto_escucha);
-
     while (1)
     {
         esperar_cliente(fd_escucha, &atender_interfaz_es);
     }
 
-    liberar_conexion(cpu_dispatch);
-    liberar_conexion(cpu_interrupt);
-    liberar_conexion(mem_peticion);
+    liberar_conexion(fd_dispatch);
+    liberar_conexion(fd_interrupt);
+    liberar_conexion(fd_memoria);
 
     return EXIT_SUCCESS;
 }

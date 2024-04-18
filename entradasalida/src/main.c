@@ -3,8 +3,7 @@
 
 #include <commons/config.h>
 
-#include <sockets/cliente.h>
-#include <sockets/servidor.h>
+#include <sockets/socket.h>
 
 int main(void)
 {

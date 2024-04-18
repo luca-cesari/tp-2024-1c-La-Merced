@@ -10,24 +10,24 @@ char *get_puerto_escucha(t_config *config)
    return config_get_string_value(config, "PUERTO_ESCUCHA");
 }
 
-struct CPU get_cpu_config(t_config *config)
+struct cpu_config get_cpu_config(t_config *config)
 {
-   struct CPU cpu_config;
+   struct cpu_config cpu_cfg;
 
-   cpu_config.ip = config_get_string_value(config, "IP_CPU");
-   cpu_config.puerto_dispatch = config_get_string_value(config, "PUERTO_CPU_DISPATCH");
-   cpu_config.puerto_interrupt = config_get_string_value(config, "PUERTO_CPU_INTERRUPT");
+   cpu_cfg.ip = config_get_string_value(config, "IP_CPU");
+   cpu_cfg.puerto_dispatch = config_get_string_value(config, "PUERTO_CPU_DISPATCH");
+   cpu_cfg.puerto_interrupt = config_get_string_value(config, "PUERTO_CPU_INTERRUPT");
 
-   return cpu_config;
+   return cpu_cfg;
 }
 
-struct MEM get_memoria_config(t_config *config)
+struct mem_config get_memoria_config(t_config *config)
 {
-   struct MEM mem_config;
+   struct mem_config mem_cfg;
 
-   mem_config.ip = config_get_string_value(config, "IP_MEMORIA");
-   mem_config.puerto = config_get_string_value(config, "PUERTO_MEMORIA");
+   mem_cfg.ip = config_get_string_value(config, "IP_MEMORIA");
+   mem_cfg.puerto = config_get_string_value(config, "PUERTO_MEMORIA");
 
-   return mem_config;
+   return mem_cfg;
 }
 

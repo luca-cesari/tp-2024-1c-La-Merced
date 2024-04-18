@@ -17,4 +17,10 @@ enum modulo
 int32_t iniciar_servidor(char *puerto);
 void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
 int32_t recibir_cliente(int32_t fd_conexion);
+
+int32_t crear_conexion(char *ip, char *puerto);
+int32_t handshake(int32_t fd_conexion, int32_t id_modulo);
+void liberar_conexion(int32_t socket_cliente);
+
 void recibir_mensaje(int32_t fd_conexion);
+// void enviar_mensaje(int32_t fd_conexion, char *mensaje);

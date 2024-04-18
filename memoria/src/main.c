@@ -3,7 +3,7 @@
 
 #include <commons/config.h>
 
-#include <sockets/servidor.h>
+#include <sockets/sockets.h>
 
 void escuchar_kernel(int32_t fd_kernel)
 {

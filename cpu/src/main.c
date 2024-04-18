@@ -3,8 +3,7 @@
 
 #include <commons/config.h>
 
-#include <sockets/servidor.h>
-#include <sockets/cliente.h>
+#include <sockets/sockets.h>
 
 void hablar_con_memoria(int32_t fd_memoria)
 {
@@ -40,12 +39,6 @@ void *escuchar_interrupt(void *fd_ptr)
     printf("Kernel conectado por Interrupt \n");
     recibir_mensaje(fd_interrupt);
 
-    return NULL;
-}
-
-void *fn_block(void *arg)
-{
-    printf("new connexion \n");
     return NULL;
 }
 
