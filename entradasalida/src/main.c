@@ -26,6 +26,6 @@ int main(void)
     enviar_mensaje(fd_memoria, 42);
 
     liberar_conexion(fd_kernel);
-    liberar_conexion(res_memoria);
+    liberar_conexion(fd_memoria);
     return 0;
 }

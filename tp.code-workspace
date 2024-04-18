@@ -6,7 +6,8 @@
 			"cstdint": "c",
 			"cstdlib": "c",
 			"chrono": "c",
-			"functional": "c"
+			"functional": "c",
+			"compare": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
 	},
