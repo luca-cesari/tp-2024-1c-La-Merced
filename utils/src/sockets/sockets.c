@@ -2,7 +2,7 @@
 
 int32_t iniciar_servidor(char *puerto)
 {
-   int32_t socket_servidor, error;
+   int32_t socket_servidor;
 
    struct addrinfo hints, *servinfo;
 
@@ -11,8 +11,7 @@ int32_t iniciar_servidor(char *puerto)
    hints.ai_socktype = SOCK_STREAM;
    hints.ai_flags = AI_PASSIVE;
 
-   // Hacer algo en caso de error (devolverlo capaz, o un exit())
-   error = getaddrinfo(NULL, puerto, &hints, &servinfo);
+   getaddrinfo(NULL, puerto, &hints, &servinfo);
 
    socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
    bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);

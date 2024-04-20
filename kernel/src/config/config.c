@@ -30,4 +30,3 @@ struct mem_config get_memoria_config(t_config *config)
 
    return mem_cfg;
 }
-

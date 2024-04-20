@@ -5,9 +5,12 @@
 
 #include <sockets/sockets.h>
 
-int main(void)
+int main(int argc, char **argv)
 {
-    t_config *config = config_create("entradasalida.config");
+    // char *nombre_interfaz = argv[1];
+    char *ruta_config = argv[2];
+
+    t_config *config = config_create(ruta_config);
 
     // Conectar con Kernel
     char *ip_kernel = config_get_string_value(config, "IP_KERNEL");
