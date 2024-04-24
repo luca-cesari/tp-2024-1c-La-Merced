@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include <readline/readline.h>
-
 #include <commons/log.h>
 
 #include <sockets/sockets.h>
 
 #include "config/config.h"
+#include "consola/consola.h"
 
 void *atender_interfaz_es(void *fd_ptr)
 {
@@ -29,12 +28,22 @@ void *atender_interfaz_es(void *fd_ptr)
 
 int main(void)
 {
+    // Temporal para probar nomas,
+    // no tiene q estar aca
+    iniciar_consola();
+
     t_config *config = iniciar_config();
+
+    int32_t fd_escucha;
+
+    int32_t fd_dispatch;
+    int32_t fd_interrupt;
+    int32_t fd_memoria;
 
     // Conexion con CPU
     struct cpu_config cpu = get_cpu_config(config);
 
-    int32_t fd_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
+    fd_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
     int32_t res_dispatch = handshake(fd_dispatch, KERNEL);
     if (res_dispatch == -1) // Hace falta?
     {
@@ -43,7 +52,7 @@ int main(void)
     }
     enviar_mensaje(fd_dispatch, 10); // mensaje de prueba
 
-    int32_t fd_interrupt = crear_conexion(cpu.ip, cpu.puerto_interrupt);
+    fd_interrupt = crear_conexion(cpu.ip, cpu.puerto_interrupt);
     int32_t res_interrupt = handshake(fd_interrupt, KERNEL);
     if (res_interrupt == -1)
     {
@@ -57,7 +66,7 @@ int main(void)
     // Conexion con Memoria
     struct mem_config mem = get_memoria_config(config);
 
-    int32_t fd_memoria = crear_conexion(mem.ip, mem.puerto);
+    fd_memoria = crear_conexion(mem.ip, mem.puerto);
     int32_t res_memoria = handshake(fd_memoria, KERNEL);
     if (res_memoria == -1)
     {
@@ -68,7 +77,7 @@ int main(void)
 
     // Escuchar Interfaces
     char *puerto_escucha = get_puerto_escucha(config);
-    int32_t fd_escucha = iniciar_servidor(puerto_escucha);
+    fd_escucha = iniciar_servidor(puerto_escucha);
     while (1)
     {
         esperar_cliente(fd_escucha, &atender_interfaz_es);
