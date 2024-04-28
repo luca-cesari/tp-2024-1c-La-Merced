@@ -1,13 +1,29 @@
 #include <stdlib.h>
 #include <commons/process.h>
+#include <commons/bitarray.h>
 
-struct PCB
+
+struct t_registro_cpu
+{
+   u_int8_t AX;
+   u_int8_t BX;
+   u_int8_t CX;
+   u_int8_t DX;
+   u_int32_t EAX;
+   u_int32_t EBX;
+   u_int32_t ECX;
+   u_int32_t EDX;
+};
+
+// algo que se va a mandar por dispatch
+// y hay q serializar
+struct t_pcb
 {
    int32_t pid;
    int32_t program_counter;
    u_int32_t quantum;
-   // cpu registers
+   t_registro_cpu registros_cpu;
+   t_bitarray *psw;
 };
 
-void crear_proceso();
-void destruir_proceso();
+t_pcb new_pcb();

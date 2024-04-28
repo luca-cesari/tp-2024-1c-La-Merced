@@ -42,6 +42,7 @@ void ejecutar_comando(char *operacion, char *argumento)
    {
       printf("Iniciar proceso \n");
       printf("Path del ejecutable: %s \n", argumento);
+      // crear_proceso(argumento); (nuevo hilo)
    }
    else if (strcmp(operacion, FINALIZAR_PROCESO) == 0)
    {
