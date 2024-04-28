@@ -8,7 +8,7 @@ void iniciar_consola()
 
    while (1)
    {
-      comando = readline(">");
+      comando = readline("> ");
       char **vec_comando = string_split(comando, " ");
 
       if (vec_comando[0] == NULL)
