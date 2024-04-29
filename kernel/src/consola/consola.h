@@ -1,8 +1,14 @@
+#ifndef CONSOLA_H
+#define CONSOLA_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <readline/readline.h>
 #include <commons/string.h>
+
+#include <planificador/planificador.h>
 
 #define EJECUTAR_SCRIPT "EJECUTAR_SCRIPT"
 #define INICIAR_PROCESO "INICIAR_PROCESO"
@@ -13,4 +19,6 @@
 #define PROCESO_ESTADO "PROCESO_ESTADO"
 
 void iniciar_consola();
-void ejecutar_comando(char *operacion, char *argumento);
+void ejecutar_comando(char *, char *);
+
+#endif // CONSOLA_H

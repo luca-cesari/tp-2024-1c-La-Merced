@@ -1,7 +1,9 @@
+#ifndef PROCESO_H
+#define PROCESO_H
+
 #include <stdlib.h>
 #include <commons/process.h>
 #include <commons/bitarray.h>
-
 
 struct t_registro_cpu
 {
@@ -17,13 +19,15 @@ struct t_registro_cpu
 
 // algo que se va a mandar por dispatch
 // y hay q serializar
-struct t_pcb
+typedef struct
 {
    int32_t pid;
    int32_t program_counter;
    u_int32_t quantum;
-   t_registro_cpu registros_cpu;
+   struct t_registro_cpu registros_cpu;
    t_bitarray *psw;
-};
+} t_pcb;
 
 t_pcb new_pcb();
+
+#endif // PROCESO_H

@@ -1,3 +1,6 @@
+#ifndef UTILS_SOCKETS_H
+#define UTILS_SOCKETS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -24,3 +27,5 @@ void liberar_conexion(int32_t socket_cliente);
 
 void recibir_mensaje(int32_t fd_conexion);
 void enviar_mensaje(int32_t fd_conexion, int32_t signal);
+
+#endif // UTILS_SOCKETS_H

@@ -6,6 +6,8 @@
 #include "config/config.h"
 #include "consola/consola.h"
 
+const int32_t *grado_multiprogramacion;
+
 void *atender_interfaz_es(void *fd_ptr)
 {
     int32_t fd_conexion = *((int32_t *)fd_ptr);
