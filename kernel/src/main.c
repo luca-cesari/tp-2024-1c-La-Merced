@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <commons/log.h>
-
 #include <sockets/sockets.h>
 
 #include "config/config.h"
+#include "logger/logger.h"
 #include "consola/consola.h"
-
-// const int32_t *grado_multiprogramacion;
 
 void *atender_interfaz_es(void *fd_ptr)
 {
@@ -35,6 +33,7 @@ int main(void)
     iniciar_consola();
 
     iniciar_config();
+    iniciar_logger();
 
     int32_t fd_escucha;
 
@@ -90,6 +89,7 @@ int main(void)
     liberar_conexion(fd_memoria);
 
     destruir_config();
+    destruir_logger();
 
     return EXIT_SUCCESS;
 }
