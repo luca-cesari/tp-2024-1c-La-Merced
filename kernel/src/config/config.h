@@ -18,9 +18,10 @@ struct mem_config
    char *puerto;
 };
 
-t_config *iniciar_config(void);
-char *get_puerto_escucha(t_config *);
-struct cpu_config get_cpu_config(t_config *);
-struct mem_config get_memoria_config(t_config *);
+void iniciar_config(void);
+char *get_puerto_escucha(void);
+struct cpu_config get_cpu_config(void);
+struct mem_config get_memoria_config(void);
+void destruir_config(void);
 
 #endif // KERNEL_CONFIG_H

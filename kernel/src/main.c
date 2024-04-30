@@ -34,7 +34,7 @@ int main(void)
     // no tiene q estar aca
     iniciar_consola();
 
-    t_config *config = iniciar_config();
+    iniciar_config();
 
     int32_t fd_escucha;
 
@@ -43,7 +43,7 @@ int main(void)
     int32_t fd_memoria;
 
     // Conexion con CPU
-    struct cpu_config cpu = get_cpu_config(config);
+    struct cpu_config cpu = get_cpu_config();
 
     fd_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
     int32_t res_dispatch = handshake(fd_dispatch, KERNEL);
@@ -66,7 +66,7 @@ int main(void)
     // Funcion para manejar la conexion con la CPU
 
     // Conexion con Memoria
-    struct mem_config mem = get_memoria_config(config);
+    struct mem_config mem = get_memoria_config();
 
     fd_memoria = crear_conexion(mem.ip, mem.puerto);
     int32_t res_memoria = handshake(fd_memoria, KERNEL);
@@ -78,7 +78,7 @@ int main(void)
     enviar_mensaje(fd_memoria, 12); // mensaje de prueba
 
     // Escuchar Interfaces
-    char *puerto_escucha = get_puerto_escucha(config);
+    char *puerto_escucha = get_puerto_escucha();
     fd_escucha = iniciar_servidor(puerto_escucha);
     while (1)
     {
@@ -88,6 +88,8 @@ int main(void)
     liberar_conexion(fd_dispatch);
     liberar_conexion(fd_interrupt);
     liberar_conexion(fd_memoria);
+
+    destruir_config();
 
     return EXIT_SUCCESS;
 }

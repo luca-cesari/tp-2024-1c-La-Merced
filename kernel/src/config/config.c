@@ -1,32 +1,39 @@
 #include "config.h"
 
-t_config *iniciar_config(void)
+t_config *kernel_config;
+
+void iniciar_config()
 {
-   return config_create(CONFIG_FILE);
+   kernel_config = config_create(CONFIG_FILE);
 }
 
-char *get_puerto_escucha(t_config *config)
+char *get_puerto_escucha()
 {
-   return config_get_string_value(config, "PUERTO_ESCUCHA");
+   return config_get_string_value(kernel_config, "PUERTO_ESCUCHA");
 }
 
-struct cpu_config get_cpu_config(t_config *config)
+struct cpu_config get_cpu_config()
 {
    struct cpu_config cpu_cfg;
 
-   cpu_cfg.ip = config_get_string_value(config, "IP_CPU");
-   cpu_cfg.puerto_dispatch = config_get_string_value(config, "PUERTO_CPU_DISPATCH");
-   cpu_cfg.puerto_interrupt = config_get_string_value(config, "PUERTO_CPU_INTERRUPT");
+   cpu_cfg.ip = config_get_string_value(kernel_config, "IP_CPU");
+   cpu_cfg.puerto_dispatch = config_get_string_value(kernel_config, "PUERTO_CPU_DISPATCH");
+   cpu_cfg.puerto_interrupt = config_get_string_value(kernel_config, "PUERTO_CPU_INTERRUPT");
 
    return cpu_cfg;
 }
 
-struct mem_config get_memoria_config(t_config *config)
+struct mem_config get_memoria_config()
 {
    struct mem_config mem_cfg;
 
-   mem_cfg.ip = config_get_string_value(config, "IP_MEMORIA");
-   mem_cfg.puerto = config_get_string_value(config, "PUERTO_MEMORIA");
+   mem_cfg.ip = config_get_string_value(kernel_config, "IP_MEMORIA");
+   mem_cfg.puerto = config_get_string_value(kernel_config, "PUERTO_MEMORIA");
 
    return mem_cfg;
+}
+
+void destruir_config()
+{
+   config_destroy(kernel_config);
 }
