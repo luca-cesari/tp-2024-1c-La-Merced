@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <commons/string.h>
-#include <commons/list.h>
+#include <commons/collections/list.h>
 #include <commons/log.h>
 
 #define LOG_FILE "kernel.log"
