@@ -21,13 +21,13 @@ struct t_registro_cpu
 // y hay q serializar
 typedef struct
 {
-   int32_t pid;
+   u_int32_t pid;
    int32_t program_counter;
    u_int32_t quantum;
    struct t_registro_cpu registros_cpu;
    t_bitarray *psw;
 } t_pcb;
 
-t_pcb new_pcb();
+t_pcb *new_pcb();
 
 #endif // PROCESO_H

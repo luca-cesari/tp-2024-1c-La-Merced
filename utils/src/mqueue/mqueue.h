@@ -11,7 +11,7 @@ typedef struct
     pthread_mutex_t mutex;
 } t_mutex_queue;
 
-t_mutex_queue *create_mutex_queue(void);
+t_mutex_queue *crear_mutex_queue(void);
 void *pop_mutex_queue(t_mutex_queue *);
 void *peek_mutex_queue(t_mutex_queue *);
 void push_mutex_queue(t_mutex_queue *, void *);

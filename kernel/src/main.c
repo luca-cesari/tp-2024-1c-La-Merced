@@ -6,7 +6,7 @@
 #include "config/config.h"
 #include "consola/consola.h"
 
-const int32_t *grado_multiprogramacion;
+// const int32_t *grado_multiprogramacion;
 
 void *atender_interfaz_es(void *fd_ptr)
 {

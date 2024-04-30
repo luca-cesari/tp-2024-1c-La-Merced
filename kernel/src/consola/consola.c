@@ -42,13 +42,7 @@ void ejecutar_comando(char *operacion, char *argumento)
    {
       printf("Iniciar proceso \n");
       printf("Path del ejecutable: %s \n", argumento);
-
-      // crear_proceso(argumento); (nuevo hilo)
-
-      pthread_t hilo;
-      pthread_create(&hilo, NULL, &crear_proceso, argumento);
-
-      pthread_detach(hilo);
+      crear_proceso(argumento);
    }
    else if (strcmp(operacion, FINALIZAR_PROCESO) == 0)
    {
@@ -58,15 +52,18 @@ void ejecutar_comando(char *operacion, char *argumento)
    else if (strcmp(operacion, INICIAR_PLANIFICACION) == 0)
    {
       printf("Iniciar planificacion \n");
+      iniciar_planificacion();
    }
    else if (strcmp(operacion, DETENER_PLANIFICACION) == 0)
    {
       printf("Detener planificacion \n");
+      detener_planificacion();
    }
    else if (strcmp(operacion, MULTIPROGRAMACION) == 0)
    {
       printf("Cambio de Multiprogramacion \n");
       printf("Grado de multiprogramacion: %s \n", argumento);
+      modificar_grado_multiprogramacion(atoi(argumento));
    }
    else if (strcmp(operacion, PROCESO_ESTADO) == 0)
    {
