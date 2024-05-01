@@ -17,7 +17,7 @@ void log_fetch_instruccion(u_int32_t pid, u_int32_t pc)
    log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pid, pc);
 }
 
-// void log_instruccion_ejecutada(u_int32_t pid, instruccion instruccion, parametros_t parametros){
+// void log_instruccion_ejecutada(u_int32_t pid, char* instruccion, char* parametros){
 
 //    log_info(cpu_logger, "PID: %d - Ejecutando:: %s - %s", pid, instruccion, parametros); // ver que tipo de dato son las instrucciones
 
@@ -40,17 +40,17 @@ void log_obtener_marco(u_int32_t pid, int numero_pagina, int numero_marco)
    log_info(cpu_logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d", pid, numero_pagina, numero_marco);
 }
 
-// void log_escritura_lectura_memoria(u_int32_t pid, accion accion, u_int8_t direccion_fisica, char* valor) // implementar tipo de dato accion
-// {
-//    switch (accion)
-//    {
-//    case LEER:
-//       log_info(cpu_logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", pid, valor);
-//    case ESCRIBIR:
-//       log_info(cpu_logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", pid, valor);
-//       return;
-//    default:
-//       return;
-//    }
+void log_escritura_lectura_memoria(u_int32_t pid, accion accion, u_int8_t direccion_fisica, char* valor)
+{
+   switch (accion)
+   {
+   case LEER:
+      log_info(cpu_logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", pid, valor);
+   case ESCRIBIR:
+      log_info(cpu_logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", pid, valor);
+      return;
+   default:
+      return;
+   }
    
-// }
+}

@@ -1,40 +1,34 @@
-#ifndef KERNEL_LOGGER_H
-#define KERNEL_LOGGER_H
+#ifndef CPU_LOGGER_H
+#define CPU_LOGGER_H
 
 #include <stdlib.h>
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <commons/log.h>
 
-#define LOG_FILE "kernel.log"
+#define LOG_FILE "cpu.log"
 
-#define NEW "NEW"
-#define READY "READY"
-#define EXEC "EXEC"
-#define BLOCKED "BLOCKED"
-#define EXIT "EXIT"
-
+// faltan instrucciones, estas con las del primer checkpoint, ver si se implementa asi lo de pedir la insrtuccion o no
+#define SET "SET"
+#define SUM "SUM"
+#define SUB "SUB"
+#define JNZ "JNZ"
+#define IO_GEN_SLEEP "IO_GEN_SLEEP"
 typedef enum
 {
-   SUCCESS,
-   INVALID_RESOURCE,
-   INVALID_WRITE
-} motivo_finalizacion;
-
-typedef enum
-{
-   INTERFAZ,
-   RECURSO
-} motivo_bloqueo;
+   LEER,
+   ESCRIBIR
+} accion;
 
 void iniciar_logger(void);
 void destruir_logger(void);
 
-void log_creacion_proceso(u_int32_t);
-void log_finalizacion_proceso(u_int32_t, motivo_finalizacion);
-void log_cambio_de_estado(u_int32_t, char *, char *);
-void log_motivo_bloqueo(u_int32_t, motivo_bloqueo, char *);
-void log_fin_de_quantum(u_int32_t);
-void log_ingreso_a_ready(void); // void para q compile, hay q ver si usar list o array
+void log_fetch_instruccion(u_int32_t , u_int32_t );
+// void log_instruccion_ejecutada(u_int32_t pid, char* instruccion, char* parametros) // ver que onda la instuccion y los parametros
+void log_tlb_hit(u_int32_t , int );
+void log_tlb_miss(u_int32_t , int ); //ver si se abstrae con el hit
+void log_obtener_marco(u_int32_t , int , int );
+void log_escritura_lectura_memoria(u_int32_t , accion , u_int8_t , char* ); // ver si la implementaicon de leer esbribir queda asi
+
 
 #endif // KERNEL_LOGGER_H
