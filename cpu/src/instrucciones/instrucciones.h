@@ -1,9 +1,19 @@
+#ifndef INSTRUCCIONES_H
+#define INSTRUCCIONES_H
+#include <registros.h>
+#include <stdlib.h>
 
-void instruction_fetch ();
-void instruction_decode();
-void instruction_execute();
-void check_interrupt ();
+// void instruction_fetch ();
+// void instruction_decode();
+// void instruction_execute();
+// void check_interrupt ();
 
+// ver porque los registros pueden ser de 32 o 8 bits => de que tipo son
+// void SET(Registro, int valor);
+// void SUM(Registro Destino, Registro Origen);
+// void SUB(Registro Destino, Registro Origen);
+// void JNZ(Registro, Instrucción);
+// void IO_GEN_SLEEP(Interfaz, int unidades_trabajo);
 
 
 //Instrucciones
@@ -27,3 +37,5 @@ void check_interrupt ();
 // IO_FS_WRITE (Interfaz, Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo)
 // IO_FS_READ (Interfaz, Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo)
 // EXIT
+
+#endif // INSTRUCCIONES_H

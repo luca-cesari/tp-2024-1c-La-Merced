@@ -2,7 +2,7 @@
 #define REGISTROS_H
 #include <stdlib.h>
 
-struct t_registro_cpu
+struct s_registro_cpu
 {
    u_int32_t PC;
    u_int8_t AX;
