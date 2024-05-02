@@ -6,9 +6,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <mqueue/mqueue.h>
-
-// temporal
-#include <proceso/proceso.h>
+#include <protocols/pcb.h>
 
 /**
  * @fn inicializar_planificador
