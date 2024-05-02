@@ -42,7 +42,7 @@ int main(void)
     int32_t fd_memoria;
 
     // Conexion con CPU
-    struct cpu_config cpu = get_cpu_config();
+    cpu_config cpu = get_cpu_config();
 
     fd_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
     int32_t res_dispatch = handshake(fd_dispatch, KERNEL);
@@ -65,7 +65,7 @@ int main(void)
     // Funcion para manejar la conexion con la CPU
 
     // Conexion con Memoria
-    struct mem_config mem = get_memoria_config();
+    mem_config mem = get_memoria_config();
 
     fd_memoria = crear_conexion(mem.ip, mem.puerto);
     int32_t res_memoria = handshake(fd_memoria, KERNEL);
