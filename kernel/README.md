@@ -22,7 +22,7 @@
 
 ### Consola
 
-- [ ] Implementar EJECUTAR_SCRIPT
+- [X] Implementar EJECUTAR_SCRIPT (Esta implementado pero hay que testear)
 - [ ] Implementar PROCESO_ESTADO
 
 ## Notas
