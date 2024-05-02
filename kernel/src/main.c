@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <commons/log.h>
 #include <sockets/sockets.h>
 
 #include "config/config.h"
