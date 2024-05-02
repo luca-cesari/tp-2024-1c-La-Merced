@@ -1,6 +1,7 @@
 #include "config.h"
 
 t_config *kernel_config;
+t_dictionary *recursos;
 
 void iniciar_config(void)
 {
@@ -49,32 +50,37 @@ algoritmo_planificacion get_algoritmo_planificacion(void)
    return -1;
 }
 
-uint32_t get_quantum(void)
+u_int32_t get_quantum(void)
 {
    return config_get_int_value(kernel_config, "QUANTUM");
 }
 
 t_dictionary *get_recursos(void)
 {
-   t_dictionary *map_recursos = dictionary_create();
+   t_dictionary *recursos = dictionary_create();
 
-   char **recursos = config_get_array_value(kernel_config, "RECURSOS");
+   char **nombres = config_get_array_value(kernel_config, "RECURSOS");
    char **instancias = config_get_array_value(kernel_config, "INSTANCIAS_RECURSOS");
 
-   for (int i = 0; recursos[i] != NULL; i++)
+   for (int i = 0; nombres[i] != NULL; i++)
    {
-      dictionary_put(map_recursos, recursos[i], atoi(instancias[i]);
+      u_int32_t *valor_instancia = malloc(sizeof(u_int32_t));
+      *valor_instancia = atoi(instancias[i]);
+      dictionary_put(recursos, nombres[i], valor_instancia);
    }
 
-   return map_recursos;
+   return recursos;
 }
 
-uint32_t get_grado_multiprogramacion(void)
+u_int32_t get_grado_multiprogramacion(void)
 {
    return config_get_int_value(kernel_config, "GRADO_MULTIPROGRAMACION");
 }
 
 void destruir_config(void)
 {
+   if (recursos != NULL)
+      dictionary_destroy(recursos);
+
    config_destroy(kernel_config);
 }

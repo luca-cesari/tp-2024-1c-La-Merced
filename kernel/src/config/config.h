@@ -33,9 +33,9 @@ char *get_puerto_escucha(void);
 cpu_config get_cpu_config(void);
 mem_config get_memoria_config(void);
 algoritmo_planificacion get_algoritmo_planificacion(void);
-uint32_t get_quantum(void);
+u_int32_t get_quantum(void);
 t_dictionary *get_recursos(void);
-uint32_t get_grado_multiprogramacion(void);
+u_int32_t get_grado_multiprogramacion(void);
 void destruir_config(void);
 
 #endif // KERNEL_CONFIG_H
