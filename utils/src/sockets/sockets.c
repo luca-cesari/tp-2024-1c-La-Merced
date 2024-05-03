@@ -1,6 +1,6 @@
 #include "sockets.h"
 
-int32_t iniciar_servidor(char *puerto)
+int32_t crear_servidor(char *puerto)
 {
    int32_t socket_servidor;
 
