@@ -1,5 +1,5 @@
-#ifndef KERNEL_CONEXION_MEM_H
-#define KERNEL_CONEXION_MEM_H
+#ifndef CONEXION_MEMORIA_H
+#define CONEXION_MEMORIA_H
 
 #include <stdlib.h>
 #include <sockets/sockets.h>
@@ -23,4 +23,4 @@ int8_t conectar_con_memoria();
  */
 void liberar_conexion_memoria();
 
-#endif // KERNEL_CONEXION_MEM_H
+#endif // CONEXION_MEMORIA_H

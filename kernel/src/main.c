@@ -26,9 +26,6 @@ void *atender_interfaz_es(void *fd_ptr)
 
 int main(void)
 {
-    // Temporal para probar nomas,
-    // no tiene q estar aca
-
     iniciar_config();
     iniciar_logger();
 

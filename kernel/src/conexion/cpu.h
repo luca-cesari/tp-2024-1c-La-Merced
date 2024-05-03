@@ -1,5 +1,5 @@
-#ifndef KERNEL_CONEXION_CPU_H
-#define KERNEL_CONEXION_CPU_H
+#ifndef CONEXION_CPU_H
+#define CONEXION_CPU_H
 
 #include <stdlib.h>
 #include <sockets/sockets.h>
@@ -45,4 +45,4 @@ t_pcb *recibir_pcb();
  */
 void liberar_conexion_cpu();
 
-#endif // KERNEL_CONEXION_CPU_H
+#endif // CONEXION_CPU_H

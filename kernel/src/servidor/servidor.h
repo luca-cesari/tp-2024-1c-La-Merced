@@ -1,0 +1,4 @@
+#ifndef KERNEL_SERVIDOR_H
+#define KERNEL_SERVIDOR_H
+
+#endif // KERNEL_SERVIDOR_H
