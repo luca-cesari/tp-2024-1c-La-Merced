@@ -1,7 +1,7 @@
-#include <sockets/sockets.h>
-
 #include "config/config.h"
 #include "logger/logger.h"
+#include "conexion/cpu.h"
+#include "conexion/memoria.h"
 #include "consola/consola.h"
 
 void *atender_interfaz_es(void *fd_ptr)
@@ -28,53 +28,24 @@ int main(void)
 {
     // Temporal para probar nomas,
     // no tiene q estar aca
-    iniciar_consola();
 
     iniciar_config();
     iniciar_logger();
 
     int32_t fd_escucha;
 
-    int32_t fd_dispatch;
-    int32_t fd_interrupt;
-    int32_t fd_memoria;
-
-    // Conexion con CPU
-    cpu_config cpu = get_cpu_config();
-
-    fd_dispatch = crear_conexion(cpu.ip, cpu.puerto_dispatch);
-    int32_t res_dispatch = handshake(fd_dispatch, KERNEL);
-    if (res_dispatch == -1) // Hace falta?
-    {
-        liberar_conexion(fd_dispatch);
+    // Capaz es un poco confuso la expresion del condicional
+    // pero básicamente falla en caso de -1 (o sea, true)
+    if (conectar_por_dispatch()) // Conexion con CPU
         return EXIT_FAILURE;
-    }
-    enviar_mensaje(fd_dispatch, 10); // mensaje de prueba
 
-    fd_interrupt = crear_conexion(cpu.ip, cpu.puerto_interrupt);
-    int32_t res_interrupt = handshake(fd_interrupt, KERNEL);
-    if (res_interrupt == -1)
-    {
-        liberar_conexion(fd_interrupt);
+    if (conectar_por_interrupt()) // Conexion con CPU
         return EXIT_FAILURE;
-    }
-    enviar_mensaje(fd_interrupt, 11); // mensaje de prueba
 
-    // Funcion para manejar la conexion con la CPU
-
-    // Conexion con Memoria
-    mem_config mem = get_memoria_config();
-
-    fd_memoria = crear_conexion(mem.ip, mem.puerto);
-    int32_t res_memoria = handshake(fd_memoria, KERNEL);
-    if (res_memoria == -1)
-    {
-        liberar_conexion(fd_memoria);
+    if (conectar_con_memoria()) // Conexion con Memoria
         return EXIT_FAILURE;
-    }
-    enviar_mensaje(fd_memoria, 12); // mensaje de prueba
 
-    // Escuchar Interfaces
+    // Escuchar Interfaces (Tiene que ser rutina en un hilo aparte, no puede bloquear el hilo principal)
     char *puerto_escucha = get_puerto_escucha();
     fd_escucha = iniciar_servidor(puerto_escucha);
     while (1)
@@ -82,9 +53,10 @@ int main(void)
         esperar_cliente(fd_escucha, &atender_interfaz_es);
     }
 
-    liberar_conexion(fd_dispatch);
-    liberar_conexion(fd_interrupt);
-    liberar_conexion(fd_memoria);
+    iniciar_consola(); // bloqueante (corre sobre este hilo)
+
+    liberar_conexion_cpu();
+    liberar_conexion_memoria();
 
     destruir_config();
     destruir_logger();
