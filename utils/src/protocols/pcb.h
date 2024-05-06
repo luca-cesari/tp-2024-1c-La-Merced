@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <commons/bitarray.h>
+
 #include "registers.h"
 
 typedef struct
@@ -13,12 +14,13 @@ typedef struct
    u_int32_t quantum;
    t_registers cpu_registers;
    t_bitarray *psw;
+   char *executable_path;
 } t_pcb;
 
 // Los argumentos de las funciones me los autocompleto copilot
 // habria q revisar
 
-t_pcb *pcb_create();
+t_pcb *pcb_create(char *executable_path);
 
 void pcb_serialize(t_pcb *pcb, void **buffer, size_t *buffer_size);
 void pcb_unserialize(t_pcb *pcb, void *buffer, size_t buffer_size);
