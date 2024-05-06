@@ -8,11 +8,14 @@
 #include <mqueue/mqueue.h>
 #include <protocols/pcb.h>
 
+#include "logger/logger.h"
+#include "estados/estados.h"
+
 /**
  * @fn inicializar_planificador
  * @brief Inicializa el planificador del kernel.
  *
- * * Crea las colas de estados.
+ * * Crea los estados.
  * * Crea los semaforos necesarios.
  * * Lanza las rutinas de planificacion (crea los hilos).
  */
@@ -30,14 +33,18 @@ void detener_planificacion();
  */
 void modificar_grado_multiprogramacion(u_int8_t);
 
-void crear_proceso(char *);
+/**
+ * @brief Función encargada de generar un PCB y encolarlo para ser planificado.
+ * @param ruta_ejecutable Ruta del archivo ejecutable.
+ */
+void ingresar_proceso(char *);
 
 /**
- * @fn pasar_a_ready
+ * @fn crear_proceso
  * @brief Planificador largo plazo, pasa de new a ready.
  *        No se ocupa de la transicion de bloqueado a ready
  */
-void *pasar_a_ready();
+void *crear_proceso();
 void pasar_a_exit(u_int32_t);
 // ...
 void *finalizar_proceso();

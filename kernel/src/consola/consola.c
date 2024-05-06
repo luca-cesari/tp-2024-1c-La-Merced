@@ -94,7 +94,7 @@ void ejecutar_comando(char *operacion, char *argumento)
    {
       printf("Iniciar proceso \n");
       printf("Path del ejecutable: %s \n", argumento);
-      crear_proceso(argumento);
+      ingresar_proceso(argumento);
       return;
    }
 

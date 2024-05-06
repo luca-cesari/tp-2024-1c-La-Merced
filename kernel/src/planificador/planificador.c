@@ -3,38 +3,21 @@
 // ver si va aca, puede q si, puede q no
 sem_t grado_multiprogramacion;
 
-sem_t puede_planificar;
-sem_t hay_proceso_en_new;
-sem_t hay_proceso_en_ready;
-sem_t hay_proceso_en_exit;
-
-t_mutex_queue *cola_new;
-t_mutex_queue *cola_ready;
-t_mutex_queue *cola_exec;
-
-// quiza no es correcto una cola de bloqueados
-// capaz hay q implementar de otra forma
-t_mutex_queue *cola_blocked;
-
-t_mutex_queue *cola_exit;
+q_new *cola_new;
+q_ready *cola_ready;
 
 void inicializar_planificador()
 {
    sem_init(&grado_multiprogramacion, 0, 5); // valor inicial depende del config
-   sem_init(&puede_planificar, 0, 0);
-   sem_init(&hay_proceso_en_new, 0, 0);
-   sem_init(&hay_proceso_en_ready, 0, 0);
-   sem_init(&hay_proceso_en_exit, 0, 0);
 
-   cola_new = crear_mutex_queue();
-   cola_ready = crear_mutex_queue();
-   cola_exec = crear_mutex_queue();
-   cola_blocked = crear_mutex_queue();
-   cola_exit = crear_mutex_queue();
+   cola_new = crear_estado_new();
+   cola_ready = crear_estado_ready();
 
-   pthread_t rutina_proceso_nuevo;
-   pthread_create(&rutina_proceso_nuevo, NULL, &pasar_a_ready, NULL);
-   pthread_detach(rutina_proceso_nuevo);
+   // .........................
+
+   pthread_t rutina_crear_proceso;
+   pthread_create(&rutina_crear_proceso, NULL, &crear_proceso, NULL);
+   pthread_detach(rutina_crear_proceso);
 
    pthread_t rutina_finalizar_proceso;
    pthread_create(&rutina_finalizar_proceso, NULL, &finalizar_proceso, NULL);
@@ -46,50 +29,41 @@ void inicializar_planificador()
 void destruir_planificador()
 {
    sem_destroy(&grado_multiprogramacion);
-   sem_destroy(&puede_planificar);
-   sem_destroy(&hay_proceso_en_new);
-   sem_destroy(&hay_proceso_en_ready);
-
-   destruir_mutex_queue(cola_new);
-   destruir_mutex_queue(cola_ready);
-   destruir_mutex_queue(cola_exec);
-   destruir_mutex_queue(cola_blocked);
-   destruir_mutex_queue(cola_exit);
+   destruir_estado_new(cola_new);
+   destruir_estado_ready(cola_ready);
 }
 
 void iniciar_planificacion()
 {
-   sem_post(&puede_planificar);
 }
 
 void detener_planificacion()
 {
-   sem_wait(&puede_planificar);
 }
 
 void modificar_grado_multiprogramacion(u_int8_t nuevo_grado) {}
 
-void crear_proceso(char *ruta)
+void ingresar_proceso(char *ruta_ejecutable)
 {
-   // crea pcb y encola
-   // ... (peticiones a memoria, hace todo lo que tiene q hacer)
-
-   sem_post(&hay_proceso_en_new);
+   t_pcb *pcb = pcb_create(ruta_ejecutable);
+   log_creacion_proceso(pcb->pid);
+   push_proceso_nuevo(cola_new, pcb);
 }
 
-void *pasar_a_ready()
+void *crear_proceso()
 {
    while (1)
    {
-      sem_wait(&puede_planificar);
-      sem_wait(&hay_proceso_en_new);
+      t_pcb *pcb = pop_proceso_nuevo(cola_new);
+
+      // tiene q pedir cosas a la memoria y esperar a que responda
+      // !! contemplar si falla (debería pasar directo a EXIT?)
+      // break;
+
+      // ver si puede planificar o no,
+      // o sea, si esta en pausa o no la planificacion
       sem_wait(&grado_multiprogramacion);
-
-      t_pcb *pcb = pop_mutex_queue(cola_new);
-      push_mutex_queue(cola_ready, pcb);
-
-      sem_post(&hay_proceso_en_ready);
-      // ...
+      push_proceso_ready(cola_ready, pcb);
    }
 
    return NULL;
@@ -109,7 +83,7 @@ void pasar_a_exit(u_int32_t pid)
    // elige un proceso a su criterio,
    // pero de alguna forma lo tiene q popear y encolar a exec
 
-   sem_post(&hay_proceso_en_exit);
+   // sem_post(&hay_proceso_en_exit);
    //...
 }
 
@@ -117,7 +91,7 @@ void *finalizar_proceso()
 {
    while (1)
    {
-      sem_wait(&hay_proceso_en_exit);
+      // sem_wait(&hay_proceso_en_exit);
 
       // t_pcb *pcb = pop_mutex_queue(cola_exit);
       // libera memoria y esas cosas

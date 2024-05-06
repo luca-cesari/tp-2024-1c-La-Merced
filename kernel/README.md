@@ -29,6 +29,10 @@
 
 ## Notas
 
+### Manejo de Estados
+
+- Crear estructuras de estados en lugar de usar colas simples
+
 ### Manejo de Interfaces I/O
 
 Idea para manejar el estado blocked respecto de las interfaces I/O:
