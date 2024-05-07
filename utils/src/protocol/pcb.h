@@ -1,5 +1,5 @@
-#ifndef UTILS_PROTOCOLS_PCB_H
-#define UTILS_PROTOCOLS_PCB_H
+#ifndef UTILS_PROTOCOL_PCB_H
+#define UTILS_PROTOCOL_PCB_H
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,4 +31,4 @@ t_pcb *pcb_recv(int32_t fd_conexion);
 // me lo recomendo copilot, ni idea si hace falta, creo q si
 void pcb_destroy(t_pcb *pcb);
 
-#endif // UTILS_PROTOCOLS_PCB_H
+#endif // UTILS_PROTOCOL_PCB_H

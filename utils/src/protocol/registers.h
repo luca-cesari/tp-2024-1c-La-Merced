@@ -1,5 +1,5 @@
-#ifndef UTILS_PROTOCOLS_REGISTERS_H
-#define UTILS_PROTOCOLS_REGISTERS_H
+#ifndef UTILS_PROTOCOL_REGISTERS_H
+#define UTILS_PROTOCOL_REGISTERS_H
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,4 +26,4 @@ t_registers registers_create();
 void registers_serialize(t_registers *registers, void **buffer, size_t *buffer_size);
 void registers_unserialize(t_registers *registers, void *buffer, size_t buffer_size);
 
-#endif // UTILS_PROTOCOLS_REGISTROS_H
+#endif // UTILS_PROTOCOL_REGISTROS_H
