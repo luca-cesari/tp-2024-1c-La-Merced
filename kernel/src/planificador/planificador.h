@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <mqueue/mqueue.h>
-#include <protocols/pcb.h>
+#include <protocol/pcb.h>
 
 #include "logger/logger.h"
 #include "estados/estados.h"
@@ -55,7 +55,7 @@ void *crear_proceso();
  * @param pcb PCB del proceso a finalizar.
  * @param q_flag Flag que indica el estado de donde fue llamado.
  */
-void pasar_a_exit(t_pcb *pcb, char* q_flag);
+void pasar_a_exit(t_pcb *pcb, char *q_flag);
 
 // ...
 void *finalizar_proceso();

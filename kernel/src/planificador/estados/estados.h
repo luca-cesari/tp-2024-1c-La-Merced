@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <semaphore.h>
-#include <protocols/pcb.h>
+#include <protocol/pcb.h>
 #include <mqueue/mqueue.h>
 
 // Ver si crear todos los structs aca
