@@ -1,6 +1,7 @@
 #include "memoria.h"
 
 int32_t fd_memoria;
+pthread_mutex_t mutex_memoria;
 
 int8_t conectar_con_memoria()
 {
@@ -13,6 +14,39 @@ int8_t conectar_con_memoria()
       liberar_conexion(fd_memoria);
       return -1;
    }
+
+   pthread_mutex_init(&mutex_memoria, NULL);
+   return 0;
+}
+
+int8_t reservar_paginas(t_pcb *pcb)
+{
+   pthread_mutex_lock(&mutex_memoria);
+   pcb_send(fd_memoria, pcb);
+   // t_pcb *header = pcb_recv(fd_memoria);
+   pthread_mutex_unlock(&mutex_memoria);
+
+   // if (header->tipo == ERROR)
+   // {
+   //    printf("Error al reservar paginas\n");
+   //    exit(EXIT_FAILURE);
+   // }
+
+   return 0;
+}
+
+int8_t liberar_memoria(t_pcb *pcb)
+{
+   pthread_mutex_lock(&mutex_memoria);
+   pcb_send(fd_memoria, pcb);
+   // t_pcb *header = pcb_recv(fd_memoria);
+   pthread_mutex_unlock(&mutex_memoria);
+
+   // if (header->tipo == ERROR)
+   // {
+   //    printf("Error al liberar memoria\n");
+   //    exit(EXIT_FAILURE);
+   // }
 
    return 0;
 }

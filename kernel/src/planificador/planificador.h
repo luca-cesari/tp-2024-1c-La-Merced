@@ -10,6 +10,8 @@
 
 #include "logger/logger.h"
 #include "estados/estados.h"
+#include "conexion/cpu.h"
+#include "conexion/memoria.h"
 
 /**
  * @fn inicializar_planificador
@@ -31,13 +33,13 @@ void detener_planificacion();
  * 1. Que hacer con los procesos encolados (ready, exec y blocked)?
  * 2. Supuestamente grado_multiprogramación es un recurso compartido que varios hilos consumen, si lo quiero modificar en tiempo de ejecución, debería usar mutex?
  */
-void modificar_grado_multiprogramacion(u_int8_t);
+void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
 
 /**
  * @brief Función encargada de generar un PCB y encolarlo para ser planificado.
  * @param ruta_ejecutable Ruta del archivo ejecutable.
  */
-void ingresar_proceso(char *);
+void ingresar_proceso(char *ruta_ejecutable);
 
 /**
  * @fn crear_proceso
@@ -45,7 +47,16 @@ void ingresar_proceso(char *);
  *        No se ocupa de la transicion de bloqueado a ready
  */
 void *crear_proceso();
-void pasar_a_exit(u_int32_t);
+
+/**
+ * @brief Indica la finalización de un proceso.
+ *        Recibe un PCB y lo pasa a la cola de exit.
+ *
+ * @param pcb PCB del proceso a finalizar.
+ * @param q_flag Flag que indica el estado de donde fue llamado.
+ */
+void pasar_a_exit(t_pcb *pcb, char* q_flag);
+
 // ...
 void *finalizar_proceso();
 

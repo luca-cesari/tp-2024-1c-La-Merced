@@ -2,7 +2,9 @@
 #define CONEXION_MEMORIA_H
 
 #include <stdlib.h>
+#include <pthread.h>
 #include <sockets/sockets.h>
+#include <protocols/pcb.h>
 
 #include "config/config.h"
 
@@ -14,9 +16,23 @@
  */
 int8_t conectar_con_memoria();
 
-// Ni idea todavía qué operaciones tiene que poder hacer con la memoria,
-// serán cosas de pedir y recibir páginas, pero desconozco el formato y
-// la implementación.
+/**
+ * @brief En principio sera un send y recive simple
+ *        donde la memoria responda segun si la reserva
+ *        fue exitosa o no.
+ *
+ * @return int32_t : 0 si la conexion fue exitosa, -1 si hubo un error
+ */
+int8_t reservar_paginas(t_pcb *);
+
+/**
+ * @brief Notifica a la memoria que se liberen las paginas
+ *        reservadas, operacion a realizar cuando finaliza
+ *        un proceso.
+ *
+ * @return int32_t : 0 si la conexion fue exitosa, -1 si hubo un error
+ */
+int8_t liberar_memoria(t_pcb *);
 
 /**
  * @brief Libera la conexion con el módulo Memoria
