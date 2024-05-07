@@ -25,8 +25,8 @@ t_pcb *pcb_create(char *executable_path);
 void pcb_serialize(t_pcb *pcb, void **buffer, size_t *buffer_size);
 void pcb_unserialize(t_pcb *pcb, void *buffer, size_t buffer_size);
 
-void pcb_send(int32_t fd, t_pcb *pcb);
-t_pcb *pcb_recv(int32_t fd);
+void pcb_send(int32_t fd_conexion, t_pcb *pcb);
+t_pcb *pcb_recv(int32_t fd_conexion);
 
 // me lo recomendo copilot, ni idea si hace falta, creo q si
 void pcb_destroy(t_pcb *pcb);
