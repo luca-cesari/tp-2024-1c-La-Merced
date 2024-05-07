@@ -4,7 +4,7 @@
 
 ### Generales
 
-- [ ] Definir los motivos de finalización para el planificador en lugar de el logger.
+- [ ] Definir los motivos de finalización para el planificador en lugar del logger.
 - [ ] Implementar función `log_ingreso_a_ready()` (logger/logger.c)
 - [ ] Testear la config:
   - Si devuelven lo que tienen que devolver
@@ -16,7 +16,7 @@
 - [ ] Revisar los header files, documentar y definir nombres de parámetros en caso de ser necesario.
 - [ ] Implementar servidor para las interfaces (sacarlo del main y lanzar las rutinas correspondientes)
 
-## Conexiones
+### Conexiones
 
 - [ ] Implementar (para las conexiones compartidas entre hilos) mutex.
 - [ ] Implementar operaciones con memoria
@@ -36,7 +36,7 @@
 ## Problemas
 
 - Mucho código repetido en los estados (son casi todos iguales)
-- Definición de estados de proceso en el logger, capaz es mejor definilo en otro lugar y consumirlo en logger y plenificador (sería más correcto conceptualmente)
+- Definición de estados de proceso en el logger, capaz es mejor definilo en otro lugar y consumirlo en logger y planificador (sería más correcto conceptualmente)
 
 ## Notas
 

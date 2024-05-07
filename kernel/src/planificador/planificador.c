@@ -5,6 +5,7 @@ sem_t grado_multiprogramacion;
 
 q_new *cola_new;
 q_ready *cola_ready;
+q_exec *cola_exec;
 q_exit *cola_exit;
 
 void inicializar_planificador()
@@ -13,6 +14,7 @@ void inicializar_planificador()
 
    cola_new = crear_estado_new();
    cola_ready = crear_estado_ready();
+   cola_exec = crear_estado_exec();
    cola_exit = crear_estado_exit();
 
    // .........................
@@ -20,6 +22,10 @@ void inicializar_planificador()
    pthread_t rutina_crear_proceso;
    pthread_create(&rutina_crear_proceso, NULL, &crear_proceso, NULL);
    pthread_detach(rutina_crear_proceso);
+
+   pthread_t rutina_planificacion_corto_plazo;
+   pthread_create(&rutina_planificacion_corto_plazo, NULL, &planificar_a_corto_plazo, &elegir_por_fifo);
+   pthread_detach(rutina_planificacion_corto_plazo);
 
    pthread_t rutina_finalizar_proceso;
    pthread_create(&rutina_finalizar_proceso, NULL, &finalizar_proceso, NULL);
@@ -34,6 +40,7 @@ void destruir_planificador()
 
    destruir_estado_new(cola_new);
    destruir_estado_ready(cola_ready);
+   destruir_estado_exec(cola_exec);
    destruir_estado_exit(cola_exit);
 }
 
@@ -91,5 +98,34 @@ void *finalizar_proceso()
       t_pcb *pcb = pop_proceso_exit(cola_exit);
       liberar_memoria(pcb);
    }
+   return NULL;
+}
+
+void *planificar_a_corto_plazo(void *ptr_planificador)
+{
+   t_pcb *(*planificador)() = ptr_planificador;
+
+   while (1)
+   {
+      t_pcb *pcb = (*planificador)();
+
+      // no es solo esto, hay q hablar con cpu
+      push_proceso_exec(cola_exec, pcb);
+   }
+   return NULL;
+}
+
+t_pcb *elegir_por_fifo()
+{
+   return pop_proceso_ready(cola_ready);
+}
+
+t_pcb *elegir_por_rr()
+{
+   return NULL;
+}
+
+t_pcb *elegir_por_vrr()
+{
    return NULL;
 }
