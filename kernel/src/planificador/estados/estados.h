@@ -36,8 +36,6 @@ void destruir_estado_ready(q_ready *);
 
 // typedef struct
 // {
-//    t_mutex_queue *queue_block;
-//    sem_t hay_proceso_block;
 // } q_block;
 
 typedef struct

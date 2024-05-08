@@ -27,6 +27,7 @@
 - [ ] Empezar a loggear en donde corresponde
 - [ ] Implementar pausa y reanudación de planificadores
 - [ ] Implementar función `modificar_grado_multiprogramacion()`
+- [ ] Refactorizar estados, unificar los strusts que se puedan unificar
 
 ### Consola
 
