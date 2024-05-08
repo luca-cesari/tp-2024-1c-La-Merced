@@ -32,17 +32,6 @@ void push_proceso_ready(q_ready *, t_pcb *);
 void *pop_proceso_ready(q_ready *);
 void destruir_estado_ready(q_ready *);
 
-typedef struct
-{
-   t_mutex_queue *queue_exec;
-   sem_t hay_proceso_exec;
-} q_exec;
-
-q_exec *crear_estado_exec();
-void push_proceso_exec(q_exec *, t_pcb *);
-void *pop_proceso_exec(q_exec *);
-void destruir_estado_exec(q_exec *);
-
 // BLOCK va a ser un poco mas especial
 
 // typedef struct

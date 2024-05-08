@@ -30,14 +30,20 @@ int8_t conectar_por_interrupt();
  *
  * @param pcb Puntero al PCB a enviar
  */
-void enviar_pcb(t_pcb *pcb);
+void enviar_pcb_cpu(t_pcb *pcb);
 
 /**
  * @brief Recibe un PCB del módulo CPU (lee un PCB del socket)
  *
  * @return t_pcb* : Puntero al PCB recibido
  */
-t_pcb *recibir_pcb();
+t_pcb *recibir_pcb_cpu();
+
+/**
+ * @brief Envía señal por el puerto de interrupción al módulo CPU
+ *        para desalojar el proceso en ejecución
+ */
+void enviar_interrupcion();
 
 /**
  * @brief Libera la conexion con el módulo CPU,

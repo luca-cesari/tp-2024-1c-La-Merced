@@ -33,16 +33,22 @@ int8_t conectar_por_interrupt()
    return 0;
 }
 
-void enviar_pcb(t_pcb *pcb)
+void enviar_pcb_cpu(t_pcb *pcb)
 {
    // TODO: Implementar
 }
 
-t_pcb *recibir_pcb()
+t_pcb *recibir_pcb_cpu()
 {
    // TODO: Implementar
 
    return NULL;
+}
+
+void enviar_interrupcion()
+{
+
+   // TODO: Implementar
 }
 
 void liberar_conexion_cpu()

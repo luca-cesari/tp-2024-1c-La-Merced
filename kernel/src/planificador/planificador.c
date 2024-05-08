@@ -5,7 +5,6 @@ sem_t grado_multiprogramacion;
 
 q_new *cola_new;
 q_ready *cola_ready;
-q_exec *cola_exec;
 q_exit *cola_exit;
 
 void inicializar_planificador()
@@ -14,7 +13,6 @@ void inicializar_planificador()
 
    cola_new = crear_estado_new();
    cola_ready = crear_estado_ready();
-   cola_exec = crear_estado_exec();
    cola_exit = crear_estado_exit();
 
    // .........................
@@ -24,7 +22,7 @@ void inicializar_planificador()
    pthread_detach(rutina_crear_proceso);
 
    pthread_t rutina_planificacion_corto_plazo;
-   pthread_create(&rutina_planificacion_corto_plazo, NULL, &planificar_a_corto_plazo, &elegir_por_fifo);
+   pthread_create(&rutina_planificacion_corto_plazo, NULL, &planificar_por_fifo, NULL);
    pthread_detach(rutina_planificacion_corto_plazo);
 
    pthread_t rutina_finalizar_proceso;
@@ -40,7 +38,6 @@ void destruir_planificador()
 
    destruir_estado_new(cola_new);
    destruir_estado_ready(cola_ready);
-   destruir_estado_exec(cola_exec);
    destruir_estado_exit(cola_exit);
 }
 
@@ -101,31 +98,56 @@ void *finalizar_proceso()
    return NULL;
 }
 
-void *planificar_a_corto_plazo(void *ptr_planificador)
+void *planificar_por_fifo()
 {
-   t_pcb *(*planificador)() = ptr_planificador;
-
    while (1)
    {
-      t_pcb *pcb = (*planificador)();
+      t_pcb *pre_exec = pop_proceso_ready(cola_ready);
+      enviar_pcb_cpu(pre_exec);
+      t_pcb *pos_exec = recibir_pcb_cpu();
 
-      // no es solo esto, hay q hablar con cpu
-      push_proceso_exec(cola_exec, pcb);
+      if (pos_exec == NULL)
+      {
+         pasar_a_exit(pre_exec, EXEC);
+         continue;
+      }
+
+      pcb_destroy(pre_exec);
+      // capaz analizar que onda, si necesita I/O o si termino
    }
+
    return NULL;
 }
 
-t_pcb *elegir_por_fifo()
+void *planificar_por_rr()
 {
-   return pop_proceso_ready(cola_ready);
+   while (1)
+   {
+      t_pcb *pre_exec = pop_proceso_ready(cola_ready);
+      enviar_pcb_cpu(pre_exec);
+
+      pthread_t rutina_cronometro;
+      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, NULL);
+      pthread_detach(rutina_cronometro);
+
+      t_pcb *pos_exec = recibir_pcb_cpu();
+      // matar el hilo??
+   }
+
+   return NULL;
 }
 
-t_pcb *elegir_por_rr()
+void *planificar_por_vrr()
 {
    return NULL;
 }
 
-t_pcb *elegir_por_vrr()
+void *cronometrar_quantum(/* capaz hay q pasar el temporal aca */)
 {
+   // setear timer
+
+   // si termina el timer
+   enviar_interrupcion();
+
    return NULL;
 }

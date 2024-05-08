@@ -60,10 +60,10 @@ void pasar_a_exit(t_pcb *pcb, char *q_flag);
 // ...
 void *finalizar_proceso();
 
-void *planificar_a_corto_plazo(void *ptr_planificador);
+void *planificar_por_fifo();
+void *planificar_por_rr();
+void *planificar_por_vrr();
 
-t_pcb *elegir_por_fifo();
-t_pcb *elegir_por_rr();
-t_pcb *elegir_por_vrr();
+void *cronometrar_quantum();
 
 #endif // PLANIFICADOR_H
