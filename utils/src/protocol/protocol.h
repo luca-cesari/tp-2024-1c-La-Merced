@@ -26,11 +26,14 @@ typedef struct
    t_buffer *buffer;
 } t_packet;
 
-t_packet *packet_create(void);
-void buffer_create(t_packet *packet);
-void packet_add(t_packet *packet, void *content, int32_t content_size);
-void *packet_serialize(t_packet *packet, int32_t packet_size);
-void packet_send(t_packet *packet, int32_t fd_conexion);
-void packet_remove(t_packet *packet);
+t_packet *crear_paquete(void);
+void crear_buffer(t_packet *paquete);
+void agregar_a_paquete(t_packet *paquete, void *contenido, int32_t tamanio);
+void *serializar_paquete(t_packet *paquete, int32_t tamanio_paquete);
+void enviar_paquete(t_packet *paquete, int32_t fd_conexion);
+void eliminar_paquete(t_packet *paquete);
+
+int32_t recibir_operacion(int fd_conexion);
+void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion);
 
 #endif // UTILS_PROTOCOL_H

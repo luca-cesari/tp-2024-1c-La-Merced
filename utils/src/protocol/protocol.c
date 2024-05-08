@@ -1,106 +1,102 @@
 #include "protocol.h"
 
-// ==============================================================================================================
-
-t_packet *packet_create(void)
+t_packet *crear_paquete(void)
 {
-   t_packet *packet = malloc(sizeof(t_packet));
-   packet->op_code = PACKET;
-   buffer_create(packet);
-   return packet;
+   t_packet *paquete = malloc(sizeof(t_packet));
+   paquete->op_code = PACKET;
+   crear_buffer(paquete);
+   return paquete;
 }
 
-void buffer_create(t_packet *packet)
+void crear_buffer(t_packet *paquete)
 {
-   packet->buffer = malloc(sizeof(t_buffer));
-   packet->buffer->size = 0;
-   packet->buffer->stream = NULL;
+   paquete->buffer = malloc(sizeof(t_buffer));
+   paquete->buffer->size = 0;
+   paquete->buffer->stream = NULL;
 }
 
-void packet_add(t_packet *packet, void *content, int32_t content_size)
+void agregar_a_paquete(t_packet *paquete, void *contenido, int32_t tamanio)
 {
    // aumenta el tamaño del buffer agregando:
    // - el tamaño del contenido
    // - el tamaño de un entero que va a guardar el tamaño del contenido
-   int32_t new_size = packet->buffer->size + content_size + sizeof(int32_t);
-   packet->buffer->stream = realloc(packet->buffer->stream, new_size);
+   int32_t new_size = paquete->buffer->size + tamanio + sizeof(int32_t);
+   paquete->buffer->stream = realloc(paquete->buffer->stream, new_size);
 
    int32_t offset = 0;
 
    // agrega el tamaño del contenido
-   offset = packet->buffer->size;
-   memcpy(packet->buffer->stream + offset, &content_size, sizeof(int32_t));
+   offset = paquete->buffer->size;
+   memcpy(paquete->buffer->stream + offset, &tamanio, sizeof(int32_t));
 
    // agrega el contenido
-   offset = packet->buffer->size + sizeof(int32_t);
-   memcpy(packet->buffer->stream + offset, content, content_size);
+   offset = paquete->buffer->size + sizeof(int32_t);
+   memcpy(paquete->buffer->stream + offset, contenido, tamanio);
 
    // actualiza el tamaño del buffer
-   packet->buffer->size += content_size + sizeof(int32_t);
+   paquete->buffer->size += tamanio + sizeof(int32_t);
 }
 
-void *packet_serialize(t_packet *packet, int32_t packet_size)
+void *serializar_paquete(t_packet *paquete, int32_t tamanio_paquete)
 {
-   void *serialized = malloc(packet_size);
+   void *serializado = malloc(tamanio_paquete);
    int32_t offset = 0;
 
    // agrega el código de operación
-   memcpy(serialized + offset, &(packet->op_code), sizeof(int32_t));
+   memcpy(serializado + offset, &(paquete->op_code), sizeof(int32_t));
    offset += sizeof(int32_t);
 
    // agrega el tamaño del buffer
-   memcpy(serialized + offset, &(packet->buffer->size), sizeof(int32_t));
+   memcpy(serializado + offset, &(paquete->buffer->size), sizeof(int32_t));
    offset += sizeof(int32_t);
 
    // agrega el contenido del buffer
-   memcpy(serialized + offset, packet->buffer->stream, packet->buffer->size);
-   // desplazamiento += packet->buffer->size;
+   memcpy(serializado + offset, paquete->buffer->stream, paquete->buffer->size);
+   // desplazamiento += paquete->buffer->size;
 
-   return serialized;
+   return serializado;
 }
 
-void packet_send(t_packet *packet, int32_t fd_conexion)
+void enviar_paquete(t_packet *paquete, int32_t fd_conexion)
 {
    // los dos primeros int32_t son el código de operación y el tamaño del buffer
-   int32_t packet_size = packet->buffer->size + 2 * sizeof(int32_t);
-   void *serialized = packet_serialize(packet, packet_size);
+   int32_t tamanio_paquete = paquete->buffer->size + 2 * sizeof(int32_t);
+   void *serializado = serializar_paquete(paquete, tamanio_paquete);
 
-   send(fd_conexion, serialized, packet_size, 0);
+   send(fd_conexion, serializado, tamanio_paquete, 0);
 
-   free(serialized);
+   free(serializado);
 }
 
-void packet_remove(t_packet *packet)
+void eliminar_paquete(t_packet *paquete)
 {
-   free(packet->buffer->stream);
-   free(packet->buffer);
-   free(packet);
+   free(paquete->buffer->stream);
+   free(paquete->buffer);
+   free(paquete);
 }
 
-// ==============================================================================================================
+int32_t recibir_operacion(int fd_conexion)
+{
+   op_code code;
+   if (recv(fd_conexion, &code, sizeof(int32_t), MSG_WAITALL) > 0)
+      return code;
+   else
+   {
+      close(fd_conexion);
+      return -1;
+   }
+}
 
-// int recibir_operacion(int socket_cliente)
-// {
-//    int cod_op;
-//    if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
-//       return cod_op;
-//    else
-//    {
-//       close(socket_cliente);
-//       return -1;
-//    }
-// }
+void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
+{
+   void *buffer;
 
-// void *recibir_buffer(int *size, int socket_cliente)
-// {
-//    void *buffer;
+   recv(fd_conexion, tamanio, sizeof(int32_t), MSG_WAITALL);
+   buffer = malloc(*tamanio);
+   recv(fd_conexion, buffer, *tamanio, MSG_WAITALL);
 
-//    recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-//    buffer = malloc(*size);
-//    recv(socket_cliente, buffer, *size, MSG_WAITALL);
-
-//    return buffer;
-// }
+   return buffer;
+}
 
 // t_list *recibir_paquete(int socket_cliente)
 // {
