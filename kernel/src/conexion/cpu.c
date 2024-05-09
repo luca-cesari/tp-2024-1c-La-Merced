@@ -35,14 +35,18 @@ int8_t conectar_por_interrupt()
 
 void enviar_pcb_cpu(t_pcb *pcb)
 {
-   // TODO: Implementar
+   send(fd_dispatch, pcb, sizeof(t_pcb), 0);
 }
 
 t_pcb *recibir_pcb_cpu()
 {
-   // TODO: Implementar
-
-   return NULL;
+   t_pcb *pcb = malloc(sizeof(t_pcb));
+   if(pcb == NULL){
+      //no se pudo asignar memoria
+      return NULL;
+   }
+   recv(fd_dispatch, pcb, sizeof(t_pcb), 0);
+   return pcb;
 }
 
 void enviar_interrupcion()
