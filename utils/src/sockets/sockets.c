@@ -63,24 +63,41 @@ int32_t crear_conexion(char *ip, char *puerto)
    hints.ai_socktype = SOCK_STREAM;
    hints.ai_flags = AI_PASSIVE;
 
-   getaddrinfo(ip, puerto, &hints, &server_info);
+   if (getaddrinfo(ip, puerto, &hints, &server_info) != 0){
+      perror("Error al obtener informacion de direcciones");
+      return -1;
+   }
 
    int32_t socket_cliente = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
-
-   connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
+   if (socket_cliente == -1){
+      perror("Error al crear el socket");
+      freeaddrinfo(server_info);
+      return -1;
+   }
+   if(connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)== -1){
+      perror("Error al conectar al servidor");
+      close(socket_cliente);
+      freeaddrinfo(server_info);
+      return -1;
+   }
 
    freeaddrinfo(server_info);
 
    return socket_cliente;
 }
 
-// No estan manejados los posibles casos de error
 int32_t handshake(int32_t fd_conexion, int32_t id_modulo)
 {
    int32_t resultado;
 
-   send(fd_conexion, &id_modulo, sizeof(int32_t), 0);
-   recv(fd_conexion, &resultado, sizeof(int32_t), MSG_WAITALL);
+   if (send(fd_conexion, &id_modulo, sizeof(int32_t), 0)== -1){
+      perror("Error al enviar el ID del modulo");
+      return -1;
+   }
+   if(recv(fd_conexion, &resultado, sizeof(int32_t), MSG_WAITALL) == -1){
+      perror("Error al recibir el resultado del handshake");
+      return -1;
+   }
 
    return resultado;
 }
