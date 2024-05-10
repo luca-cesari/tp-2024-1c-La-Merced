@@ -30,32 +30,9 @@ tipo_interfaz get_tipo_interfaz(void)
 }
 
 //Aclaración: Lo hago con diccionarios mas que nada porque cada interfaz puede devolver una estructura distinta
-//Para obtener datos importantes de configuración según tipo de interfaz
-t_dictionary get_config_segun_interfaz(tipo_interfaz)
-{
-   switch (tipo_interfaz)
-   {
-   case GENERICA:
-      return get_generica_config();
-   case STDIN:
-      /* TODO */
-      break;
-   case STDOUT:
-      /* TODO */
-      break;
-   case DIALFS:
-      /* TODO */
-      break;
-   
-   default:
-      return -1;
-   }
-}
-
-
 
 //Para obtener datos importantes de interfaz generica
-t_dictionary get_generica_config()
+t_dictionary* get_generica_config()
 {
    t_dictionary * generica = dictionary_create();
    dictionary_put(generica, "tipo_interfaz", config_get_string_value(entradasalida_config, "TIPO_INTERFAZ"));
@@ -63,8 +40,47 @@ t_dictionary get_generica_config()
    dictionary_put(generica, "ip_kernel", config_get_string_value(entradasalida_config, "IP_KERNEL"));
    dictionary_put(generica, "puerto_kernel", config_get_string_value(entradasalida_config, "PUERTO_KERNEL"));
 
-
    return generica;
+}
+
+//Para obtener datos importantes de interfaz stdin
+t_dictionary* get_stdin_config()
+{
+   t_dictionary * stdin = dictionary_create();
+   dictionary_put(stdin, "tipo_interfaz", config_get_string_value(entradasalida_config, "TIPO_INTERFAZ"));
+   dictionary_put(stdin, "tiempo_unidad_trabajo", config_get_string_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO"));
+   dictionary_put(stdin, "ip_kernel", config_get_string_value(entradasalida_config, "IP_KERNEL"));
+   dictionary_put(stdin, "puerto_kernel", config_get_string_value(entradasalida_config, "PUERTO_KERNEL"));
+   dictionary_put(stdin, "ip_memoria", config_get_string_value(entradasalida_config, "IP_MEMORIA"));
+   dictionary_put(stdin, "puerto_memoria", config_get_string_value(entradasalida_config, "PUERTO_MEMORIA"));
+
+   return stdin;
+}
+//Para obtener datos importantes de interfaz stdout
+t_dictionary* get_stdout_config()
+{
+   t_dictionary * stdout = dictionary_create();
+   dictionary_put(stdout, "tipo_interfaz", config_get_string_value(entradasalida_config, "TIPO_INTERFAZ"));
+   dictionary_put(stdout, "tiempo_unidad_trabajo", config_get_string_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO"));
+   dictionary_put(stdout, "ip_kernel", config_get_string_value(entradasalida_config, "IP_KERNEL"));
+   dictionary_put(stdout, "puerto_kernel", config_get_string_value(entradasalida_config, "PUERTO_KERNEL"));
+   dictionary_put(stdout, "ip_memoria", config_get_string_value(entradasalida_config, "IP_MEMORIA"));
+   dictionary_put(stdout, "puerto_memoria", config_get_string_value(entradasalida_config, "PUERTO_MEMORIA"));
+
+   return stdout;
+}
+//Para obtener datos importantes de interfaz dialfs
+t_dictionary* get_dialfs_config()
+{
+   t_dictionary * dialfs = dictionary_create();
+   dictionary_put(dialfs, "create", config_get_string_value(entradasalida_config, "IO_FS_CREATE"));
+   dictionary_put(dialfs, "delete", config_get_string_value(entradasalida_config, "IO_FS_DELETE"));
+   dictionary_put(dialfs, "truncate", config_get_string_value(entradasalida_config, "IO_FS_TRUNCATE"));
+   dictionary_put(dialfs, "write", config_get_string_value(entradasalida_config, "IO_FS_WRITE"));
+   dictionary_put(dialfs, "read", config_get_string_value(entradasalida_config, "IO_FS_READ"));
+
+
+   return dialfs;
 }
 
 
@@ -75,7 +91,7 @@ kernel_config get_kernel_config(void)
    kernel_config kernel_cfg;
 
    kernel_cfg.ip = config_get_string_value(entradasalida_config, "IP_KERNEL");
-   kernel_cfg.puerto_dispatch = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
+   kernel_cfg.puerto = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
 
    return kernel_cfg;
 }
@@ -85,8 +101,8 @@ mem_config get_memoria_config(void)
 {
    mem_config mem_cfg;
 
-   mem_cfg.ip = config_get_string_value(kernel_config, "IP_MEMORIA");
-   mem_cfg.puerto = config_get_string_value(kernel_config, "PUERTO_MEMORIA");
+   mem_cfg.ip = config_get_string_value(entradasalida_config, "IP_MEMORIA");
+   mem_cfg.puerto = config_get_string_value(entradasalida_config, "PUERTO_MEMORIA");
 
    return mem_cfg;
 }
@@ -95,5 +111,5 @@ mem_config get_memoria_config(void)
 
 void destruir_config(void)
 {
-   config_destroy(kernel_config);
+   config_destroy(entradasalida_config);
 }

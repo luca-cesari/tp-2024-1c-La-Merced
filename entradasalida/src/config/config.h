@@ -30,6 +30,10 @@ typedef enum
 
 void iniciar_config(void);
 tipo_interfaz get_tipo_interfaz(void);
+t_dictionary* get_generica_config();
+t_dictionary* get_stdin_config();
+t_dictionary* get_stdout_config();
+t_dictionary* get_dialfs_config();
 kernel_config get_kernel_config(void);
 mem_config get_memoria_config(void);
 void destruir_config(void);
