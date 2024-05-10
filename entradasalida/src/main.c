@@ -5,6 +5,8 @@
 
 #include <sockets/sockets.h>
 
+#include "config/config.h"
+
 int main(int argc, char **argv)
 {
     // char *nombre_interfaz = argv[1];
@@ -12,19 +14,18 @@ int main(int argc, char **argv)
 
     t_config *config = config_create(ruta_config);
 
+    tipo_interfaz tipo_de_esta_interfaz = get_tipo_interfaz();
     // Conectar con Kernel
-    char *ip_kernel = config_get_string_value(config, "IP_KERNEL");
-    char *puerto_kernel = config_get_string_value(config, "PUERTO_KERNEL");
+    kernel_config ker = get_kernel_config();
 
-    int32_t fd_kernel = crear_conexion(ip_kernel, puerto_kernel);
+    int32_t fd_kernel = crear_conexion(ker.ip , ker.puerto);
     handshake(fd_kernel, E_S);
     enviar_mensaje(fd_kernel, 41);
 
     // Conectar con Memoria
-    char *ip_memoria = config_get_string_value(config, "IP_MEMORIA");
-    char *puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
+    mem_config mem = get_memoria_config();
 
-    int32_t fd_memoria = crear_conexion(ip_memoria, puerto_memoria);
+    int32_t fd_memoria = crear_conexion(mem.ip, mem.puerto);
     handshake(fd_memoria, E_S);
     enviar_mensaje(fd_memoria, 42);
 
