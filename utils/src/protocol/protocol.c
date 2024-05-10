@@ -98,6 +98,12 @@ void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
    return buffer;
 }
 
+t_list *recibir_paquete(int32_t fd_conexion)
+{
+   //...
+   return NULL;
+}
+
 // t_list *recibir_paquete(int socket_cliente)
 // {
 //    int size;
