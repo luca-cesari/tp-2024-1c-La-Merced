@@ -21,9 +21,9 @@ typedef struct
 // habria q revisar
 
 // como registros a secas o como puntero?
-t_registers registers_create();
+t_registers crear_registros();
 
-void registers_serialize(t_registers *registers, void **buffer, size_t *buffer_size);
-void registers_unserialize(t_registers *registers, void *buffer, size_t buffer_size);
+void serializar_registros(t_registers *registers, void **buffer, size_t *buffer_size);
+void deserializar_registros(t_registers *registers, void *buffer, size_t buffer_size);
 
 #endif // UTILS_PROTOCOL_REGISTROS_H

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <commons/bitarray.h>
 
+#include "protocol.h"
 #include "registers.h"
 
 typedef struct
@@ -17,18 +18,12 @@ typedef struct
    char *executable_path;
 } t_pcb;
 
-// Los argumentos de las funciones me los autocompleto copilot
-// habria q revisar
-
-t_pcb *pcb_create(char *executable_path);
-
-void pcb_serialize(t_pcb *pcb, void **buffer, size_t *buffer_size);
-void pcb_unserialize(t_pcb *pcb, void *buffer, size_t buffer_size);
-
-void pcb_send(int32_t fd_conexion, t_pcb *pcb);
-t_pcb *pcb_recv(int32_t fd_conexion);
+t_pcb *crear_pcb(char *ejecutable);
+t_packet *serializar_pcb(t_pcb *pcb);
+void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
+t_pcb *recibir_pcb(int32_t fd_conexion);
 
 // me lo recomendo copilot, ni idea si hace falta, creo q si
-void pcb_destroy(t_pcb *pcb);
+void destruir_pcb(t_pcb *pcb);
 
 #endif // UTILS_PROTOCOL_PCB_H
