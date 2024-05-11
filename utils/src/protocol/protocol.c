@@ -121,3 +121,51 @@ t_list *recibir_paquete(int32_t fd_conexion)
    free(buffer);
    return valores;
 }
+
+void enviar_senial(int32_t signal, int32_t fd_conexion)
+{
+   op_code code = SIGNAL;
+   void *buffer = malloc(sizeof(int32_t) * 2);
+
+   memcpy(buffer, &code, sizeof(int32_t));
+   memcpy(buffer + sizeof(int32_t), &signal, sizeof(int32_t));
+
+   send(fd_conexion, buffer, sizeof(int32_t) * 2, 0);
+   free(buffer);
+}
+
+int32_t recibir_senial(int32_t fd_conexion)
+{
+   int32_t signal;
+   recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
+   return signal;
+}
+
+void enviar_mensaje(char *mensaje, int32_t fd_conexion)
+{
+   op_code code = MESSAGE;
+   int32_t tamanio_mensaje = strlen(mensaje) + 1;
+   int32_t buffer_size = sizeof(int32_t) * 2 + tamanio_mensaje;
+   void *buffer = malloc(buffer_size);
+
+   int32_t offset = 0;
+   memcpy(buffer, &code, sizeof(int32_t));
+   offset += sizeof(int32_t);
+   memcpy(buffer + offset, &tamanio_mensaje, sizeof(int32_t));
+   offset += sizeof(int32_t);
+   memcpy(buffer + offset, mensaje, tamanio_mensaje);
+
+   send(fd_conexion, buffer, buffer_size, 0);
+   free(buffer);
+}
+
+char *recibir_mensaje(int32_t fd_conexion)
+{
+   int32_t tamanio_mensaje;
+   recv(fd_conexion, &tamanio_mensaje, sizeof(int32_t), MSG_WAITALL);
+
+   char *mensaje = malloc(tamanio_mensaje);
+   recv(fd_conexion, mensaje, tamanio_mensaje, MSG_WAITALL);
+
+   return mensaje;
+}
