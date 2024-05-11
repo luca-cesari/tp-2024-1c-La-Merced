@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     // char *nombre_interfaz = argv[1];
     char *ruta_config = argv[2];
 
-    t_config *config = config_create(ruta_config);
+    //t_config *config = config_create(ruta_config);
     iniciar_config(); //Por ahora uso el config predeterminado, en un futuro se usara el que viene por parámetro en el main
 
 

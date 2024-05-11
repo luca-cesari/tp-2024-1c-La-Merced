@@ -7,6 +7,7 @@
 #include <commons/collections/dictionary.h>
 #include <sockets/sockets.h>
 #include "config/config.h"
+#include "conexion/kernel.h"
 
 
 void inicializar_interfaz_generica(void);
