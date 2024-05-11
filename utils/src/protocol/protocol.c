@@ -100,28 +100,24 @@ void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
 
 t_list *recibir_paquete(int32_t fd_conexion)
 {
-   //...
-   return NULL;
+   int32_t buffer_size;
+   void *buffer;
+   int32_t offset = 0;
+   t_list *valores = list_create();
+   int32_t tamanio;
+
+   buffer = recibir_buffer(&buffer_size, fd_conexion);
+
+   while (offset < buffer_size)
+   {
+      memcpy(&tamanio, buffer + offset, sizeof(int32_t));
+      offset += sizeof(int32_t);
+      void *valor = malloc(tamanio);
+      memcpy(valor, buffer + offset, tamanio);
+      offset += tamanio;
+      list_add(valores, valor);
+   }
+
+   free(buffer);
+   return valores;
 }
-
-// t_list *recibir_paquete(int socket_cliente)
-// {
-//    int size;
-//    int desplazamiento = 0;
-//    void *buffer;
-//    t_list *valores = list_create();
-//    int tamanio;
-
-//    buffer = recibir_buffer(&size, socket_cliente);
-//    while (desplazamiento < size)
-//    {
-//       memcpy(&tamanio, buffer + desplazamiento, sizeof(int));
-//       desplazamiento += sizeof(int);
-//       char *valor = malloc(tamanio);
-//       memcpy(valor, buffer + desplazamiento, tamanio);
-//       desplazamiento += tamanio;
-//       list_add(valores, valor);
-//    }
-//    free(buffer);
-//    return valores;
-// }
