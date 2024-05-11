@@ -22,7 +22,7 @@ int8_t conectar_con_memoria()
 int8_t reservar_paginas(t_pcb *pcb)
 {
    pthread_mutex_lock(&mutex_memoria);
-   pcb_send(fd_memoria, pcb);
+   enviar_pcb(fd_memoria, pcb);
    // t_pcb *header = pcb_recv(fd_memoria);
    pthread_mutex_unlock(&mutex_memoria);
 
@@ -38,7 +38,7 @@ int8_t reservar_paginas(t_pcb *pcb)
 int8_t liberar_memoria(t_pcb *pcb)
 {
    pthread_mutex_lock(&mutex_memoria);
-   pcb_send(fd_memoria, pcb);
+   enviar_pcb(fd_memoria, pcb);
    // t_pcb *header = pcb_recv(fd_memoria);
    pthread_mutex_unlock(&mutex_memoria);
 

@@ -53,7 +53,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
 
 void ingresar_proceso(char *ruta_ejecutable)
 {
-   t_pcb *pcb = pcb_create(ruta_ejecutable);
+   t_pcb *pcb = crear_pcb(ruta_ejecutable);
    log_creacion_proceso(pcb->pid);
    push_proceso_nuevo(cola_new, pcb);
 }
@@ -112,7 +112,7 @@ void *planificar_por_fifo()
          continue;
       }
 
-      pcb_destroy(pre_exec);
+      destruir_pcb(pre_exec);
       // capaz analizar que onda, si necesita I/O o si termino
    }
 
