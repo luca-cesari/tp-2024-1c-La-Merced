@@ -60,12 +60,11 @@ void obtener_instrucciones()
 {
     FILE *pseudocodigo = recibir_pseudocodigo();
     char linea[100];
-    t_dictionary instrucciones = *dictionary_create();
+    t_list *instrucciones = list_create();
     int key = 1; // sera necesario, sino lo es, mejor lista
     while (fgets(linea, sizeof(linea), pseudocodigo) != NULL)
     {
-        void *instruccion = procesar_instruccion(linea);
-        almacenar_instruccion(instruccion, instrucciones, key); // no hace nada, mas que dictionary_pot, solo  esta por temas de declaratividad, ver
+        almacenar_instruccion(linea, instrucciones, key); // no hace nada, mas que dictionary_pot, solo  esta por temas de declaratividad, ver
         key++;
     }
 }
