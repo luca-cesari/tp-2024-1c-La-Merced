@@ -29,56 +29,56 @@ tipo_interfaz get_tipo_interfaz(void)
 
 }
 
-//Aclaración: Lo hago con diccionarios mas que nada porque cada interfaz puede devolver una estructura distinta
 
-//Para obtener datos importantes de interfaz generica
-t_dictionary* get_generica_config()
+// Para obtener datos importantes de interfaz generica
+generica_config get_generica_config()
 {
-   t_dictionary * generica = dictionary_create();
-   dictionary_put(generica, "tipo_interfaz", config_get_string_value(entradasalida_config, "TIPO_INTERFAZ"));
-   dictionary_put(generica, "tiempo_unidad_trabajo", config_get_string_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO"));
-   dictionary_put(generica, "ip_kernel", config_get_string_value(entradasalida_config, "IP_KERNEL"));
-   dictionary_put(generica, "puerto_kernel", config_get_string_value(entradasalida_config, "PUERTO_KERNEL"));
+   generica_config generica;
+   generica.tipo_interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
+   generica.tiempo_unidad_trabajo = config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
+   generica.ip_kernel = config_get_string_value(entradasalida_config, "IP_KERNEL");
+   generica.puerto_kernel = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
 
    return generica;
 }
 
-//Para obtener datos importantes de interfaz stdin
-t_dictionary* get_stdin_config()
+// Para obtener datos importantes de interfaz stdin
+stdin_config get_stdin_config()
 {
-   t_dictionary * stdin = dictionary_create();
-   dictionary_put(stdin, "tipo_interfaz", config_get_string_value(entradasalida_config, "TIPO_INTERFAZ"));
-   dictionary_put(stdin, "tiempo_unidad_trabajo", config_get_string_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO"));
-   dictionary_put(stdin, "ip_kernel", config_get_string_value(entradasalida_config, "IP_KERNEL"));
-   dictionary_put(stdin, "puerto_kernel", config_get_string_value(entradasalida_config, "PUERTO_KERNEL"));
-   dictionary_put(stdin, "ip_memoria", config_get_string_value(entradasalida_config, "IP_MEMORIA"));
-   dictionary_put(stdin, "puerto_memoria", config_get_string_value(entradasalida_config, "PUERTO_MEMORIA"));
+   stdin_config stdin;
+   stdin.tipo_interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
+   stdin.tiempo_unidad_trabajo = config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
+   stdin.ip_kernel = config_get_string_value(entradasalida_config, "IP_KERNEL");
+   stdin.puerto_kernel = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
+   stdin.ip_memoria = config_get_string_value(entradasalida_config, "IP_MEMORIA");
+   stdin.puerto_memoria = config_get_string_value(entradasalida_config, "PUERTO_MEMORIA");
 
    return stdin;
 }
-//Para obtener datos importantes de interfaz stdout
-t_dictionary* get_stdout_config()
+
+// Para obtener datos importantes de interfaz stdout
+stdout_config get_stdout_config()
 {
-   t_dictionary * stdout = dictionary_create();
-   dictionary_put(stdout, "tipo_interfaz", config_get_string_value(entradasalida_config, "TIPO_INTERFAZ"));
-   dictionary_put(stdout, "tiempo_unidad_trabajo", config_get_string_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO"));
-   dictionary_put(stdout, "ip_kernel", config_get_string_value(entradasalida_config, "IP_KERNEL"));
-   dictionary_put(stdout, "puerto_kernel", config_get_string_value(entradasalida_config, "PUERTO_KERNEL"));
-   dictionary_put(stdout, "ip_memoria", config_get_string_value(entradasalida_config, "IP_MEMORIA"));
-   dictionary_put(stdout, "puerto_memoria", config_get_string_value(entradasalida_config, "PUERTO_MEMORIA"));
+   stdout_config stdout;
+   stdout.tipo_interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
+   stdout.tiempo_unidad_trabajo = config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
+   stdout.ip_kernel = config_get_string_value(entradasalida_config, "IP_KERNEL");
+   stdout.puerto_kernel = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
+   stdout.ip_memoria = config_get_string_value(entradasalida_config, "IP_MEMORIA");
+   stdout.puerto_memoria = config_get_string_value(entradasalida_config, "PUERTO_MEMORIA");
 
    return stdout;
 }
-//Para obtener datos importantes de interfaz dialfs
-t_dictionary* get_dialfs_config()
-{
-   t_dictionary * dialfs = dictionary_create();
-   dictionary_put(dialfs, "create", config_get_string_value(entradasalida_config, "IO_FS_CREATE"));
-   dictionary_put(dialfs, "delete", config_get_string_value(entradasalida_config, "IO_FS_DELETE"));
-   dictionary_put(dialfs, "truncate", config_get_string_value(entradasalida_config, "IO_FS_TRUNCATE"));
-   dictionary_put(dialfs, "write", config_get_string_value(entradasalida_config, "IO_FS_WRITE"));
-   dictionary_put(dialfs, "read", config_get_string_value(entradasalida_config, "IO_FS_READ"));
 
+// Para obtener datos importantes de interfaz dialfs
+dialfs_config get_dialfs_config()
+{
+   dialfs_config dialfs;
+   dialfs.create = config_get_string_value(entradasalida_config, "IO_FS_CREATE");
+   dialfs.delete = config_get_string_value(entradasalida_config, "IO_FS_DELETE");
+   dialfs.truncate = config_get_string_value(entradasalida_config, "IO_FS_TRUNCATE");
+   dialfs.write = config_get_string_value(entradasalida_config, "IO_FS_WRITE");
+   dialfs.read = config_get_string_value(entradasalida_config, "IO_FS_READ");
 
    return dialfs;
 }
