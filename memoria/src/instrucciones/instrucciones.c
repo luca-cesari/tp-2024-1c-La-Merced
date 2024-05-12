@@ -2,69 +2,47 @@
 
 FILE *recibir_pseudocodigo();
 
-void *generar_instruccion(char *instruccion, char **parametros)
+int contarLineas(FILE *archivo)
 {
-    if (strcmp(instruccion, SET) == 0)
+    int contador = 0;
+    char caracter;
+
+    while ((caracter = fgetc(archivo)) != EOF)
     {
-        return set(parametros[0], parametros[1]);
+        if (caracter == '\n')
+        { // si el caracter es un salto de línea, incrementa el contador
+            contador++;
+        }
     }
-    else if (strcmp(instruccion, SUM) == 0)
+
+    // si el archivo no termina con un salto de línea, se cuenta una última línea
+    if (contador != 0)
     {
-        return sum(parametros[0], parametros[1]);
+        contador++;
     }
-    else if (strcmp(instruccion, SUB) == 0)
-    {
-        return sub(parametros[0], parametros[1]);
-    }
-    else if (strcmp(instruccion, JNZ) == 0)
-    {
-        return jnz(parametros[0], parametros[1]);
-    }
-    else if (strcmp(instruccion, IO_GEN_SLEEP) == 0)
-    {
-        return io_gen_sleep(parametros[0], parametros[1]);
-    }
-    else
-    {
-        // En caso de instrucción desconocida
-        printf("Instrucción desconocida: %s\n", instruccion);
-    }
+
+    return contador;
 }
 
-void *procesar_instruccion(const char *linea)
-{
-
-    char **tokens;
-    char **parametros;
-    tokens = string_split(linea, " ");
-    char *instruccion = tokens[0];
-    for (int i = 1; tokens[i] != NULL; i++)
-    {
-        string_array_push(parametros, tokens[i]);
-    }
-    for (int i = 0; tokens[i] != NULL; i++)
-    { // no se si hay que hacerlo, capaz puedo ponerlo en el otro if, pero no tendria que sumarle nada a la i
-        free(tokens[i]);
-    }
-    free(tokens);
-
-    return generar_instruccion(instruccion, parametros);
-}
-
-void almacenar_instrucciones(void *instruccion, t_dictionary *diccionario, int key)
-{ // en el diccionario de las commons, la key esta como char*, no se porque no tira error si la mia es int
-    dictionary_put(diccionario, key, instruccion);
-}
-
-void obtener_instrucciones()
+char *obtener_array_instrucciones()
 {
     FILE *pseudocodigo = recibir_pseudocodigo();
     char linea[100];
-    t_list *instrucciones = list_create();
-    int key = 1; // sera necesario, sino lo es, mejor lista
-    while (fgets(linea, sizeof(linea), pseudocodigo) != NULL)
+    int num_instrucciones = contarLineas(pseudocodigo);
+    // t_list *instrucciones = list_create();
+    char *instrucciones[num_instrucciones];
+    int i = 0;
+    while (fgets(linea, sizeof(linea), pseudocodigo) != NULL) // lee cada linea del archivo y lo guarda en el array
     {
-        almacenar_instruccion(linea, instrucciones, key); // no hace nada, mas que dictionary_pot, solo  esta por temas de declaratividad, ver
-        key++;
+        instrucciones[i] = linea;
+        i++;
     }
+    return instrucciones[];
+}
+
+char *obtener_instruccion(int PC)
+{   // vamos a hacer que el pc tenga los accesos a memoria en HEXA(pregunta), ver
+    // cada vez que quiere una instruccion tiene que obtener todo el array, no esta bueno, pero hasta que no veamos memoria no se puede hacer mucho
+    char *instrucciones[] = obtener_array_instrucciones();
+    return instrucciones[PC];
 }
