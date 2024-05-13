@@ -9,7 +9,7 @@
 #include <protocol/pcb.h>
 
 #include "logger/logger.h"
-#include "estados/estados.h"
+#include "estados.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 

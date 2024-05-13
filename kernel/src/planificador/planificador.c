@@ -3,17 +3,17 @@
 // ver si va aca, puede q si, puede q no
 sem_t grado_multiprogramacion;
 
-q_new *cola_new;
-q_ready *cola_ready;
-q_exit *cola_exit;
+q_estado *cola_new;
+q_estado *cola_ready;
+q_estado *cola_exit;
 
 void inicializar_planificador()
 {
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
 
-   cola_new = crear_estado_new();
-   cola_ready = crear_estado_ready();
-   cola_exit = crear_estado_exit();
+   cola_new = crear_estado();
+   cola_ready = crear_estado();
+   cola_exit = crear_estado();
 
    // .........................
 
@@ -36,9 +36,9 @@ void destruir_planificador()
 {
    sem_destroy(&grado_multiprogramacion);
 
-   destruir_estado_new(cola_new);
-   destruir_estado_ready(cola_ready);
-   destruir_estado_exit(cola_exit);
+   destruir_estado(cola_new);
+   destruir_estado(cola_ready);
+   destruir_estado(cola_exit);
 }
 
 void iniciar_planificacion()
@@ -55,14 +55,14 @@ void ingresar_proceso(char *ruta_ejecutable)
 {
    t_pcb *pcb = crear_pcb(ruta_ejecutable);
    log_creacion_proceso(pcb->pid);
-   push_proceso_nuevo(cola_new, pcb);
+   push_proceso(cola_new, pcb);
 }
 
 void *crear_proceso()
 {
    while (1)
    {
-      t_pcb *pcb = pop_proceso_nuevo(cola_new);
+      t_pcb *pcb = pop_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
       if (reservar_paginas(pcb))
@@ -74,7 +74,7 @@ void *crear_proceso()
       // ver si puede planificar o no,
       // o sea, si esta en pausa o no la planificacion
       sem_wait(&grado_multiprogramacion);
-      push_proceso_ready(cola_ready, pcb);
+      push_proceso(cola_ready, pcb);
    }
 
    return NULL;
@@ -85,14 +85,14 @@ void pasar_a_exit(t_pcb *pcb, char *q_flag)
    if (strcmp(q_flag, NEW) == 0)
       sem_post(&grado_multiprogramacion);
 
-   push_proceso_exit(cola_exit, pcb);
+   push_proceso(cola_exit, pcb);
 }
 
 void *finalizar_proceso()
 {
    while (1)
    {
-      t_pcb *pcb = pop_proceso_exit(cola_exit);
+      t_pcb *pcb = pop_proceso(cola_exit);
       liberar_memoria(pcb);
    }
    return NULL;
@@ -102,7 +102,7 @@ void *planificar_por_fifo()
 {
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso_ready(cola_ready);
+      t_pcb *pre_exec = pop_proceso(cola_ready);
       enviar_pcb_cpu(pre_exec);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
@@ -123,7 +123,7 @@ void *planificar_por_rr()
 {
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso_ready(cola_ready);
+      t_pcb *pre_exec = pop_proceso(cola_ready);
       enviar_pcb_cpu(pre_exec);
 
       pthread_t rutina_cronometro;
