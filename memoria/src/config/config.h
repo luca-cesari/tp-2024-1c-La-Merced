@@ -10,7 +10,7 @@
 
 typedef struct
 {
-    u_int32_t puerto_escucha;
+    char* puerto_escucha;
     u_int32_t tam_memoria;
     u_int32_t tam_pagina;
     char *path_instrucciones;
