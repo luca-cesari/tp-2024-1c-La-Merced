@@ -25,28 +25,6 @@ void *escuchar_conexiones(void *fd_escucha)
    return NULL;
 }
 
-void escuchar_kernel(int32_t fd_kernel)
-{
-    printf("Kernel conectado \n");
-    recibir_mensaje(fd_kernel);
-
-    recibir_mensaje(fd_kernel); // block
-}
-
-void escuchar_cpu(int32_t fd_cpu)
-{
-    printf("CPU conectado \n");
-    recibir_mensaje(fd_cpu);
-
-    recibir_mensaje(fd_cpu); // block
-}
-
-void escuchar_interfaz_es(int32_t fd_es)
-{
-    printf("Interfaz E/S conectada \n");
-    recibir_mensaje(fd_es);
-}
-
 void *atender_cliente(void *fd_ptr)
 {
     int32_t fd_conexion = *((int32_t *)fd_ptr);
@@ -72,3 +50,26 @@ void *atender_cliente(void *fd_ptr)
 
     return NULL;
 }
+
+void escuchar_kernel(int32_t fd_kernel)
+{
+    printf("Kernel conectado \n");
+    recibir_mensaje(fd_kernel);
+
+    recibir_mensaje(fd_kernel); // block
+}
+
+void escuchar_cpu(int32_t fd_cpu)
+{
+    printf("CPU conectado \n");
+    recibir_mensaje(fd_cpu);
+
+    recibir_mensaje(fd_cpu); // block
+}
+
+void escuchar_interfaz_es(int32_t fd_es)
+{
+    printf("Interfaz E/S conectada \n");
+    recibir_mensaje(fd_es);
+}
+

@@ -1,4 +1,4 @@
-/*#include "instrucciones.h"
+#include "instrucciones.h"
 
 FILE *recibir_pseudocodigo();
 
@@ -46,4 +46,3 @@ char *obtener_instruccion(int PC)
     char *instrucciones[] = obtener_array_instrucciones();
     return instrucciones[PC];
 }
-*/
