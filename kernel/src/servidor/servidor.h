@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
+#include <protocol/protocol.h>
 
 #include "config/config.h"
 
