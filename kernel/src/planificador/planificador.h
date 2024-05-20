@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <commons/temporal.h>
 #include <mqueue/mqueue.h>
 #include <protocol/pcb.h>
 
@@ -64,6 +65,6 @@ void *planificar_por_fifo();
 void *planificar_por_rr();
 void *planificar_por_vrr();
 
-void *cronometrar_quantum();
+void *cronometrar_quantum(void *milisegundos);
 
 #endif // PLANIFICADOR_H

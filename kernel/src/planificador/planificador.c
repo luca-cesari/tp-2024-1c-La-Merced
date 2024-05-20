@@ -7,6 +7,9 @@ q_estado *cola_new;
 q_estado *cola_ready;
 q_estado *cola_exit;
 
+int8_t desalojado;
+pthread_mutex_t desalojado_mutex;
+
 void inicializar_planificador()
 {
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
@@ -119,35 +122,65 @@ void *planificar_por_fifo()
    return NULL;
 }
 
+// en cuanto al temporal, por el momento se implementa de esta forma,
+// no c si funciona o no,
 void *planificar_por_rr()
 {
+   u_int32_t quantum = get_quantum();
+
+   // mepa q no hace falta alocar memoria
+   pthread_mutex_init(&desalojado_mutex, NULL);
+
    while (1)
    {
       t_pcb *pre_exec = pop_proceso(cola_ready);
       enviar_pcb_cpu(pre_exec);
 
+      pthread_mutex_lock(&desalojado_mutex);
+      desalojado = 0;
+      pthread_mutex_unlock(&desalojado_mutex);
+
       pthread_t rutina_cronometro;
-      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, NULL);
+      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(quantum));
       pthread_detach(rutina_cronometro);
 
       t_pcb *pos_exec = recibir_pcb_cpu();
-      // matar el hilo??
+
+      pthread_mutex_lock(&desalojado_mutex);
+      desalojado = 1;
+      pthread_mutex_unlock(&desalojado_mutex);
+
+      // lo mismo que en fifo
+      // chequear si necesita I/O o si termino
    }
 
+   pthread_mutex_destroy(&desalojado_mutex);
    return NULL;
 }
 
 void *planificar_por_vrr()
 {
+   // usar un temporal aca
    return NULL;
 }
 
-void *cronometrar_quantum(/* capaz hay q pasar el temporal aca */)
+// ES UN ASCO COMO SE MANEJA
+// pero deberia funcionar, y eso es lo q importa por el momento
+void *cronometrar_quantum(void *milisegundos)
 {
-   // setear timer
+   u_int32_t segundos = (*(u_int32_t *)milisegundos) / 1000;
+   sleep(segundos);
 
-   // si termina el timer
-   enviar_interrupcion();
-
-   return NULL;
+   pthread_mutex_lock(&desalojado_mutex);
+   if (desalojado)
+   {
+      pthread_mutex_unlock(&desalojado_mutex);
+      return NULL;
+   }
+   else
+   {
+      enviar_interrupcion();
+      pthread_mutex_unlock(&desalojado_mutex);
+      return NULL;
+   }
 }
