@@ -12,12 +12,18 @@ void iniciar_servidor()
    pthread_detach(hilo_escucha);
 }
 
+void *escuchar_conexiones(void *fd_escucha)
+{
+   while (1)
+   {
+      esperar_cliente(*((int32_t *)fd_escucha), &atender_interfaz_es);
+   }
+   return NULL;
+}
+
 void *atender_interfaz_es(void *fd_ptr)
 {
    int32_t fd_conexion = *((int32_t *)fd_ptr);
-   free(fd_ptr); // Hace falta?
-
-   // atender handsake (para saber quienes el cliente)
    uint32_t modulo_cliente = recibir_cliente(fd_conexion);
 
    if (modulo_cliente != E_S)
@@ -26,19 +32,7 @@ void *atender_interfaz_es(void *fd_ptr)
       return NULL;
    }
 
-   printf("Interfaz E/S conectada \n");
-   recibir_mensaje(fd_conexion);
-
-   return NULL;
-}
-
-void *escuchar_conexiones(void *fd_escucha)
-{
-   while (1)
-   {
-      // Revisar esto, esperar cliente crea un hilo, pero no se si esta bien eso
-      esperar_cliente(*((int32_t *)fd_escucha), &atender_interfaz_es);
-   }
+   // encolar a blocked
 
    return NULL;
 }
