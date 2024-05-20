@@ -13,43 +13,6 @@ void hablar_con_memoria(int32_t fd_memoria)
     recibir_mensaje(fd_memoria); // para bloquear nd mas
 }
 
-void *escuchar_dispatch(void *fd_ptr)
-{
-    int32_t fd_dispatch = *((int32_t *)fd_ptr);
-
-    if (recibir_cliente(fd_dispatch) != KERNEL)
-    {
-        printf("Error de Cliente \n");
-        return NULL;
-    }
-
-    printf("Kernel conectado por Dispatch \n");
-    while (1)
-    {
-        recibir_mensaje(fd_dispatch);
-    }
-
-    return NULL;
-}
-
-void *escuchar_interrupt(void *fd_ptr)
-{
-    int32_t fd_interrupt = *((int32_t *)fd_ptr);
-    if (recibir_cliente(fd_interrupt) != KERNEL)
-    {
-        printf("Error de Cliente \n");
-        return NULL;
-    }
-
-    printf("Kernel conectado por Interrupt \n");
-    while (1)
-    {
-        recibir_mensaje(fd_interrupt);
-    }
-
-    return NULL;
-}
-
 int main(void)
 {
     char *puerto_dispatch;
