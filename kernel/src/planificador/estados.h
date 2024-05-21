@@ -9,10 +9,10 @@
 typedef struct
 {
    t_mutex_queue *queue;
-   sem_t* hay_proceso;
+   sem_t *hay_proceso;
 } q_estado;
 
-q_estado *crear_estado();
+q_estado *crear_estado(void);
 void push_proceso(q_estado *, t_pcb *);
 void *pop_proceso(q_estado *);
 void destruir_estado(q_estado *);

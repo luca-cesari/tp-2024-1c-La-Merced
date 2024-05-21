@@ -122,8 +122,6 @@ void *planificar_por_fifo()
    return NULL;
 }
 
-// en cuanto al temporal, por el momento se implementa de esta forma,
-// no c si funciona o no,
 void *planificar_por_rr()
 {
    u_int32_t quantum = get_quantum();
