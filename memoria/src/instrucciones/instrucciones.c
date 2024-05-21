@@ -1,48 +1,48 @@
 #include "instrucciones.h"
 
-FILE *recibir_pseudocodigo();
+t_list* lista_procesos = list_create();
 
-int contarLineas(FILE *archivo)
+
+/*Para cargar un proceso a memoria tengo que agregarlo a la lista de procesos,
+esto implica que debo añadir a la lista el pid, path y una lista de instrucciones*/
+
+void cargar_proceso_a_memoria(int32_t pid, char* path)
 {
-    int contador = 0;
-    char caracter;
+    /*Para obtener la lista de instrucciones primero debo usar el path para 
+    leer las instrucciones que hay en un archivo de pseudocodigo*/
+    t_list *instrucciones = list_create();
+    instrucciones = leer_instrucciones(path);
+    /*Una vez que tengo la lista de instrucciones, puedo crear un proceso de instrucciones
+    y añadirlo a la lista de procesos*/
+    t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
+    proceso->pid = pid;
+    proceso->path = strdup(path);
+    proceso->instrucciones = instrucciones;
+    list_add(lista_procesos, proceso);
 
-    while ((caracter = fgetc(archivo)) != EOF)
-    {
-        if (caracter == '\n')
-        { // si el caracter es un salto de línea, incrementa el contador
-            contador++;
-        }
-    }
-
-    // si el archivo no termina con un salto de línea, se cuenta una última línea
-    if (contador != 0)
-    {
-        contador++;
-    }
-
-    return contador;
 }
 
-char *obtener_array_instrucciones()
+t_list* leer_instrucciones(char* path)
 {
-    FILE *pseudocodigo = recibir_pseudocodigo();
-    char linea[100];
-    int num_instrucciones = contarLineas(pseudocodigo);
-    // t_list *instrucciones = list_create();
-    char *instrucciones[num_instrucciones];
-    int i = 0;
-    while (fgets(linea, sizeof(linea), pseudocodigo) != NULL) // lee cada linea del archivo y lo guarda en el array
+    /*Un ejemplo de las instrucciones que pueden venir en el archivo son las siguientes:
+    SET AX 1
+    SET BX 1
+    SET PC 5
+    SUM AX BX
+    Simplemente tengo que guardarlas como strings en la lista de instrucciones a medida
+    que las voy leyendo. Cada instruccion es una linea nueva. La CPU luego se encargará de interpretar
+    estos strings*/
+    FILE *archivo = fopen(path, "r");
+    char *linea = NULL;
+    size_t len = 0;
+    ssize_t read;
+    t_list *instrucciones = list_create();
+    while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        instrucciones[i] = linea;
-        i++;
+        char *instruccion = strdup(linea);
+        list_add(instrucciones, instruccion);
     }
-    return instrucciones[];
-}
-
-char *obtener_instruccion(int PC)
-{   // vamos a hacer que el pc tenga los accesos a memoria en HEXA(pregunta), ver
-    // cada vez que quiere una instruccion tiene que obtener todo el array, no esta bueno, pero hasta que no veamos memoria no se puede hacer mucho
-    char *instrucciones[] = obtener_array_instrucciones();
-    return instrucciones[PC];
+    fclose(archivo);
+    free(linea);
+    return instrucciones;
 }
