@@ -108,6 +108,11 @@ int *buscar_operando(char *parametro)
    {
       return &(registros_cpu.EDX);
    }
+   else
+   {
+      // en caso de operando desconocido
+      printf("Operando desconocido: %s\n", parametro);
+   }
 }
 
 void *procesar_instruccion(int PC)
