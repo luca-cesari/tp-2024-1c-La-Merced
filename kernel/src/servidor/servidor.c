@@ -33,6 +33,8 @@ void *atender_interfaz_es(void *fd_ptr)
    }
 
    // encolar a blocked
+   char *nombre_interfaz = recibir_mensaje(fd_conexion);
+   conectar_entrada_salida(nombre_interfaz, fd_conexion);
 
    return NULL;
 }

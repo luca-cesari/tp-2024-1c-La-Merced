@@ -7,6 +7,8 @@ q_estado *cola_new;
 q_estado *cola_ready;
 q_estado *cola_exit;
 
+q_blocked *cola_blocked;
+
 int8_t desalojado;
 pthread_mutex_t desalojado_mutex;
 
@@ -17,6 +19,7 @@ void inicializar_planificador()
    cola_new = crear_estado();
    cola_ready = crear_estado();
    cola_exit = crear_estado();
+   cola_blocked = crear_estado_blocked();
 
    // .........................
 
@@ -42,6 +45,7 @@ void destruir_planificador()
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
    destruir_estado(cola_exit);
+   destruir_estado_blocked(cola_blocked);
 }
 
 void iniciar_planificacion()
@@ -59,6 +63,11 @@ void ingresar_proceso(char *ruta_ejecutable)
    t_pcb *pcb = crear_pcb(ruta_ejecutable);
    log_creacion_proceso(pcb->pid);
    push_proceso(cola_new, pcb);
+}
+
+void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
+{
+   conectar_interfaz(cola_blocked, nombre_interfaz, fd_conexion);
 }
 
 void *crear_proceso()
