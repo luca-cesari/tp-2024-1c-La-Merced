@@ -30,6 +30,86 @@ void *generar_instruccion(char **instruc_parametros)
    }
 }
 
+int es_numero(char *parametro)
+{
+   while (*parametro)
+   {
+      if (*parametro < '0' || *parametro > '9')
+      {
+         return 0; // tiene un caracter no numerico
+      }
+      parametro++;
+   }
+   return 1; // es un numero
+}
+
+int char_a_numero(char *parametro)
+{
+   return atoi(parametro);
+}
+
+long char_a_numero_robusto(char *parametro)
+{
+   char *endptr;
+   errno = 0;
+   long num = strtol(parametro, &endptr, 10); // el long tiene un maximo de tamanio permitido , 10 hace referencia a la base del numero, en este caso decimal
+
+   if (errno == ERANGE)
+   {
+      printf("Error de desbordamiento.\n");
+      return 0;
+   }
+   else if (*endptr != '\0')
+   {
+      printf("La conversión no fue completamente exitosa. Parte de la cadena no convertida: %s\n", endptr);
+      return 0;
+   }
+   else
+   {
+      return num;
+   }
+}
+
+int *buscar_operando(char *parametro)
+{
+   if (es_numero(parametro))
+   {
+      return char_a_numero(parametro); // ver si usar el mas robusto
+   }
+   else if (strcmp(parametro, "AX") == 0)
+   {
+      return &(registros_cpu.AX);
+   }
+   else if (strcmp(parametro, "BX") == 0)
+   {
+      return &(registros_cpu.BX);
+   }
+   else if (strcmp(parametro, "CX") == 0)
+   {
+      return &(registros_cpu.CX);
+   }
+   else if (strcmp(parametro, "DX") == 0)
+   {
+      return &(registros_cpu.DX);
+   }
+   else if (strcmp(parametro, "EAX") == 0)
+   {
+      return &(registros_cpu.EAX);
+   }
+   else if (strcmp(parametro, "EBX") == 0)
+   {
+      return &(registros_cpu.EBX);
+   }
+   else if (strcmp(parametro, "ECX") == 0)
+   {
+      return &(registros_cpu.ECX);
+   }
+   else if (strcmp(parametro, "EDX") == 0)
+   {
+      return &(registros_cpu.EDX);
+   }
+}
+
 void *procesar_instruccion(int PC)
 {
    char **instruccion_parametros;

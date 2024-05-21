@@ -5,6 +5,8 @@
 #include <string.h>
 #include <commons/string.h>
 #include <stdio.h>
+#include <errno.h>
+#include <limits.h>
 
 // void instruction_fetch ();
 // void instruction_decode();
