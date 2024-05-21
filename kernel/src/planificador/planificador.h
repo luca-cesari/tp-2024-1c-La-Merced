@@ -11,6 +11,7 @@
 
 #include "logger/logger.h"
 #include "estados.h"
+#include "blocked.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 
@@ -41,6 +42,13 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
  * @param ruta_ejecutable Ruta del archivo ejecutable.
  */
 void ingresar_proceso(char *ruta_ejecutable);
+
+/**
+ * @brief Conecta una interfaz de entrada/salida a la cola de BLOCKED.
+ * @param nombre_interfaz nombre de la interfaz a conectar, único en todo el sistema.
+ * @param fd_conexion file descriptor de la conexión a la interfaz de entrada/salida
+ */
+void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion);
 
 /**
  * @fn crear_proceso
