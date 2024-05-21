@@ -54,10 +54,27 @@ void *atender_cliente(void *fd_ptr)
 void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
-    recibir_mensaje(fd_kernel);
+    
+    instruccion_kernel instruccion_paquete = recibir_instruccion_kernel(fd_kernel);
 
-    recibir_mensaje(fd_kernel); // block
+    switch (instruccion_paquete->tipo)
+    {
+    case INICIAR_PROCESO:
+        printf("INICIAR_PROCESO \n");
+        //TODO: Implementar la lógica de iniciar proceso, con el path y demás
+
+        break;
+    case FINALIZAR_PROCESO:
+        printf("FINALIZAR_PROCESO \n");
+        break;
+    default:
+        printf("Error de instruccion \n");
+        break;
+    }
+    
+
 }
+
 
 void escuchar_cpu(int32_t fd_cpu)
 {

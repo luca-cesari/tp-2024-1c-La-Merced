@@ -19,6 +19,19 @@ int8_t conectar_con_memoria()
    return 0;
 }
 
+
+void iniciar_proceso(pid_t pid, char *path)
+{
+   instruccion_kernel instruccion;
+   instruccion.tipo = INICIAR_PROCESO;
+   instruccion.pid = pid;
+   strcpy(instruccion.parametros.path, path);
+
+   pthread_mutex_lock(&mutex_memoria);
+   enviar_instruccion_kernel(fd_memoria, instruccion);
+   pthread_mutex_unlock(&mutex_memoria);
+}
+
 int8_t reservar_paginas(t_pcb *pcb)
 {
    pthread_mutex_lock(&mutex_memoria);
