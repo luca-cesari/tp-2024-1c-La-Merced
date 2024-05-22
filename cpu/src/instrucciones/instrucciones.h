@@ -10,8 +10,8 @@
 #include <commons/collections/dictionary.h>
 
 char *fetch();
-void decode(char *char_instruccion_completa, void (**instruccion)(struct Parametros));
-void execute();
+void (*)(struct Parametros) decode(char *char_instruccion_completa);
+// void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
 void check_interrupt();
 
 // typedef enum {
@@ -37,11 +37,11 @@ void check_interrupt();
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-void set(struct Parametros);
-void sum(struct Parametros);
-void sub(struct Parametros);
-void jnz(struct Parametros);
-void io_gen_sleep(struct Parametros);
+void *set(struct Parametros);
+void *sum(struct Parametros);
+void *sub(struct Parametros);
+void *jnz(struct Parametros);
+void *io_gen_sleep(struct Parametros);
 
 //////DECODE /////////////////////////////////////////////
 ////ESTRUCTURAS DECODE ////////
@@ -50,7 +50,7 @@ union Parametro
    u_int8_t *registro_u8;
    u_int32_t *registro_u32;
    int valor;
-   //   interfaz;
+   char *interfaz;
 };
 
 struct Parametros
@@ -62,7 +62,7 @@ struct Parametros
 };
 /// FUNCIONES DECODE ////////////
 
-// void generar_instruccion(char **instruc_parametros);
+char **instruccion_parametros(char *char_instruccion);
 int es_numero(char *parametro);
 int char_a_numero(char *parametro);
 struct Parametros obtener_parametros(char **parametros);

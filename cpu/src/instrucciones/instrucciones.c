@@ -4,33 +4,37 @@
 t_dictionary *instrucciones;
 t_dictionary *registros;
 
+
 void ciclo_instruccion()
 {
    char *char_instruccion = fetch();
-   void (*instruccion)(struct Parametros);
-   decode(char_instruccion, &instruccion);
-   execute(instruccion); // no hace mucho, revisar
+   void (*instruccion)(struct Parametros) = decode(char_instruccion);
+   execute(instruccion, char_instruccion); // no hace mucho, revisar
    check_interrupt();
 }
 
-// void decode(char *char_instruccion, void (**instruccion)(struct Parametros))
-// {
-//    char **instruccion_parametros;
-//    instruccion_parametros = string_split(instruccion, " ");
-//    return generar_instruccion(instruccion_parametros);
-// }
-
-void decode(char *char_instruccion_completa, void (**instruccion)(struct Parametros))
+void execute(void (*instruccion)(struct Parametros), char *char_instruccion)
 {
-   char **instruccion_parametros;
-   instruccion_parametros = string_split(char_instruccion_completa, " ");
+
+   char **instruc_parametros = instruccion_parametros(char_instruccion);
+   instruccion(obtener_parametros(instruc_parametros));
+}
+
+char **instruccion_parametros(char *char_instruccion)
+{
+   return string_split(char_instruccion, " ");
+}
+
+void (*funcion)(struct Parametros)decode(char *char_instruccion)
+{
+   char **instruccion_parametros = instruccion_parametros(char_instruccion);
+   // char **instruccion_parametros;
+   // instruccion_parametros = string_split(char_instruccion_completa, " ");
    instrucciones = dictionary_create();
    set_diccionario_instrucciones(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
    if (dictionary_has_key(instrucciones, instrucion_parametros[0]))
    {
-      void (*set_instruccion)(struct Parametros);
-      set_instruccion = dictionary_get(instrucciones, instrucion_parametros[0]);
-      instruccion = set_instruccion(obtener_parametros(instruc_parametros));
+      return dictionary_get(instrucciones, instrucion_parametros[0]);
    }
    else
    {
@@ -43,8 +47,8 @@ struct Parametros obtener_parametros(char **parametros)
 {
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    struct Parametros struct_parametros;
-   struct_parametros.parametro1 = buscar_operando(parametros[1]);
-   struct_parametros.parametro2 = buscar_operando(parametros[2]);
+   struct_parametros.parametro1 = *buscar_operando(parametros[1]);
+   struct_parametros.parametro2 = *buscar_operando(parametros[2]);
    // struct_parametros.parametro3 = buscar_operando(parametros[3]) // siguientes checkpoints
    // struct_parametros.parametro4 = buscar_operando(parametros[4])
    return struct_parametros;
@@ -72,11 +76,11 @@ union Parametro *buscar_operando(char *parametro)
 
 void set_diccionario_instrucciones(t_dictionary *instrucciones)
 {
-   dictionary_put(instrucciones, "SET", set);
-   dictionary_put(instrucciones, "SUM", sum);
-   dictionary_put(instrucciones, "SUB", sub);
-   dictionary_put(instrucciones, "JNZ", jnz);
-   dictionary_put(instrucciones, "IO_GEN_SLEEP", io_gen_sleep);
+   dictionary_put(instrucciones, "SET", &set);
+   dictionary_put(instrucciones, "SUM", &sum);
+   dictionary_put(instrucciones, "SUB", &sub);
+   dictionary_put(instrucciones, "JNZ", &jnz);
+   dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
 }
 
 void set_diccionario_registros(t_dictionary *registros)
