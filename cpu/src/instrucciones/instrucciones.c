@@ -1,8 +1,9 @@
 #include "instrucciones.h"
 
-void ciclo_instruccion(){
+void ciclo_instruccion()
+{
    char *char_instruccion = fetch();
-   void *instruccion= decode(char_instruccion);
+   void *instruccion = decode(char_instruccion);
    execute(instruccion); // no hace mucho, revisar
    check_interrupt();
 }
@@ -14,8 +15,8 @@ void *decode(char *instruccion)
    return generar_instruccion(instruccion_parametros);
 }
 
-void *set( *registro, int *valor){
-
+void *set(*registro, int *valor)
+{
 }
 
 void *generar_instruccion(char **instruc_parametros)
@@ -100,48 +101,52 @@ int char_a_numero(char *parametro)
 //       return num;
 //    }
 // }
+void *obtener_parametros(char **parametros){
+   
+}
 
-void *buscar_operando(char *parametro)
+void *buscar_operandos(char **parametros)
 {
-   if (es_numero(parametro))
+   set_diccionario_parametros(t_dictionary * registros); // ver porque cada vez que busque operandos de una instruccion tiene que llenar el diciconario
+   int i=0;
+   while (parametros[i] != NULL)
    {
-      return char_a_numero(parametro); // ver si usar el mas robusto
-   }
-   else if (strcmp(parametro, "AX") == 0)
-   {
-      return &(registros_cpu.AX);
-   }
-   else if (strcmp(parametro, "BX") == 0)
-   {
-      return &(registros_cpu.BX);
-   }
-   else if (strcmp(parametro, "CX") == 0)
-   {
-      return &(registros_cpu.CX);
-   }
-   else if (strcmp(parametro, "DX") == 0)
-   {
-      return &(registros_cpu.DX);
-   }
-   else if (strcmp(parametro, "EAX") == 0)
-   {
-      return &(registros_cpu.EAX);
-   }
-   else if (strcmp(parametro, "EBX") == 0)
-   {
-      return &(registros_cpu.EBX);
-   }
-   else if (strcmp(parametro, "ECX") == 0)
-   {
-      return &(registros_cpu.ECX);
-   }
-   else if (strcmp(parametro, "EDX") == 0)
-   {
-      return &(registros_cpu.EDX);
-   }
-   else
-   {
-      // en caso de operando desconocido
-      printf("Operando desconocido: %s\n", parametro);
+      if (es_numero(parametros[i]))
+      {
+         return char_a_numero(parametros[i]); // ver si usar el mas robusto
+      }
+      else if (dictionary_has_key(registros, parametros[i]))
+      {
+      }
+      else
+      {
+         // en caso de operando desconocido
+         printf("Operando desconocido: %s\n", parametros[i]);
+      }
+      i++;
    }
 }
+
+void set_diccionario_instrucciones(t_dictionary *instrucciones)
+{
+   dictionary_put(instrucciones, "SET", set);
+   dictionary_put(instrucciones, "SUM", sum);
+   dictionary_put(instrucciones, "SUB", sub);
+   dictionary_put(instrucciones, "JNZ", jnz);
+   dictionary_put(instrucciones, "IO_GEN_SLEEP", io_gen_sleep);
+}
+
+void set_diccionario_parametros(t_dictionary *registros)
+{
+   dictionary_put(registros, "AX", &(registros_cpu.AX));
+   dictionary_put(registros, "BX", &(registros_cpu.BX));
+   dictionary_put(registros, "CX", &(registros_cpu.CX));
+   dictionary_put(registros, "DX", &(registros_cpu.DX));
+   dictionary_put(registros, "EAX", &(registros_cpu.EAX));
+   dictionary_put(registros, "EBX", &(registros_cpu.EBX));
+   dictionary_put(registros, "ECX", &(registros_cpu.ECX));
+   dictionary_put(registros, "EDX", &(registros_cpu.EDX));
+}
+
+t_dictionary *instrucciones = *dictionary_create();
+t_dictionary *registros = *dictionary_create();

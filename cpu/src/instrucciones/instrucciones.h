@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <limits.h>
+#include <commons/collections/dictionary.h>
 
 void fetch();
 void decode();
@@ -30,20 +31,39 @@ void check_interrupt();
 #define IO_GEN_SLEEP "IO_GEN_SLEEP"
 
 // ver porque los registros pueden ser de 32 o 8 bits => de que tipo son
-void *set(char *registro, char *valor);
-void *sum(char *registro_destino, char *registro_origen);
-void *sub(char *registro_destino, char *registro_origen);
-void *jnz(char *registro, char *instruccion);
-void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
+// void *set(char *registro, char *valor);
+// void *sum(char *registro_destino, char *registro_origen);
+// void *sub(char *registro_destino, char *registro_origen);
+// void *jnz(char *registro, char *instruccion);
+// void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
+void *set(struct Parametros);
+void *sum(struct Parametros);
+void *sub(struct Parametros);
+void *jnz(struct Parametros);
+void *io_gen_sleep(struct Parametros);
 
+union Parametro
+{
+   uint8_t *registro_u8;
+   uint32_t *registro_u32;
+   int valor;
+   //   interfaz;
+};
+
+struct Parametros
+{
+   union Parametro parametro1;
+   union Parametro parametro2;
+   // union Parametro parametro3;
+   // union Parametro parametro4;
+};
 /// funciones decode
 
 void *generar_instruccion(char **instruc_parametros);
 int es_numero(char *parametro);
 int char_a_numero(char *parametro);
 int *buscar_operando(char *parametro);
-
 
 // Instrucciones
 //  SET (Registro, Valor)
