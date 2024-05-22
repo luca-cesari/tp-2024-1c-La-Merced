@@ -21,26 +21,11 @@ void *set(*registro, int *valor)
 
 void *generar_instruccion(char **instruc_parametros)
 {
-   char *instruccion = instruc_parametros[0];
-   if (strcmp(instruccion, SET) == 0)
+   set_diccionario_parametros(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
+   if (dictionary_has_key(instrucciones, parametro))
    {
-      return set(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, SUM) == 0)
-   {
-      return sum(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, SUB) == 0)
-   {
-      return sub(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, JNZ) == 0)
-   {
-      return jnz(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, IO_GEN_SLEEP) == 0)
-   {
-      return io_gen_sleep(instruc_parametros[1], instruc_parametros[2]);
+      void *instruccion = dictionary_get(instrucciones, instruc_parametros[0]);
+      return instruccion(obtener_parametros(instruc_parametros));
    }
    else
    {
@@ -48,6 +33,62 @@ void *generar_instruccion(char **instruc_parametros)
       printf("Instrucción desconocida: %s\n", instruccion);
    }
 }
+
+void *obtener_parametros(char **parametros)
+{
+   // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
+   struct Parametros struct_parametros;
+   struct_parametros.parametro1 = buscar_operando(parametros[1]);
+   struct_parametros.parametro2 = buscar_operando(parametros[2]);
+   // struct_parametros.parametro3 = buscar_operando(parametros[3]) // siguientes checkpoints
+   // struct_parametros.parametro4 = buscar_operando(parametros[4])
+   return struct_parametros;
+}
+
+void *buscar_operando(char *parametro)
+{
+   set_diccionario_parametros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
+   if (es_numero(parametro))
+   {
+      return char_a_numero(parametro); // ver si usar el mas robusto
+   }
+   else if (dictionary_has_key(registros, parametro))
+   {
+      return dictionary_get(registros, parametro);
+   }
+   else // falta interfaz
+   {
+      // en caso de operando desconocido
+      printf("Operando desconocido: %s\n", parametro);
+   }
+}
+
+///////// ESTRUCTURAS AUXILIARES ///////////
+t_dictionary *instrucciones = *dictionary_create();
+t_dictionary *registros = *dictionary_create();
+
+void set_diccionario_instrucciones(t_dictionary *instrucciones)
+{
+   dictionary_put(instrucciones, "SET", set);
+   dictionary_put(instrucciones, "SUM", sum);
+   dictionary_put(instrucciones, "SUB", sub);
+   dictionary_put(instrucciones, "JNZ", jnz);
+   dictionary_put(instrucciones, "IO_GEN_SLEEP", io_gen_sleep);
+}
+
+void set_diccionario_parametros(t_dictionary *registros)
+{
+   dictionary_put(registros, "AX", &(registros_cpu.AX));
+   dictionary_put(registros, "BX", &(registros_cpu.BX));
+   dictionary_put(registros, "CX", &(registros_cpu.CX));
+   dictionary_put(registros, "DX", &(registros_cpu.DX));
+   dictionary_put(registros, "EAX", &(registros_cpu.EAX));
+   dictionary_put(registros, "EBX", &(registros_cpu.EBX));
+   dictionary_put(registros, "ECX", &(registros_cpu.ECX));
+   dictionary_put(registros, "EDX", &(registros_cpu.EDX));
+}
+
+//////////FUNCIONES AUXILIARES////////////
 
 int es_numero(char *parametro)
 {
@@ -101,52 +142,3 @@ int char_a_numero(char *parametro)
 //       return num;
 //    }
 // }
-void *obtener_parametros(char **parametros){
-   
-}
-
-void *buscar_operandos(char **parametros)
-{
-   set_diccionario_parametros(t_dictionary * registros); // ver porque cada vez que busque operandos de una instruccion tiene que llenar el diciconario
-   int i=0;
-   while (parametros[i] != NULL)
-   {
-      if (es_numero(parametros[i]))
-      {
-         return char_a_numero(parametros[i]); // ver si usar el mas robusto
-      }
-      else if (dictionary_has_key(registros, parametros[i]))
-      {
-      }
-      else
-      {
-         // en caso de operando desconocido
-         printf("Operando desconocido: %s\n", parametros[i]);
-      }
-      i++;
-   }
-}
-
-void set_diccionario_instrucciones(t_dictionary *instrucciones)
-{
-   dictionary_put(instrucciones, "SET", set);
-   dictionary_put(instrucciones, "SUM", sum);
-   dictionary_put(instrucciones, "SUB", sub);
-   dictionary_put(instrucciones, "JNZ", jnz);
-   dictionary_put(instrucciones, "IO_GEN_SLEEP", io_gen_sleep);
-}
-
-void set_diccionario_parametros(t_dictionary *registros)
-{
-   dictionary_put(registros, "AX", &(registros_cpu.AX));
-   dictionary_put(registros, "BX", &(registros_cpu.BX));
-   dictionary_put(registros, "CX", &(registros_cpu.CX));
-   dictionary_put(registros, "DX", &(registros_cpu.DX));
-   dictionary_put(registros, "EAX", &(registros_cpu.EAX));
-   dictionary_put(registros, "EBX", &(registros_cpu.EBX));
-   dictionary_put(registros, "ECX", &(registros_cpu.ECX));
-   dictionary_put(registros, "EDX", &(registros_cpu.EDX));
-}
-
-t_dictionary *instrucciones = *dictionary_create();
-t_dictionary *registros = *dictionary_create();
