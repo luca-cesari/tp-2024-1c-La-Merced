@@ -25,7 +25,7 @@ char **instruccion_parametros(char *char_instruccion)
    return string_split(char_instruccion, " ");
 }
 
-void (*funcion)(struct Parametros)decode(char *char_instruccion)
+void (*decode(char *char_instruccion))(struct Parametros);
 {
    char **instruccion_parametros = instruccion_parametros(char_instruccion);
    // char **instruccion_parametros;

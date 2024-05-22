@@ -10,8 +10,8 @@
 #include <commons/collections/dictionary.h>
 
 char *fetch();
-void (*)(struct Parametros) decode(char *char_instruccion_completa);
-// void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
+void (*decode(char *char_instruccion))(struct Parametros);
+void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
 void check_interrupt();
 
 // typedef enum {
