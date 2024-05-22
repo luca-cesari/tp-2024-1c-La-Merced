@@ -14,6 +14,10 @@ void *decode(char *instruccion)
    return generar_instruccion(instruccion_parametros);
 }
 
+void *set( *registro, int *valor){
+
+}
+
 void *generar_instruccion(char **instruc_parametros)
 {
    char *instruccion = instruc_parametros[0];
@@ -97,7 +101,7 @@ int char_a_numero(char *parametro)
 //    }
 // }
 
-int *buscar_operando(char *parametro)
+void *buscar_operando(char *parametro)
 {
    if (es_numero(parametro))
    {

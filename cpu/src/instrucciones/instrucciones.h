@@ -36,6 +36,15 @@ void *sub(char *registro_destino, char *registro_origen);
 void *jnz(char *registro, char *instruccion);
 void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
+
+/// funciones decode
+
+void *generar_instruccion(char **instruc_parametros);
+int es_numero(char *parametro);
+int char_a_numero(char *parametro);
+int *buscar_operando(char *parametro);
+
+
 // Instrucciones
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)
