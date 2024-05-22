@@ -10,7 +10,7 @@
 #include <commons/collections/dictionary.h>
 
 char *fetch();
-void *decode(char *instruccion);
+void decode(char *char_instruccion_completa, void (**instruccion)(struct Parametros));
 void execute();
 void check_interrupt();
 
@@ -37,11 +37,11 @@ void check_interrupt();
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-void *set(Parametros);
-void *sum(Parametros);
-void *sub(Parametros);
-void *jnz(Parametros);
-void *io_gen_sleep(Parametros);
+void set(struct Parametros);
+void sum(struct Parametros);
+void sub(struct Parametros);
+void jnz(struct Parametros);
+void io_gen_sleep(struct Parametros);
 
 //////DECODE /////////////////////////////////////////////
 ////ESTRUCTURAS DECODE ////////
@@ -62,11 +62,13 @@ struct Parametros
 };
 /// FUNCIONES DECODE ////////////
 
-void *generar_instruccion(char **instruc_parametros);
+// void generar_instruccion(char **instruc_parametros);
 int es_numero(char *parametro);
 int char_a_numero(char *parametro);
 struct Parametros obtener_parametros(char **parametros);
-void *buscar_operando(char *parametro);
+union Parametro *buscar_operando(char *parametro);
+void set_diccionario_instrucciones(t_dictionary *);
+void set_diccionario_registros(t_dictionary *);
 
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)

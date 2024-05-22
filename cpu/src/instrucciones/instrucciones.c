@@ -1,36 +1,45 @@
 #include "instrucciones.h"
+#include "registros/registros.c"
+
+t_dictionary *instrucciones;
+t_dictionary *registros;
 
 void ciclo_instruccion()
 {
    char *char_instruccion = fetch();
-   void *instruccion = decode(char_instruccion);
+   void (*instruccion)(struct Parametros);
+   decode(char_instruccion, &instruccion);
    execute(instruccion); // no hace mucho, revisar
    check_interrupt();
 }
 
-void *decode(char *instruccion)
+// void decode(char *char_instruccion, void (**instruccion)(struct Parametros))
+// {
+//    char **instruccion_parametros;
+//    instruccion_parametros = string_split(instruccion, " ");
+//    return generar_instruccion(instruccion_parametros);
+// }
+
+void decode(char *char_instruccion_completa, void (**instruccion)(struct Parametros))
 {
    char **instruccion_parametros;
-   instruccion_parametros = string_split(instruccion, " ");
-   return generar_instruccion(instruccion_parametros);
-}
-
-void *generar_instruccion(char **instruc_parametros)
-{
-   set_diccionario_parametros(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
-   if (dictionary_has_key(instrucciones, parametro))
+   instruccion_parametros = string_split(char_instruccion_completa, " ");
+   instrucciones = dictionary_create();
+   set_diccionario_instrucciones(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
+   if (dictionary_has_key(instrucciones, instrucion_parametros[0]))
    {
-      void *instruccion = dictionary_get(instrucciones, instruc_parametros[0]);
-      return instruccion(obtener_parametros(instruc_parametros));
+      void (*set_instruccion)(struct Parametros);
+      set_instruccion = dictionary_get(instrucciones, instrucion_parametros[0]);
+      instruccion = set_instruccion(obtener_parametros(instruc_parametros));
    }
    else
    {
       // En caso de instrucción desconocida
-      printf("Instrucción desconocida: %s\n", instruc_parametros[0]);
+      printf("Instrucción desconocida: %s\n", instrucion_parametros[0]);
    }
 }
 
- struct Parametros obtener_parametros(char **parametros)
+struct Parametros obtener_parametros(char **parametros)
 {
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    struct Parametros struct_parametros;
@@ -41,9 +50,10 @@ void *generar_instruccion(char **instruc_parametros)
    return struct_parametros;
 }
 
-void *buscar_operando(char *parametro)
+union Parametro *buscar_operando(char *parametro)
 {
-   set_diccionario_parametros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
+   registros = dictionary_create();
+   set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
    if (es_numero(parametro))
    {
       return char_a_numero(parametro); // ver si usar el mas robusto
@@ -58,10 +68,7 @@ void *buscar_operando(char *parametro)
       printf("Operando desconocido: %s\n", parametro);
    }
 }
-
 ///////// ESTRUCTURAS AUXILIARES ///////////
-t_dictionary *instrucciones = *dictionary_create();
-t_dictionary *registros = *dictionary_create();
 
 void set_diccionario_instrucciones(t_dictionary *instrucciones)
 {
@@ -72,7 +79,7 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
    dictionary_put(instrucciones, "IO_GEN_SLEEP", io_gen_sleep);
 }
 
-void set_diccionario_parametros(t_dictionary *registros)
+void set_diccionario_registros(t_dictionary *registros)
 {
    dictionary_put(registros, "AX", &(registros_cpu.AX));
    dictionary_put(registros, "BX", &(registros_cpu.BX));
