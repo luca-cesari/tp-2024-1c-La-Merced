@@ -10,21 +10,21 @@
 
 typedef enum
 {
-   SIGNAL,
-   MESSAGE,
-   PACKET
+    SIGNAL,
+    MESSAGE,
+    PACKET
 } op_code;
 
 typedef struct
 {
-   int32_t size;
-   void *stream;
+    int32_t size;
+    void *stream;
 } t_buffer;
 
 typedef struct
 {
-   op_code op_code;
-   t_buffer *buffer;
+    op_code op_code;
+    t_buffer *buffer;
 } t_packet;
 
 t_packet *crear_paquete(void);
@@ -44,17 +44,20 @@ int32_t recibir_senial(int32_t fd_conexion);
 void enviar_mensaje(char *mensaje, int32_t fd_conexion);
 char *recibir_mensaje(int32_t fd_conexion);
 
-//INICIO Protocolo de comunicación entre Memoria y Kernel
-typedef enum {
+// INICIO Protocolo de comunicación entre Memoria y Kernel
+typedef enum
+{
     INICIAR_PROCESO,
     FINALIZAR_PROCESO,
     // Otros tipos de instrucciones si los hay
 } tipo_instruccion;
 
-typedef struct {
+typedef struct
+{
     tipo_instruccion tipo;
-    int pid;  // El PID está presente en todos los casos
-    union {
+    int pid; // El PID está presente en todos los casos
+    union
+    {
         char path[256]; // Presente solo para INICIAR_PROCESO
         // Otros parámetros específicos para otros tipos de instrucciones si los hay
     } parametros;
@@ -63,7 +66,6 @@ typedef struct {
 instruccion_kernel recibir_instruccion_del_kernel(int32_t fd_kernel);
 void enviar_instruccion_a_memoria(int32_t fd_memoria, instruccion_kernel instruccion);
 
-//FIN Protocolo de comunicación entre Memoria y Kernel
-
+// FIN Protocolo de comunicación entre Memoria y Kernel
 
 #endif // UTILS_PROTOCOL_H

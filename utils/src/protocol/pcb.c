@@ -53,6 +53,7 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->psw = bitarray_create_with_mode(list_get(paquete, 4), *(size_t *)list_get(paquete, 5), *(bit_numbering_t *)list_get(paquete, 6));
    pcb->executable_path = strdup(list_get(paquete, 7));
 
+   list_destroy(paquete);
    return pcb;
 }
 
