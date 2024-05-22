@@ -1,5 +1,19 @@
 #include "instrucciones.h"
 
+void ciclo_instruccion(){
+   char *char_instruccion = fetch();
+   void *instruccion= decode(char_instruccion);
+   execute(instruccion); // no hace mucho, revisar
+   check_interrupt();
+}
+
+void *decode(char *instruccion)
+{
+   char **instruccion_parametros;
+   instruccion_parametros = string_split(instruccion_completa, " ");
+   return generar_instruccion(instruccion_parametros);
+}
+
 void *generar_instruccion(char **instruc_parametros)
 {
    char *instruccion = instruc_parametros[0];
@@ -42,33 +56,46 @@ int es_numero(char *parametro)
    }
    return 1; // es un numero
 }
+// VER QUE  OPCION ES MEJOR
+
+// int es_numero_isDigit(const char *cadena) {
+//     size_t longitud = strlen(cadena);
+//     for (size_t i = 0; i < longitud; i++) {
+//         if (!isdigit(cadena[i])) {
+//             return 0; // No es un número
+//         }
+//     }
+//     return 1; // Es un número
+// }
 
 int char_a_numero(char *parametro)
 {
    return atoi(parametro);
 }
 
-long char_a_numero_robusto(char *parametro)
-{
-   char *endptr;
-   errno = 0;
-   long num = strtol(parametro, &endptr, 10); // el long tiene un maximo de tamanio permitido , 10 hace referencia a la base del numero, en este caso decimal
+// VER QUE  OPCION ES MEJOR
 
-   if (errno == ERANGE)
-   {
-      printf("Error de desbordamiento.\n");
-      return 0;
-   }
-   else if (*endptr != '\0')
-   {
-      printf("La conversión no fue completamente exitosa. Parte de la cadena no convertida: %s\n", endptr);
-      return 0;
-   }
-   else
-   {
-      return num;
-   }
-}
+// long char_a_numero_robusto(char *parametro)
+// {
+//    char *endptr;
+//    errno = 0;
+//    long num = strtol(parametro, &endptr, 10); // el long tiene un maximo de tamanio permitido , 10 hace referencia a la base del numero, en este caso decimal
+
+//    if (errno == ERANGE)
+//    {
+//       printf("Error de desbordamiento.\n");
+//       return 0;
+//    }
+//    else if (*endptr != '\0')
+//    {
+//       printf("La conversión no fue completamente exitosa. Parte de la cadena no convertida: %s\n", endptr);
+//       return 0;
+//    }
+//    else
+//    {
+//       return num;
+//    }
+// }
 
 int *buscar_operando(char *parametro)
 {
@@ -113,12 +140,4 @@ int *buscar_operando(char *parametro)
       // en caso de operando desconocido
       printf("Operando desconocido: %s\n", parametro);
    }
-}
-
-void *procesar_instruccion(int PC)
-{
-   char **instruccion_parametros;
-   char *instruccion_completa = obtener_instruccion(PC); // ver porque esta funcion es de memoria, y no la conoce supuestamente, hay que hacer cosas con paquetes o no se
-   instruccion_parametros = string_split(instruccion_completa, " ");
-   return generar_instruccion(instruccion_parametros);
 }

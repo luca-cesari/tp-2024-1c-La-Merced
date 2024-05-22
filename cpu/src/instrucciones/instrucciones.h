@@ -8,10 +8,10 @@
 #include <errno.h>
 #include <limits.h>
 
-// void instruction_fetch ();
-// void instruction_decode();
-// void instruction_execute();
-// void check_interrupt ();
+void fetch();
+void decode();
+void execute();
+void check_interrupt();
 
 // typedef enum {
 //     SET,
