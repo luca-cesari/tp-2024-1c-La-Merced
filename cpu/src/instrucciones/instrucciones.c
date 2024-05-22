@@ -1,17 +1,63 @@
 #include "instrucciones.h"
-#include "registros/registros.c"
+
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
 
 
-void ciclo_instruccion()
-{
-   char *char_instruccion = fetch();
-   void (*instruccion)(struct Parametros) = decode(char_instruccion);
-   execute(instruccion, char_instruccion); // no hace mucho, revisar
-   check_interrupt();
+void *set(struct Parametros);
+void *sum(struct Parametros);
+void *sub(struct Parametros);
+void *jnz(struct Parametros);
+void *io_gen_sleep(struct Parametros);
+
+void (*decode(char *char_instruccion))(struct Parametros);
+void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
+
+char *fetch(){
+      return "SET AX 10";
+   
 }
+
+void check_interrupt(){
+    printf("Check interrupt\n");
+}
+
+void *set(struct Parametros parametros)
+{
+   *(parametros.parametro1.registro_u32) = parametros.parametro2.valor;
+   return NULL;
+}
+
+void *sum(struct Parametros parametros)
+{
+   *(parametros.parametro1.registro_u32) += parametros.parametro2.valor;
+   return NULL;
+}
+
+void *sub(struct Parametros parametros)
+{
+   *(parametros.parametro1.registro_u32) -= parametros.parametro2.valor;
+   return NULL;
+}  
+
+void *jnz(struct Parametros parametros)
+{
+   if (*(parametros.parametro1.registro_u32) != 0)
+   {
+      // ejecutar instruccion
+   }
+   return NULL;
+}
+
+void *io_gen_sleep(struct Parametros parametros)
+{
+   // falta implementar
+   return NULL;
+}
+
+
+
 
 void execute(void (*instruccion)(struct Parametros), char *char_instruccion)
 {
@@ -27,19 +73,20 @@ char **instruccion_parametros(char *char_instruccion)
 
 void (*decode(char *char_instruccion))(struct Parametros)
 {
-   char **instruccion_parametros = instruccion_parametros(char_instruccion);
+   char **instruc_parametros = instruccion_parametros(char_instruccion);
    // char **instruccion_parametros;
    // instruccion_parametros = string_split(char_instruccion_completa, " ");
    instrucciones = dictionary_create();
    set_diccionario_instrucciones(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
-   if (dictionary_has_key(instrucciones, instrucion_parametros[0]))
+   if (dictionary_has_key(instrucciones, instruc_parametros[0]))
    {
-      return dictionary_get(instrucciones, instrucion_parametros[0]);
+      return dictionary_get(instrucciones, instruc_parametros[0]);
    }
    else
    {
       // En caso de instrucción desconocida
-      printf("Instrucción desconocida: %s\n", instrucion_parametros[0]);
+      printf("Instrucción desconocida: %s\n", instruc_parametros[0]);
+      return NULL;
    }
 }
 
@@ -126,6 +173,8 @@ int char_a_numero(char *parametro)
    return atoi(parametro);
 }
 
+
+
 // VER QUE  OPCION ES MEJOR
 
 // long char_a_numero_robusto(char *parametro)
@@ -149,3 +198,17 @@ int char_a_numero(char *parametro)
 //       return num;
 //    }
 // }
+
+void ciclo_instruccion()
+{
+   char *char_instruccion = fetch();
+   
+   void (*instruccion)(struct Parametros) = decode(char_instruccion);
+   if (instruccion != NULL) {
+       execute(instruccion, char_instruccion); // no hace mucho, revisar
+   } else {
+       printf("Error: instrucción desconocida '%s'\n", char_instruccion);
+   }
+   
+   check_interrupt();
+}

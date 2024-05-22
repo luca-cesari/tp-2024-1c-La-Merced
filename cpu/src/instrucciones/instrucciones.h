@@ -8,10 +8,11 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
+#include <registros/registros.c>
 
 char *fetch();
-void (*decode(char *char_instruccion))(struct Parametros);
-void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
+//void (*decode(char *char_instruccion))(struct Parametros);
+//void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
 void check_interrupt();
 
 // typedef enum {
@@ -37,11 +38,11 @@ void check_interrupt();
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-void *set(struct Parametros);
-void *sum(struct Parametros);
-void *sub(struct Parametros);
-void *jnz(struct Parametros);
-void *io_gen_sleep(struct Parametros);
+//void *set(struct Parametros);
+//void *sum(struct Parametros);
+//void *sub(struct Parametros);
+//void *jnz(struct Parametros);
+//void *io_gen_sleep(struct Parametros);
 
 //////DECODE /////////////////////////////////////////////
 ////ESTRUCTURAS DECODE ////////
