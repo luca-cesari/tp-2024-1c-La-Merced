@@ -1,23 +1,36 @@
 #include "generica.h"
 
-generica_config config;
+t_dictionary *instruccion_funcion;
 
-void inicializar_interfaz_generica(void)
+void iniciar_rutina_interfaz_generica(void)
 {
-    config = get_generica_config();
+    crear_instrucciones();
 
-    gen_sleep(3);
+    while (1)
+    {
+        t_io_request *peticion_io = esperar_instruccion();
 
-    conectar_con_kernel();
+        if (!dictionary_has_key(instruccion_funcion, peticion_io->instruction))
+            enviar_respuesta(INVALID_INSTRUCTION);
 
-    liberar_conexion_kernel();
-
+        void (*funcion)(char *) = dictionary_get(instruccion_funcion, peticion_io->instruction);
+        funcion(peticion_io->arguments);
+        log_operacion(peticion_io->pid, peticion_io->instruction);
+        enviar_respuesta(SUCCESS);
+    }
 }
 
-void gen_sleep(int32_t cant_unidad_trabajo)
+void crear_instrucciones()
+{
+    instruccion_funcion = dictionary_create();
+    dictionary_put(instruccion_funcion, "IO_GEN_SLEEP", &gen_sleep);
+}
+
+void gen_sleep(char *cant_unidad_trabajo)
 {
 
-    int32_t tiempo_en_ms = config.tiempo_unidad_trabajo;
-    usleep(cant_unidad_trabajo * tiempo_en_ms);
-    
+    u_int32_t tiempo_en_ms = get_tiempo_unidad_trabajo();
+
+    u_int32_t timepo_a_bloquear = atoi(cant_unidad_trabajo) * tiempo_en_ms;
+    sleep(timepo_a_bloquear / 1000);
 }

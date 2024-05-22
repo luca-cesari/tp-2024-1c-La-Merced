@@ -2,16 +2,14 @@
 
 t_config *entradasalida_config;
 
-
-void iniciar_config(void)
+void iniciar_config(char *archivo_config)
 {
-   entradasalida_config = config_create(CONFIG_FILE);
+   entradasalida_config = config_create(archivo_config);
 }
 
-//Para conocer tipo de interfaz
 tipo_interfaz get_tipo_interfaz(void)
 {
-   char* interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
+   char *interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
 
    if (strcmp(interfaz, "GENERICA") == 0)
       return GENERICA;
@@ -26,67 +24,9 @@ tipo_interfaz get_tipo_interfaz(void)
       return DIALFS;
 
    return -1;
-
 }
 
-
-// Para obtener datos importantes de interfaz generica
-generica_config get_generica_config()
-{
-   generica_config generica;
-   generica.tipo_interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
-   generica.tiempo_unidad_trabajo = config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
-   generica.ip_kernel = config_get_string_value(entradasalida_config, "IP_KERNEL");
-   generica.puerto_kernel = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
-
-   return generica;
-}
-
-// Para obtener datos importantes de interfaz stdin
-stdin_config get_stdin_config()
-{
-   stdin_config stdin;
-   stdin.tipo_interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
-   stdin.tiempo_unidad_trabajo = config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
-   stdin.ip_kernel = config_get_string_value(entradasalida_config, "IP_KERNEL");
-   stdin.puerto_kernel = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
-   stdin.ip_memoria = config_get_string_value(entradasalida_config, "IP_MEMORIA");
-   stdin.puerto_memoria = config_get_string_value(entradasalida_config, "PUERTO_MEMORIA");
-
-   return stdin;
-}
-
-// Para obtener datos importantes de interfaz stdout
-stdout_config get_stdout_config()
-{
-   stdout_config stdout;
-   stdout.tipo_interfaz = config_get_string_value(entradasalida_config, "TIPO_INTERFAZ");
-   stdout.tiempo_unidad_trabajo = config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
-   stdout.ip_kernel = config_get_string_value(entradasalida_config, "IP_KERNEL");
-   stdout.puerto_kernel = config_get_string_value(entradasalida_config, "PUERTO_KERNEL");
-   stdout.ip_memoria = config_get_string_value(entradasalida_config, "IP_MEMORIA");
-   stdout.puerto_memoria = config_get_string_value(entradasalida_config, "PUERTO_MEMORIA");
-
-   return stdout;
-}
-
-// Para obtener datos importantes de interfaz dialfs
-dialfs_config get_dialfs_config()
-{
-   dialfs_config dialfs;
-   dialfs.create = config_get_string_value(entradasalida_config, "IO_FS_CREATE");
-   dialfs.delete = config_get_string_value(entradasalida_config, "IO_FS_DELETE");
-   dialfs.truncate = config_get_string_value(entradasalida_config, "IO_FS_TRUNCATE");
-   dialfs.write = config_get_string_value(entradasalida_config, "IO_FS_WRITE");
-   dialfs.read = config_get_string_value(entradasalida_config, "IO_FS_READ");
-
-   return dialfs;
-}
-
-
-
-//Para conectarme al kernel (ESTO ES SOLO POR AHORA, LUEGO DEPENDERA DEL TIPO DE INTERFAZ)
-kernel_config get_kernel_config(void) 
+kernel_config get_kernel_config(void)
 {
    kernel_config kernel_cfg;
 
@@ -96,7 +36,6 @@ kernel_config get_kernel_config(void)
    return kernel_cfg;
 }
 
-//Para conectarme a la memoria (ESTO ES SOLO POR AHORA, LUEGO DEPENDERA DEL TIPO DE INTERFAZ)
 mem_config get_memoria_config(void)
 {
    mem_config mem_cfg;
@@ -107,7 +46,23 @@ mem_config get_memoria_config(void)
    return mem_cfg;
 }
 
+u_int32_t get_tiempo_unidad_trabajo(void)
+{
+   return config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
+}
 
+dialfs_config get_dialfs_config()
+{
+   dialfs_config dialfs_cfg;
+
+   dialfs_cfg.tiempo_unidad_trabajo = get_tiempo_unidad_trabajo();
+   dialfs_cfg.path_base_dialfs = config_get_string_value(entradasalida_config, "PATH_BASE_DIALFS");
+   dialfs_cfg.block_size = config_get_int_value(entradasalida_config, "BLOCK_SIZE");
+   dialfs_cfg.block_count = config_get_int_value(entradasalida_config, "BLOCK_COUNT");
+   dialfs_cfg.retraso_compactacion = config_get_int_value(entradasalida_config, "RETRASO_COMPACTACION");
+
+   return dialfs_cfg;
+}
 
 void destruir_config(void)
 {
