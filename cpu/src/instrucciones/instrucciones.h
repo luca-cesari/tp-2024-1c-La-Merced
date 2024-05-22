@@ -9,8 +9,8 @@
 #include <limits.h>
 #include <commons/collections/dictionary.h>
 
-void fetch();
-void decode();
+char *fetch();
+void *decode(char *instruccion);
 void execute();
 void check_interrupt();
 
@@ -37,16 +37,18 @@ void check_interrupt();
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-void *set(struct Parametros);
-void *sum(struct Parametros);
-void *sub(struct Parametros);
-void *jnz(struct Parametros);
-void *io_gen_sleep(struct Parametros);
+void *set(Parametros);
+void *sum(Parametros);
+void *sub(Parametros);
+void *jnz(Parametros);
+void *io_gen_sleep(Parametros);
 
+//////DECODE /////////////////////////////////////////////
+////ESTRUCTURAS DECODE ////////
 union Parametro
 {
-   uint8_t *registro_u8;
-   uint32_t *registro_u32;
+   u_int8_t *registro_u8;
+   u_int32_t *registro_u32;
    int valor;
    //   interfaz;
 };
@@ -58,14 +60,15 @@ struct Parametros
    // union Parametro parametro3;
    // union Parametro parametro4;
 };
-/// funciones decode
+/// FUNCIONES DECODE ////////////
 
 void *generar_instruccion(char **instruc_parametros);
 int es_numero(char *parametro);
 int char_a_numero(char *parametro);
-int *buscar_operando(char *parametro);
+struct Parametros obtener_parametros(char **parametros);
+void *buscar_operando(char *parametro);
 
-// Instrucciones
+// Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)
 //  MOV_OUT (Registro Dirección, Registro Datos)

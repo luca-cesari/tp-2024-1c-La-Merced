@@ -11,12 +11,8 @@ void ciclo_instruccion()
 void *decode(char *instruccion)
 {
    char **instruccion_parametros;
-   instruccion_parametros = string_split(instruccion_completa, " ");
+   instruccion_parametros = string_split(instruccion, " ");
    return generar_instruccion(instruccion_parametros);
-}
-
-void *set(*registro, int *valor)
-{
 }
 
 void *generar_instruccion(char **instruc_parametros)
@@ -30,11 +26,11 @@ void *generar_instruccion(char **instruc_parametros)
    else
    {
       // En caso de instrucción desconocida
-      printf("Instrucción desconocida: %s\n", instruccion);
+      printf("Instrucción desconocida: %s\n", instruc_parametros[0]);
    }
 }
 
-void *obtener_parametros(char **parametros)
+ struct Parametros obtener_parametros(char **parametros)
 {
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    struct Parametros struct_parametros;
