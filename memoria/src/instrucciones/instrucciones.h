@@ -14,6 +14,11 @@ typedef struct
 } t_proceso_instrucciones;
 
 
+/**
+ * @brief Inicializa la memoria de instrucciones, es decir la lista de procesos
+ **/
+
+void inicializar_memoria_instrucciones();
 
 /**
  * @brief Carga un proceso a la memoria de instrucciones, es decir a una lista
