@@ -2,16 +2,8 @@
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
+t_registers registros_cpu;
 
-void set(Parametros);
-void sum(Parametros);
-void sub(Parametros);
-void jnz(Parametros);
-void io_gen_sleep(Parametros);
-
-void (*decode(char *char_instruccion))(Parametros);
-void execute(void (*instruccion)(Parametros), char *char_instruccion);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 char *fetch()
 {
    return "SET AX 10";
@@ -65,14 +57,14 @@ void jnz(Parametros parametros)
    {
       if (*(parametros.parametro1.dato.registro_u32) != 0)
       {
-         registros_cpu.PC = parametros.parametro2.dato.valor;
+         // registros_cpu.PC = parametros.parametro2.dato.valor;
       }
    }
    else
    {
       if (*(parametros.parametro1.dato.registro_u8) != 0)
       {
-         registros_cpu.PC = parametros.parametro2.dato.valor;
+         // registros_cpu.PC = parametros.parametro2.dato.valor;
       }
    }
 }

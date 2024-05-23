@@ -1,6 +1,6 @@
 #ifndef INSTRUCCIONES_H
 #define INSTRUCCIONES_H
-#include <registros/registros.h>
+#include <protocol/registers.h>
 #include <stdlib.h>
 #include <string.h>
 #include <commons/string.h>
@@ -8,44 +8,9 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
-#include <registros/registros.c>
+#include <main.c>
 
-char *fetch();
-// void (*decode(char *char_instruccion))(struct Parametros);
-// void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
-void check_interrupt();
-
-// typedef enum {
-//     SET,
-//     SUM,
-//     SUB,
-//     JNZ,
-//     IO_GEN_SLEEP
-// } instruccion;
-
-// QUE ES MEJOR, ENUM O DEFINE
-
-#define SET "SET"
-#define SUM "SUM"
-#define SUB "SUB"
-#define JNZ "JNZ"
-#define IO_GEN_SLEEP "IO_GEN_SLEEP"
-
-// ver porque los registros pueden ser de 32 o 8 bits => de que tipo son
-// void *set(char *registro, char *valor);
-// void *sum(char *registro_destino, char *registro_origen);
-// void *sub(char *registro_destino, char *registro_origen);
-// void *jnz(char *registro, char *instruccion);
-// void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
-
-// void *set(Parametros);
-// void *sum(Parametros);
-// void *sub(Parametros);
-// void *jnz(Parametros);
-// void *io_gen_sleep(Parametros);
-
-//////DECODE /////////////////////////////////////////////
-////ESTRUCTURAS DECODE ////////
+///ESTRUCTURAS DECODE ////////
 typedef struct
 {
   enum
@@ -72,6 +37,27 @@ typedef struct
    // Parametro parametro3;
    // Parametro parametro4;
 } Parametros;
+
+
+char *fetch();
+void (*decode(char *char_instruccion))(Parametros);
+void execute(void (*instruccion)(Parametros), char *char_instruccion);
+void check_interrupt();
+
+// ver porque los registros pueden ser de 32 o 8 bits => de que tipo son
+// void *set(char *registro, char *valor);
+// void *sum(char *registro_destino, char *registro_origen);
+// void *sub(char *registro_destino, char *registro_origen);
+// void *jnz(char *registro, char *instruccion);
+// void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
+
+// void *set(Parametros);
+// void *sum(Parametros);
+// void *sub(Parametros);
+// void *jnz(Parametros);
+// void *io_gen_sleep(Parametros);
+
+
 /// FUNCIONES DECODE ////////////
 
 char **instruccion_parametros(char *char_instruccion);
@@ -81,6 +67,13 @@ Parametros obtener_parametros(char **parametros);
 Parametro buscar_operando(char *parametro);
 void set_diccionario_instrucciones(t_dictionary *);
 void set_diccionario_registros(t_dictionary *);
+
+////////FUNCIONES EXECUTE////////
+void set(Parametros);
+void sum(Parametros);
+void sub(Parametros);
+void jnz(Parametros);
+void io_gen_sleep(Parametros);
 
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
