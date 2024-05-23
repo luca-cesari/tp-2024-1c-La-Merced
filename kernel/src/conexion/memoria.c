@@ -19,48 +19,24 @@ int8_t conectar_con_memoria()
    return 0;
 }
 
-
-void iniciar_proceso(pid_t pid, char *path)
+int8_t memoria_iniciar_proceso(u_int32_t pid, char *path)
 {
    instruccion_kernel instruccion;
    instruccion.tipo = INICIAR_PROCESO;
    instruccion.pid = pid;
-   strcpy(instruccion.parametros.path, path);
+   instruccion.parametros.path = path;
 
    pthread_mutex_lock(&mutex_memoria);
-   enviar_instruccion_kernel(fd_memoria, instruccion);
-   pthread_mutex_unlock(&mutex_memoria);
-}
-
-int8_t reservar_paginas(t_pcb *pcb)
-{
-   pthread_mutex_lock(&mutex_memoria);
-   enviar_pcb(fd_memoria, pcb);
-   // t_pcb *header = pcb_recv(fd_memoria);
+   enviar_instruccion_a_memoria(fd_memoria, instruccion);
    pthread_mutex_unlock(&mutex_memoria);
 
-   // if (header->tipo == ERROR)
-   // {
-   //    printf("Error al reservar paginas\n");
-   //    exit(EXIT_FAILURE);
-   // }
-
+   // habria que esperar la respuesta de la memoria
    return 0;
 }
 
-int8_t liberar_memoria(t_pcb *pcb)
+// TODO
+int8_t memoria_finalizar_proceso(u_int32_t pid)
 {
-   pthread_mutex_lock(&mutex_memoria);
-   enviar_pcb(fd_memoria, pcb);
-   // t_pcb *header = pcb_recv(fd_memoria);
-   pthread_mutex_unlock(&mutex_memoria);
-
-   // if (header->tipo == ERROR)
-   // {
-   //    printf("Error al liberar memoria\n");
-   //    exit(EXIT_FAILURE);
-   // }
-
    return 0;
 }
 

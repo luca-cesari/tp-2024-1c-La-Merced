@@ -19,29 +19,22 @@ int8_t conectar_con_memoria();
 /**
  * @brief Envia la instruccion de iniciar proceso a la memoria
  *
- * @param pid_t : pid del proceso a iniciar
+ * @param u_int32_t : pid del proceso a iniciar
  * @param char * : path del archivo a ejecutar
- */
-
-void iniciar_proceso(pid_t, char *);
-
-/**
- * @brief En principio sera un send y recive simple
- *        donde la memoria responda segun si la reserva
- *        fue exitosa o no.
  *
- * @return int32_t : 0 si la conexion fue exitosa, -1 si hubo un error
+ * @return int8_t : 0 si fue exitosa, -1 si hubo un error
  */
-int8_t reservar_paginas(t_pcb *);
+int8_t memoria_iniciar_proceso(u_int32_t, char *);
 
 /**
  * @brief Notifica a la memoria que se liberen las paginas
- *        reservadas, operacion a realizar cuando finaliza
- *        un proceso.
+ *        reservadas por el proceso
  *
- * @return int32_t : 0 si la conexion fue exitosa, -1 si hubo un error
+ * @param u_int32_t : pid del proceso a finalizar
+ *
+ * @return int8_t : 0 si fue exitosa, -1 si hubo un error
  */
-int8_t liberar_memoria(t_pcb *);
+int8_t memoria_finalizar_proceso(u_int32_t pid);
 
 /**
  * @brief Libera la conexion con el módulo Memoria
