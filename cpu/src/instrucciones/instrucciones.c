@@ -57,14 +57,14 @@ void jnz(Parametros parametros)
    {
       if (*(parametros.parametro1.dato.registro_u32) != 0)
       {
-         // registros_cpu.PC = parametros.parametro2.dato.valor;
+         registros_cpu.PC = parametros.parametro2.dato.valor;
       }
    }
    else
    {
       if (*(parametros.parametro1.dato.registro_u8) != 0)
       {
-         // registros_cpu.PC = parametros.parametro2.dato.valor;
+         registros_cpu.PC = parametros.parametro2.dato.valor;
       }
    }
 }
