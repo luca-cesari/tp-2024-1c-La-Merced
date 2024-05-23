@@ -38,36 +38,37 @@ void check_interrupt();
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-//void *set(struct Parametros);
-//void *sum(struct Parametros);
-//void *sub(struct Parametros);
-//void *jnz(struct Parametros);
-//void *io_gen_sleep(struct Parametros);
+//void *set(Parametros);
+//void *sum(Parametros);
+//void *sub(Parametros);
+//void *jnz(Parametros);
+//void *io_gen_sleep(Parametros);
 
 //////DECODE /////////////////////////////////////////////
 ////ESTRUCTURAS DECODE ////////
-union Parametro
+typedef union
 {
    u_int8_t *registro_u8;
    u_int32_t *registro_u32;
    int valor;
    char *interfaz;
-};
+}Parametro;
 
-struct Parametros
+typedef struct
 {
-   union Parametro parametro1;
-   union Parametro parametro2;
-   // union Parametro parametro3;
-   // union Parametro parametro4;
-};
+   Parametro parametro1;
+   Parametro parametro2;
+   //Parametro parametro3;
+   //Parametro parametro4;
+   enum {INT32, INT8, NONE} tipo_registro;
+}Parametros;
 /// FUNCIONES DECODE ////////////
 
 char **instruccion_parametros(char *char_instruccion);
 int es_numero(char *parametro);
 int char_a_numero(char *parametro);
-struct Parametros obtener_parametros(char **parametros);
-union Parametro *buscar_operando(char *parametro);
+Parametros obtener_parametros(char **parametros);
+Parametro *buscar_operando(char *parametro);
 void set_diccionario_instrucciones(t_dictionary *);
 void set_diccionario_registros(t_dictionary *);
 

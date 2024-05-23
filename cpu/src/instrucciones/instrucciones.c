@@ -4,16 +4,15 @@
 t_dictionary *instrucciones;
 t_dictionary *registros;
 
+void *set(Parametros);
+void *sum(Parametros);
+void *sub(Parametros);
+void *jnz(Parametros);
+void *io_gen_sleep(Parametros);
 
-void *set(struct Parametros);
-void *sum(struct Parametros);
-void *sub(struct Parametros);
-void *jnz(struct Parametros);
-void *io_gen_sleep(struct Parametros);
-
-void (*decode(char *char_instruccion))(struct Parametros);
-void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
-
+void (*decode(char *char_instruccion))(Parametros);
+void execute(void (*instruccion)(Parametros), char *char_instruccion);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 char *fetch(){
       return "SET AX 10";
    
@@ -23,41 +22,36 @@ void check_interrupt(){
     printf("Check interrupt\n");
 }
 
-void *set(struct Parametros parametros)
+void *set(Parametros parametros)
 {
-   *(parametros.parametro1.registro_u32) = parametros.parametro2.valor;
-   return NULL;
+   *(parametros.parametro1) = parametros.parametro2;
 }
 
-void *sum(struct Parametros parametros)
+void *sum(Parametros parametros)
 {
-   *(parametros.parametro1.registro_u32) += parametros.parametro2.valor;
-   return NULL;
+   *(parametros.parametro1) += parametros.parametro2;
 }
 
-void *sub(struct Parametros parametros)
+void *sub(Parametros parametros)
 {
-   *(parametros.parametro1.registro_u32) -= parametros.parametro2.valor;
-   return NULL;
+   *(parametros.parametro1) -= parametros.parametro2;
 }  
 
-void *jnz(struct Parametros parametros)
+void *jnz(Parametros parametros)
 {
-   if (*(parametros.parametro1.registro_u32) != 0)
+   if (*(parametros.parametro1) != 0)
    {
-      // ejecutar instruccion
+      registros_cpu.PC = parametros.parametro2;
    }
-   return NULL;
 }
 
-void *io_gen_sleep(struct Parametros parametros)
+void *io_gen_sleep(Parametros parametros)
 {
    // falta implementar
-   return NULL;
 }
 
 
-void execute(void (*instruccion)(struct Parametros), char *char_instruccion)
+void execute(void (*instruccion)(Parametros), char *char_instruccion)
 {
 
    char **instruc_parametros = instruccion_parametros(char_instruccion);
@@ -69,7 +63,7 @@ char **instruccion_parametros(char *char_instruccion)
    return string_split(char_instruccion, " ");
 }
 
-void (*decode(char *char_instruccion))(struct Parametros)
+void (*decode(char *char_instruccion))(Parametros)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    // char **instruccion_parametros;
@@ -88,7 +82,7 @@ void (*decode(char *char_instruccion))(struct Parametros)
    }
 }
 
-struct Parametros obtener_parametros(char **parametros)
+Parametros obtener_parametros(char **parametros)
 {
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    struct Parametros struct_parametros;
@@ -99,7 +93,7 @@ struct Parametros obtener_parametros(char **parametros)
    return struct_parametros;
 }
 
-union Parametro *buscar_operando(char *parametro)
+Parametro *buscar_operando(char *parametro)
 {
    registros = dictionary_create();
    set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
@@ -201,7 +195,7 @@ void ciclo_instruccion()
 {
    char *char_instruccion = fetch();
    
-   void (*instruccion)(struct Parametros) = decode(char_instruccion);
+   void (*instruccion)(Parametros) = decode(char_instruccion);
    if (instruccion != NULL) {
        execute(instruccion, char_instruccion); // no hace mucho, revisar
    } else {
