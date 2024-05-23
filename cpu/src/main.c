@@ -5,13 +5,6 @@
 
 #include <sockets/sockets.h>
 
-void hablar_con_memoria(int32_t fd_memoria)
-{
-    printf("Memoria conectada \n");
-    enviar_mensaje(fd_memoria, 21); // mensaje de prueba
-
-    recibir_mensaje(fd_memoria); // para bloquear nd mas
-}
 
 int main(void)
 {

@@ -46,8 +46,6 @@ void *atender_kernel(void *fd_ptr)
     return NULL;
 }
 
-
-
 void *escuchar_conexiones(void *fd_conexion)
 {
  if(fd_conexion == *fd_dispatch){
