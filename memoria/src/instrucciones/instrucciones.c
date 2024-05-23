@@ -1,9 +1,13 @@
 #include "instrucciones.h"
 
-//para mi el pid lo tendria que crear en la funcion, no por parametro
+t_list* lista_procesos;
 
+void inicializar_memoria_instrucciones()
+{
+    /*Inicializo la lista de procesos*/
+    lista_procesos = list_create();
 
-t_list* lista_procesos = list_create();
+}
 
 
 /*Para cargar un proceso a memoria tengo que agregarlo a la lista de procesos,

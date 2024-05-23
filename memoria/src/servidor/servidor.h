@@ -6,6 +6,7 @@
 #include <sockets/sockets.h>
 #include "config/config.h"
 #include "protocol/protocol.h"
+#include "instrucciones/instrucciones.h"
 
 
 

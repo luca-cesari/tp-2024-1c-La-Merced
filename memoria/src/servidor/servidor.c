@@ -55,14 +55,13 @@ void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
     
-    instruccion_kernel instruccion_paquete = recibir_instruccion_kernel(fd_kernel);
+    instruccion_kernel* instruccion_paquete = recibir_instruccion_del_kernel(fd_kernel);
 
-    switch (instruccion_paquete.tipo)
+    switch (instruccion_paquete->tipo)
     {
     case INICIAR_PROCESO:
         printf("INICIAR_PROCESO \n");
-        //TODO: Implementar la lógica de iniciar proceso, con el path y demás
-        cargar_proceso_a_memoria(instruccion_paquete.pid ,instruccion_paquete.parametros.path);
+        cargar_proceso_a_memoria(instruccion_paquete->pid ,instruccion_paquete->parametros.path);
         
 
         break;
