@@ -8,7 +8,7 @@
 
 #define LOG_FILE "io.log"
 
-void iniciar_logger(void);
+void iniciar_logger(char *nombre_interfaz);
 void destruir_logger(void);
 
 void log_operacion(u_int32_t pid, char* operacion);

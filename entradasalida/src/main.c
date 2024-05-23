@@ -1,8 +1,9 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <commons/config.h>
-#include <sockets/sockets.h>
 #include "config/config.h"
+#include "logger/logger.h"
+
+#include "conexion/kernel.h"
+#include "conexion/memoria.h"
+
 #include "interfaz/generica.h"
 #include "interfaz/stdin.h"
 #include "interfaz/stdout.h"
@@ -10,26 +11,37 @@
 
 int main(int argc, char **argv)
 {
-    // char *nombre_interfaz = argv[1];
+    char *nombre_interfaz = argv[1];
     char *ruta_config = argv[2];
 
-    //t_config *config = config_create(ruta_config);
-    iniciar_config(); //Por ahora uso el config predeterminado, en un futuro se usara el que viene por parámetro en el main
+    iniciar_config(ruta_config);
+    iniciar_logger(nombre_interfaz);
 
+    conectar_con_kernel(nombre_interfaz);
+    conectar_con_memoria();
 
     switch (get_tipo_interfaz())
     {
     case GENERICA:
-        inicializar_interfaz_generica();
+        iniciar_rutina_interfaz_generica();
+        break;
     case STDIN:
         inicializar_interfaz_stdin();
+        break;
     case STDOUT:
         inicializar_interfaz_stdout();
+        break;
     case DIALFS:
         inicializar_interfaz_dialfs();
-    default:
         break;
+    default:
+        destruir_config();
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    liberar_conexion_kernel();
+    liberar_conexion_memoria();
+
+    destruir_config();
+    return EXIT_SUCCESS;
 }

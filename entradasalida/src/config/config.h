@@ -6,7 +6,13 @@
 #include <commons/config.h>
 #include <commons/collections/dictionary.h>
 
-#define CONFIG_FILE "entradasalida.config"
+typedef enum
+{
+   GENERICA,
+   STDIN,
+   STDOUT,
+   DIALFS
+} tipo_interfaz;
 
 typedef struct
 {
@@ -20,59 +26,38 @@ typedef struct
    char *puerto;
 } mem_config;
 
-typedef enum
+// typedef struct
+// {
+//    u_int32_t tiempo_unidad_trabajo;
+// } generica_config;
+
+// typedef struct
+// {
+// } stdin_config;
+
+// typedef struct
+// {
+//    u_int32_t tiempo_unidad_trabajo;
+// } stdout_config;
+
+typedef struct
 {
-   GENERICA,
-   STDIN,
-   STDOUT,
-   DIALFS
-} tipo_interfaz;
-
-// Estructura para datos importantes de interfaz generica
-typedef struct {
-   char* tipo_interfaz;
-   int tiempo_unidad_trabajo;
-   char* ip_kernel;
-   char* puerto_kernel;
-} generica_config;
-
-// Estructura para datos importantes de interfaz stdin
-typedef struct {
-   char* tipo_interfaz;
-   int tiempo_unidad_trabajo;
-   char* ip_kernel;
-   char* puerto_kernel;
-   char* ip_memoria;
-   char* puerto_memoria;
-} stdin_config;
-
-// Estructura para datos importantes de interfaz stdout
-typedef struct {
-   char* tipo_interfaz;
-   int tiempo_unidad_trabajo;
-   char* ip_kernel;
-   char* puerto_kernel;
-   char* ip_memoria;
-   char* puerto_memoria;
-} stdout_config;
-
-// Estructura para datos importantes de interfaz dialfs
-typedef struct {
-   char* create;
-   char* delete;
-   char* truncate;
-   char* write;
-   char* read;
+   u_int32_t tiempo_unidad_trabajo;
+   char *path_base_dialfs;
+   u_int32_t block_size;
+   u_int32_t block_count;
+   u_int32_t retraso_compactacion;
 } dialfs_config;
 
-void iniciar_config(void);
+void iniciar_config(char *);
 tipo_interfaz get_tipo_interfaz(void);
-generica_config get_generica_config();
-stdin_config get_stdin_config();
-stdout_config get_stdout_config();
-dialfs_config get_dialfs_config();
 kernel_config get_kernel_config(void);
 mem_config get_memoria_config(void);
+u_int32_t get_tiempo_unidad_trabajo(void);
+// generica_config get_generica_config();
+// stdin_config get_stdin_config();
+// stdout_config get_stdout_config();
+dialfs_config get_dialfs_config();
 void destruir_config(void);
 
 #endif // IO_CONFIG_H

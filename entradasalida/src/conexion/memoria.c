@@ -1,7 +1,6 @@
 #include "memoria.h"
 
 int32_t fd_memoria;
-pthread_mutex_t mutex_memoria;
 
 int8_t conectar_con_memoria()
 {
@@ -15,10 +14,8 @@ int8_t conectar_con_memoria()
       return -1;
    }
 
-   pthread_mutex_init(&mutex_memoria, NULL);
    return 0;
 }
-
 
 void liberar_conexion_memoria()
 {
