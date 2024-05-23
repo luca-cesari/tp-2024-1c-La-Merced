@@ -17,7 +17,7 @@ typedef struct
 typedef enum
 {
    INVALID_INSTRUCTION,
-   SUCCESS,
+   EXECUTED,
 } t_io_response;
 
 t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumantos);
