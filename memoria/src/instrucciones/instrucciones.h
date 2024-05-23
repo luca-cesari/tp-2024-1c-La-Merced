@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "commons/collections/list.h"
+#include <protocol/pcb.h>
 
 typedef struct{
     int32_t num_instruccion;

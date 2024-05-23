@@ -68,15 +68,15 @@ t_list* leer_instrucciones(char* path)
 void eliminar_proceso(t_pcb *pcb){
     //busco el proceso en la lista
     for(int i = 0; i < list_size(lista_procesos); i++){
-        t_proceso_instrucciones *proceso = list_get(lista_proceso, i);
+        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
         if (proceso->pid == pcb->pid){
             free(proceso->path);
             for(int j = 0; j < list_size(proceso->instrucciones); j++){
-                char *intruccion = list_get(proceso->instrucciones);
+                char *instruccion = list_get(proceso->instrucciones, j);
                 free(instruccion);
             }
             list_destroy(proceso->instrucciones);
-            list_remove(list_procesos, i);
+            list_remove(lista_procesos, i);
             free(proceso);
             break;
         }
@@ -86,8 +86,8 @@ void eliminar_proceso(t_pcb *pcb){
 t_instruccion* proxima_instruccion(t_pcb *pcb){
     for(int i = 0; i < list_size(lista_procesos); i++){
         //busca el proceso en la lista de procesos por pid
-        t_proceso_instrucciones *proceso = list_get(lista_proceso, i);
-        if (proceso->pid == pid){
+        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
+        if (proceso->pid == pcb->pid){
 
             //busco la instruccion con el pc 
             for(int j = 0; j < list_size(proceso->instrucciones); j++){
@@ -100,4 +100,5 @@ t_instruccion* proxima_instruccion(t_pcb *pcb){
             }
         }
     }
+    return NULL;
 }
