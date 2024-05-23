@@ -1,10 +1,15 @@
 #ifndef INSTRUCCIONES_H
 #define INSTRUCCIONES_H
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "commons/collections/list.h"
 
+typedef struct{
+    int32_t num_instruccion;
+    char * instruccion;
+}t_instruccion;
 
 typedef struct
 {
@@ -32,5 +37,7 @@ void cargar_proceso_a_memoria(int32_t pid, char* path);
  * @return t_list* 
  */
 t_list* leer_instrucciones(char* path);
+void eliminar_proceso(t_pcb *pcb);
+t_instruccion* proxima_instruccion(t_pcb *pcb);
 
 #endif // INSTRUCCIONES_H

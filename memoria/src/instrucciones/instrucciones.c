@@ -1,5 +1,8 @@
 #include "instrucciones.h"
 
+//para mi el pid lo tendria que crear en la funcion, no por parametro
+
+
 t_list* lista_procesos = list_create();
 
 
@@ -33,16 +36,64 @@ t_list* leer_instrucciones(char* path)
     que las voy leyendo. Cada instruccion es una linea nueva. La CPU luego se encargará de interpretar
     estos strings*/
     FILE *archivo = fopen(path, "r");
+    if(archivo == NULL){
+        perror("Error al abrir el archivo");
+        return NULL;
+    }
     char *linea = NULL;
     size_t len = 0;
     ssize_t read;
     t_list *instrucciones = list_create();
+
+    int32_t numero_instruccion = 1; // inicializo el numero en 1
+
     while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        char *instruccion = strdup(linea);
+        t_instruccion* instruccion = malloc(sizeof(t_instruccion));
+        instruccion->num_instruccion = numero_instruccion;
+        instruccion->instruccion = strdup(linea);
         list_add(instrucciones, instruccion);
+        numero_instruccion++;
     }
     fclose(archivo);
     free(linea);
     return instrucciones;
+}
+
+
+void eliminar_proceso(t_pcb *pcb){
+    //busco el proceso en la lista
+    for(int i = 0; i < list_size(lista_procesos); i++){
+        t_proceso_instrucciones *proceso = list_get(lista_proceso, i);
+        if (proceso->pid == pcb->pid){
+            free(proceso->path);
+            for(int j = 0; j < list_size(proceso->instrucciones); j++){
+                char *intruccion = list_get(proceso->instrucciones);
+                free(instruccion);
+            }
+            list_destroy(proceso->instrucciones);
+            list_remove(list_procesos, i);
+            free(proceso);
+            break;
+        }
+    }
+}
+
+t_instruccion* proxima_instruccion(t_pcb *pcb){
+    for(int i = 0; i < list_size(lista_procesos); i++){
+        //busca el proceso en la lista de procesos por pid
+        t_proceso_instrucciones *proceso = list_get(lista_proceso, i);
+        if (proceso->pid == pid){
+
+            //busco la instruccion con el pc 
+            for(int j = 0; j < list_size(proceso->instrucciones); j++){
+
+                t_instruccion* instruccion = list_get(proceso->instrucciones, j);
+                
+                if(instruccion->num_instruccion == pcb->program_counter){
+                    return instruccion;
+                }
+            }
+        }
+    }
 }
