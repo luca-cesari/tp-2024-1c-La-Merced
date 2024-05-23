@@ -11,8 +11,8 @@
 #include <registros/registros.c>
 
 char *fetch();
-//void (*decode(char *char_instruccion))(struct Parametros);
-//void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
+// void (*decode(char *char_instruccion))(struct Parametros);
+// void execute(void (*instruccion)(struct Parametros), char *char_instruccion); //VER PORQUE TIRA ERROR DESCOMENTADO
 void check_interrupt();
 
 // typedef enum {
@@ -38,37 +38,47 @@ void check_interrupt();
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-//void *set(Parametros);
-//void *sum(Parametros);
-//void *sub(Parametros);
-//void *jnz(Parametros);
-//void *io_gen_sleep(Parametros);
+// void *set(Parametros);
+// void *sum(Parametros);
+// void *sub(Parametros);
+// void *jnz(Parametros);
+// void *io_gen_sleep(Parametros);
 
 //////DECODE /////////////////////////////////////////////
 ////ESTRUCTURAS DECODE ////////
-typedef union
+typedef struct
 {
-   u_int8_t *registro_u8;
-   u_int32_t *registro_u32;
-   int valor;
-   char *interfaz;
-}Parametro;
+  enum
+   {
+      INT32,
+      INT8,
+      VALOR,
+      INTERFAZ,
+      NONE,
+   } tipo_dato;
+   union
+   {
+      u_int8_t *registro_u8;
+      u_int32_t *registro_u32;
+      int valor;
+      char *interfaz;
+   }dato;
+} Parametro;
 
 typedef struct
 {
    Parametro parametro1;
    Parametro parametro2;
-   //Parametro parametro3;
-   //Parametro parametro4;
-   enum {INT32, INT8, NONE} tipo_registro;
-}Parametros;
+   // Parametro parametro3;
+   // Parametro parametro4;
+} Parametros;
 /// FUNCIONES DECODE ////////////
 
 char **instruccion_parametros(char *char_instruccion);
 int es_numero(char *parametro);
 int char_a_numero(char *parametro);
 Parametros obtener_parametros(char **parametros);
-Parametro *buscar_operando(char *parametro);
+Parametro buscar_operando(char *parametro);
 void set_diccionario_instrucciones(t_dictionary *);
 void set_diccionario_registros(t_dictionary *);
 

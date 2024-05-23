@@ -1,55 +1,86 @@
 #include "instrucciones.h"
 
-
 t_dictionary *instrucciones;
 t_dictionary *registros;
 
-void *set(Parametros);
-void *sum(Parametros);
-void *sub(Parametros);
-void *jnz(Parametros);
-void *io_gen_sleep(Parametros);
+void set(Parametros);
+void sum(Parametros);
+void sub(Parametros);
+void jnz(Parametros);
+void io_gen_sleep(Parametros);
 
 void (*decode(char *char_instruccion))(Parametros);
 void execute(void (*instruccion)(Parametros), char *char_instruccion);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-char *fetch(){
-      return "SET AX 10";
-   
+char *fetch()
+{
+   return "SET AX 10";
 }
 
-void check_interrupt(){
-    printf("Check interrupt\n");
+void check_interrupt()
+{
+   printf("Check interrupt\n");
 }
 
-void *set(Parametros parametros)
+void set(Parametros parametros)
 {
-   *(parametros.parametro1) = parametros.parametro2;
-}
-
-void *sum(Parametros parametros)
-{
-   *(parametros.parametro1) += parametros.parametro2;
-}
-
-void *sub(Parametros parametros)
-{
-   *(parametros.parametro1) -= parametros.parametro2;
-}  
-
-void *jnz(Parametros parametros)
-{
-   if (*(parametros.parametro1) != 0)
+   if (parametros.parametro1.tipo_dato == INT32)
    {
-      registros_cpu.PC = parametros.parametro2;
+      *(parametros.parametro1.dato.registro_u32) = parametros.parametro2.dato.valor;
+   }
+   else
+   {
+      *(parametros.parametro1.dato.registro_u8) = parametros.parametro2.dato.valor;
    }
 }
 
-void *io_gen_sleep(Parametros parametros)
+void sum(Parametros parametros)
+{
+   if (parametros.parametro1.tipo_dato == INT32)
+   {
+      *(parametros.parametro1.dato.registro_u32) += *(parametros.parametro2.dato.registro_u32);
+   }
+   else
+   {
+      *(parametros.parametro1.dato.registro_u8) += *(parametros.parametro2.dato.registro_u8);
+   }
+}
+
+void sub(Parametros parametros)
+{
+   if (parametros.parametro1.tipo_dato == INT32)
+   {
+      *(parametros.parametro1.dato.registro_u32) -= *(parametros.parametro2.dato.registro_u32);
+   }
+   else
+   {
+      *(parametros.parametro1.dato.registro_u8) -= *(parametros.parametro2.dato.registro_u8);
+   }
+}
+
+void jnz(Parametros parametros)
+{
+
+   if (parametros.parametro1.tipo_dato == INT32)
+   {
+      if (*(parametros.parametro1.dato.registro_u32) != 0)
+      {
+         registros_cpu.PC = parametros.parametro2.dato.valor;
+      }
+   }
+   else
+   {
+      if (*(parametros.parametro1.dato.registro_u8) != 0)
+      {
+         registros_cpu.PC = parametros.parametro2.dato.valor;
+      }
+   }
+}
+
+void io_gen_sleep(Parametros parametros)
 {
    // falta implementar
 }
-
 
 void execute(void (*instruccion)(Parametros), char *char_instruccion)
 {
@@ -82,33 +113,49 @@ void (*decode(char *char_instruccion))(Parametros)
    }
 }
 
-Parametros obtener_parametros(char **parametros)
+Parametros obtener_parametros(char **parametros) // CHEQUEAR SI ES QUE RECIBE NONE
 {
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
-   struct Parametros struct_parametros;
-   struct_parametros.parametro1 = *buscar_operando(parametros[1]);
-   struct_parametros.parametro2 = *buscar_operando(parametros[2]);
+   Parametros struct_parametros;
+   struct_parametros.parametro1 = buscar_operando(parametros[1]);
+   struct_parametros.parametro2 = buscar_operando(parametros[2]);
    // struct_parametros.parametro3 = buscar_operando(parametros[3]) // siguientes checkpoints
    // struct_parametros.parametro4 = buscar_operando(parametros[4])
    return struct_parametros;
 }
 
-Parametro *buscar_operando(char *parametro)
+Parametro buscar_operando(char *parametro)
 {
    registros = dictionary_create();
    set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
+   Parametro operando;
    if (es_numero(parametro))
    {
-      return char_a_numero(parametro); // ver si usar el mas robusto
+      operando.tipo_dato = VALOR;
+      operando.dato.valor = char_a_numero(parametro);
+      return operando; // ver si usar el mas robusto
    }
    else if (dictionary_has_key(registros, parametro))
    {
-      return dictionary_get(registros, parametro);
+      if (string_starts_with(parametro, "E"))
+      {
+         operando.tipo_dato = INT32;
+         operando.dato.registro_u32 = dictionary_get(registros, parametro);
+         return operando;
+      }
+      else
+      {
+         operando.tipo_dato = INT8;
+         operando.dato.registro_u8 = dictionary_get(registros, parametro);
+         return operando;
+      }
    }
    else // falta interfaz
    {
       // en caso de operando desconocido
       printf("Operando desconocido: %s\n", parametro);
+      operando.tipo_dato = NONE;
+      return operando;
    }
 }
 ///////// ESTRUCTURAS AUXILIARES ///////////
@@ -165,8 +212,6 @@ int char_a_numero(char *parametro)
    return atoi(parametro);
 }
 
-
-
 // VER QUE  OPCION ES MEJOR
 
 // long char_a_numero_robusto(char *parametro)
@@ -194,13 +239,16 @@ int char_a_numero(char *parametro)
 void ciclo_instruccion()
 {
    char *char_instruccion = fetch();
-   
+
    void (*instruccion)(Parametros) = decode(char_instruccion);
-   if (instruccion != NULL) {
-       execute(instruccion, char_instruccion); // no hace mucho, revisar
-   } else {
-       printf("Error: instrucción desconocida '%s'\n", char_instruccion);
+   if (instruccion != NULL)
+   {
+      execute(instruccion, char_instruccion); // no hace mucho, revisar
    }
-   
+   else
+   {
+      printf("Error: instrucción desconocida '%s'\n", char_instruccion);
+   }
+
    check_interrupt();
 }
