@@ -57,8 +57,6 @@ void *io_gen_sleep(struct Parametros parametros)
 }
 
 
-
-
 void execute(void (*instruccion)(struct Parametros), char *char_instruccion)
 {
 
