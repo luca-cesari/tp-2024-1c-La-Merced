@@ -17,6 +17,15 @@
 int8_t conectar_con_memoria();
 
 /**
+ * @brief Envia la instruccion de iniciar proceso a la memoria
+ *
+ * @param pid_t : pid del proceso a iniciar
+ * @param char * : path del archivo a ejecutar
+ */
+
+void iniciar_proceso(pid_t, char *);
+
+/**
  * @brief En principio sera un send y recive simple
  *        donde la memoria responda segun si la reserva
  *        fue exitosa o no.

@@ -3,17 +3,23 @@
 // ver si va aca, puede q si, puede q no
 sem_t grado_multiprogramacion;
 
-q_new *cola_new;
-q_ready *cola_ready;
-q_exit *cola_exit;
+q_estado *cola_new;
+q_estado *cola_ready;
+q_estado *cola_exit;
+
+q_blocked *cola_blocked;
+
+int8_t desalojado;
+pthread_mutex_t desalojado_mutex;
 
 void inicializar_planificador()
 {
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
 
-   cola_new = crear_estado_new();
-   cola_ready = crear_estado_ready();
-   cola_exit = crear_estado_exit();
+   cola_new = crear_estado();
+   cola_ready = crear_estado();
+   cola_exit = crear_estado();
+   cola_blocked = crear_estado_blocked();
 
    // .........................
 
@@ -36,9 +42,10 @@ void destruir_planificador()
 {
    sem_destroy(&grado_multiprogramacion);
 
-   destruir_estado_new(cola_new);
-   destruir_estado_ready(cola_ready);
-   destruir_estado_exit(cola_exit);
+   destruir_estado(cola_new);
+   destruir_estado(cola_ready);
+   destruir_estado(cola_exit);
+   destruir_estado_blocked(cola_blocked);
 }
 
 void iniciar_planificacion()
@@ -55,14 +62,19 @@ void ingresar_proceso(char *ruta_ejecutable)
 {
    t_pcb *pcb = crear_pcb(ruta_ejecutable);
    log_creacion_proceso(pcb->pid);
-   push_proceso_nuevo(cola_new, pcb);
+   push_proceso(cola_new, pcb);
+}
+
+void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
+{
+   conectar_interfaz(cola_blocked, nombre_interfaz, fd_conexion);
 }
 
 void *crear_proceso()
 {
    while (1)
    {
-      t_pcb *pcb = pop_proceso_nuevo(cola_new);
+      t_pcb *pcb = pop_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
       if (reservar_paginas(pcb))
@@ -74,7 +86,7 @@ void *crear_proceso()
       // ver si puede planificar o no,
       // o sea, si esta en pausa o no la planificacion
       sem_wait(&grado_multiprogramacion);
-      push_proceso_ready(cola_ready, pcb);
+      push_proceso(cola_ready, pcb);
    }
 
    return NULL;
@@ -85,14 +97,14 @@ void pasar_a_exit(t_pcb *pcb, char *q_flag)
    if (strcmp(q_flag, NEW) == 0)
       sem_post(&grado_multiprogramacion);
 
-   push_proceso_exit(cola_exit, pcb);
+   push_proceso(cola_exit, pcb);
 }
 
 void *finalizar_proceso()
 {
    while (1)
    {
-      t_pcb *pcb = pop_proceso_exit(cola_exit);
+      t_pcb *pcb = pop_proceso(cola_exit);
       liberar_memoria(pcb);
    }
    return NULL;
@@ -102,7 +114,7 @@ void *planificar_por_fifo()
 {
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso_ready(cola_ready);
+      t_pcb *pre_exec = pop_proceso(cola_ready);
       enviar_pcb_cpu(pre_exec);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
@@ -121,33 +133,61 @@ void *planificar_por_fifo()
 
 void *planificar_por_rr()
 {
+   u_int32_t quantum = get_quantum();
+
+   // mepa q no hace falta alocar memoria
+   pthread_mutex_init(&desalojado_mutex, NULL);
+
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso_ready(cola_ready);
+      t_pcb *pre_exec = pop_proceso(cola_ready);
       enviar_pcb_cpu(pre_exec);
 
+      pthread_mutex_lock(&desalojado_mutex);
+      desalojado = 0;
+      pthread_mutex_unlock(&desalojado_mutex);
+
       pthread_t rutina_cronometro;
-      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, NULL);
+      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(quantum));
       pthread_detach(rutina_cronometro);
 
       t_pcb *pos_exec = recibir_pcb_cpu();
-      // matar el hilo??
+
+      pthread_mutex_lock(&desalojado_mutex);
+      desalojado = 1;
+      pthread_mutex_unlock(&desalojado_mutex);
+
+      // lo mismo que en fifo
+      // chequear si necesita I/O o si termino
    }
 
+   pthread_mutex_destroy(&desalojado_mutex);
    return NULL;
 }
 
 void *planificar_por_vrr()
 {
+   // usar un temporal aca
    return NULL;
 }
 
-void *cronometrar_quantum(/* capaz hay q pasar el temporal aca */)
+// ES UN ASCO COMO SE MANEJA
+// pero deberia funcionar, y eso es lo q importa por el momento
+void *cronometrar_quantum(void *milisegundos)
 {
-   // setear timer
+   u_int32_t segundos = (*(u_int32_t *)milisegundos) / 1000;
+   sleep(segundos);
 
-   // si termina el timer
-   enviar_interrupcion();
-
-   return NULL;
+   pthread_mutex_lock(&desalojado_mutex);
+   if (desalojado)
+   {
+      pthread_mutex_unlock(&desalojado_mutex);
+      return NULL;
+   }
+   else
+   {
+      enviar_interrupcion();
+      pthread_mutex_unlock(&desalojado_mutex);
+      return NULL;
+   }
 }

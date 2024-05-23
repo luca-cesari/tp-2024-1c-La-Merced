@@ -9,7 +9,7 @@
 - [ ] Testear la config:
   - Si devuelven lo que tienen que devolver
   - Si se libera la memoria como corresponde con el destroy
-- [ ] Implementar envío y recepción de PCB (con la CPU):
+- [X] Implementar envío y recepción de PCB (con la CPU):
   - Implementar en utils como protocolo de comunicación CPU <-> Kernel
   - Implemenar serialización y deserialización
 - [X] Revisar el `main.c`, quizá mejor abstraer la lógica de conexiones
@@ -19,7 +19,7 @@
 ### Conexiones
 
 - [ ] Implementar (para las conexiones compartidas entre hilos) mutex.
-- [ ] Implementar operaciones con memoria
+- [X] Implementar operaciones con memoria
 
 ### Planificador
 

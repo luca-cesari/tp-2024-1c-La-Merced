@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
+#include <protocol/protocol.h>
 
 #include "config/config.h"
+#include "planificador/planificador.h"
 
 /**
  * @brief Inicia el servidor Kernel. La función no es bloqueante,

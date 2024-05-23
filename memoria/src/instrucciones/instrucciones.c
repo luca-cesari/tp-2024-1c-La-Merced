@@ -1,48 +1,104 @@
 #include "instrucciones.h"
 
-FILE *recibir_pseudocodigo();
+t_list* lista_procesos;
 
-int contarLineas(FILE *archivo)
+void inicializar_memoria_instrucciones()
 {
-    int contador = 0;
-    char caracter;
+    /*Inicializo la lista de procesos*/
+    lista_procesos = list_create();
 
-    while ((caracter = fgetc(archivo)) != EOF)
+}
+
+
+/*Para cargar un proceso a memoria tengo que agregarlo a la lista de procesos,
+esto implica que debo añadir a la lista el pid, path y una lista de instrucciones*/
+
+void cargar_proceso_a_memoria(int32_t pid, char* path)
+{
+    /*Para obtener la lista de instrucciones primero debo usar el path para 
+    leer las instrucciones que hay en un archivo de pseudocodigo*/
+    t_list *instrucciones = list_create();
+    instrucciones = leer_instrucciones(path);
+    /*Una vez que tengo la lista de instrucciones, puedo crear un proceso de instrucciones
+    y añadirlo a la lista de procesos*/
+    t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
+    proceso->pid = pid;
+    proceso->path = strdup(path);
+    proceso->instrucciones = instrucciones;
+    list_add(lista_procesos, proceso);
+
+}
+
+t_list* leer_instrucciones(char* path)
+{
+    /*Un ejemplo de las instrucciones que pueden venir en el archivo son las siguientes:
+    SET AX 1
+    SET BX 1
+    SET PC 5
+    SUM AX BX
+    Simplemente tengo que guardarlas como strings en la lista de instrucciones a medida
+    que las voy leyendo. Cada instruccion es una linea nueva. La CPU luego se encargará de interpretar
+    estos strings*/
+    FILE *archivo = fopen(path, "r");
+    if(archivo == NULL){
+        perror("Error al abrir el archivo");
+        return NULL;
+    }
+    char *linea = NULL;
+    size_t len = 0;
+    ssize_t read;
+    t_list *instrucciones = list_create();
+
+    int32_t numero_instruccion = 1; // inicializo el numero en 1
+
+    while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        if (caracter == '\n')
-        { // si el caracter es un salto de línea, incrementa el contador
-            contador++;
+        t_instruccion* instruccion = malloc(sizeof(t_instruccion));
+        instruccion->num_instruccion = numero_instruccion;
+        instruccion->instruccion = strdup(linea);
+        list_add(instrucciones, instruccion);
+        numero_instruccion++;
+    }
+    fclose(archivo);
+    free(linea);
+    return instrucciones;
+}
+
+
+void eliminar_proceso(t_pcb *pcb){
+    //busco el proceso en la lista
+    for(int i = 0; i < list_size(lista_procesos); i++){
+        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
+        if (proceso->pid == pcb->pid){
+            free(proceso->path);
+            for(int j = 0; j < list_size(proceso->instrucciones); j++){
+                char *instruccion = list_get(proceso->instrucciones, j);
+                free(instruccion);
+            }
+            list_destroy(proceso->instrucciones);
+            list_remove(lista_procesos, i);
+            free(proceso);
+            break;
         }
     }
-
-    // si el archivo no termina con un salto de línea, se cuenta una última línea
-    if (contador != 0)
-    {
-        contador++;
-    }
-
-    return contador;
 }
 
-char *obtener_array_instrucciones()
-{
-    FILE *pseudocodigo = recibir_pseudocodigo();
-    char linea[100];
-    int num_instrucciones = contarLineas(pseudocodigo);
-    // t_list *instrucciones = list_create();
-    char *instrucciones[num_instrucciones];
-    int i = 0;
-    while (fgets(linea, sizeof(linea), pseudocodigo) != NULL) // lee cada linea del archivo y lo guarda en el array
-    {
-        instrucciones[i] = linea;
-        i++;
-    }
-    return instrucciones[];
-}
+t_instruccion* proxima_instruccion(t_pcb *pcb){
+    for(int i = 0; i < list_size(lista_procesos); i++){
+        //busca el proceso en la lista de procesos por pid
+        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
+        if (proceso->pid == pcb->pid){
 
-char *obtener_instruccion(int PC)
-{   // vamos a hacer que el pc tenga los accesos a memoria en HEXA(pregunta), ver
-    // cada vez que quiere una instruccion tiene que obtener todo el array, no esta bueno, pero hasta que no veamos memoria no se puede hacer mucho
-    char *instrucciones[] = obtener_array_instrucciones();
-    return instrucciones[PC];
+            //busco la instruccion con el pc 
+            for(int j = 0; j < list_size(proceso->instrucciones); j++){
+
+                t_instruccion* instruccion = list_get(proceso->instrucciones, j);
+                
+                if(instruccion->num_instruccion == pcb->program_counter){
+                    return instruccion;
+                }
+            }
+        }
+    }
+    return NULL;
 }

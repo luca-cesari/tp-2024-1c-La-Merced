@@ -7,6 +7,7 @@
 
 #include "protocol.h"
 #include "registers.h"
+#include "io_request.h"
 
 typedef struct
 {
@@ -15,6 +16,7 @@ typedef struct
    u_int32_t quantum;
    t_registers cpu_registers;
    t_bitarray *psw;
+   t_io_request *io_request; // non managed (initialization, serialization, deserialization, deletion)
    char *executable_path;
 } t_pcb;
 

@@ -5,11 +5,13 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <commons/temporal.h>
 #include <mqueue/mqueue.h>
 #include <protocol/pcb.h>
 
 #include "logger/logger.h"
-#include "estados/estados.h"
+#include "estados.h"
+#include "blocked.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 
@@ -42,6 +44,13 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
 void ingresar_proceso(char *ruta_ejecutable);
 
 /**
+ * @brief Conecta una interfaz de entrada/salida a la cola de BLOCKED.
+ * @param nombre_interfaz nombre de la interfaz a conectar, único en todo el sistema.
+ * @param fd_conexion file descriptor de la conexión a la interfaz de entrada/salida
+ */
+void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion);
+
+/**
  * @fn crear_proceso
  * @brief Planificador largo plazo, pasa de new a ready.
  *        No se ocupa de la transicion de bloqueado a ready
@@ -64,6 +73,6 @@ void *planificar_por_fifo();
 void *planificar_por_rr();
 void *planificar_por_vrr();
 
-void *cronometrar_quantum();
+void *cronometrar_quantum(void *milisegundos);
 
 #endif // PLANIFICADOR_H
