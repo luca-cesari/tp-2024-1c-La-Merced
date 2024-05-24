@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <commons/cpu.h>
+#include <commons/config.h>
 #include <commons/collections/dictionary.h>
 
 #define CONFIG_FILE "cpu.config"

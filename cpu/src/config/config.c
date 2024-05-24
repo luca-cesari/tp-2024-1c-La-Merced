@@ -6,6 +6,14 @@ void iniciar_config(void)
 {
    cpu_config = config_create(CONFIG_FILE);
 }
+char *get_puerto_escucha_dispatch(void)
+{
+   return config_get_string_value(cpu_config, "PUERTO_ESCUCHA_DISPATCH");
+}
+char *get_puerto_escucha_interrupt(void)
+{
+   return config_get_string_value(cpu_config, "PUERTO_ESCUCHA_INTERRUPT");
+}
 
 mem_config get_memoria_config(void)
 {
@@ -15,15 +23,6 @@ mem_config get_memoria_config(void)
    mem_cfg.puerto = config_get_string_value(cpu_config, "PUERTO_MEMORIA");
 
    return mem_cfg;
-}
-kernel_config get_kernel_config(void)
-{
-   kernel_config kernel_cfg;
-
-   kernel_cfg.puerto_dispatch = config_get_string_value(cpu_config, "PUERTO_ESCUCHA_DISPATCH");
-   kernel_cfg.puerto_interrupt = config_get_string_value(cpu_config, "PUERTO_ESCUCHA_INTERRUPT");
-
-   return kernel_cfg;
 }
 
 u_int32_t get_cant_entradas_tlb(void)
@@ -39,7 +38,7 @@ algoritmo_tlb get_algoritmo_tlb(void)
       return FIFO;
 
    if (strcmp(algoritmo, "LRU") == 0)
-      return RR;
+      return LRU;
 
    return -1;
 }

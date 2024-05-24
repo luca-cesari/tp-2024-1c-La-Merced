@@ -1,44 +1,25 @@
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <commons/config.h>
-
-#include <sockets/sockets.h>
-
+#include "config/config.h"
+#include "logger/logger.h"
+#include "conexion/memoria.h"
+#include "servidor/servidor.h"
+#include "instrucciones/instrucciones.h"
 
 int main(void)
 {
-    char *puerto_dispatch;
-    char *puerto_interrupt;
-    char *ip_memoria;
-    char *puerto_memoria;
+    iniciar_config();
+    iniciar_logger();
 
-    t_config *config = config_create("cpu.config");
+    // Capaz es un poco confuso la expresion del condicional
+    // pero básicamente falla en caso de -1 (o sea, true)
+    if (conectar_con_memoria()) // Conexion con Memoria
+        return EXIT_FAILURE;
 
-    // Escuchar al Kernel
-    puerto_dispatch = config_get_string_value(config, "PUERTO_ESCUCHA_DISPATCH");
-    puerto_interrupt = config_get_string_value(config, "PUERTO_ESCUCHA_INTERRUPT");
+    iniciar_servidor();
 
-    int32_t fd_escucha_dispatch = iniciar_servidor(puerto_dispatch);
-    esperar_cliente(fd_escucha_dispatch, &escuchar_dispatch);
+    liberar_conexion_memoria();
 
-    int32_t fd_escucha_interrupt = iniciar_servidor(puerto_interrupt);
-    esperar_cliente(fd_escucha_interrupt, &escuchar_interrupt);
+    destruir_config();
+    destruir_logger();
 
-    // Conectar con memoria
-    ip_memoria = config_get_string_value(config, "IP_MEMORIA");
-    puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-
-    int32_t fd_memoria = crear_conexion(ip_memoria, puerto_memoria);
-    int32_t respuesta = handshake(fd_memoria, CPU);
-    if (respuesta == -1)
-    {
-        printf("Error de conexion a memoria \n");
-        liberar_conexion(fd_memoria);
-        return 1;
-    }
-    hablar_con_memoria(fd_memoria);
-
-    liberar_conexion(fd_memoria);
-    return 0;
+    return EXIT_SUCCESS;
 }

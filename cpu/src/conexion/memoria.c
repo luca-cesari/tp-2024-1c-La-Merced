@@ -19,13 +19,13 @@ int8_t conectar_con_memoria()
 
 void hablar_con_memoria(int32_t fd_memoria)
 {
-    printf("Memoria conectada \n");
-    enviar_mensaje(fd_memoria, 21); // mensaje de prueba
+   printf("Memoria conectada \n");
+   enviar_mensaje(fd_memoria, 21); // mensaje de prueba
 
-    recibir_mensaje(fd_memoria); // para bloquear nd mas
+   recibir_mensaje(fd_memoria); // para bloquear nd mas
 }
 
-void liberar_conexion_mem()
+void liberar_conexion_memoria()
 {
    liberar_conexion(fd_memoria);
 }

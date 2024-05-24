@@ -9,6 +9,6 @@
 
 int8_t conectar_con_memoria();
 void hablar_con_memoria(int32_t fd_memoria);
-void liberar_conexion_mem();
+void liberar_conexion_memoria();
 
 #endif // CONEXION_MEMORIA_H

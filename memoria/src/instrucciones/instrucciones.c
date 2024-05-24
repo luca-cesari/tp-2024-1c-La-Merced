@@ -1,21 +1,19 @@
 #include "instrucciones.h"
 
-t_list* lista_procesos;
+t_list *lista_procesos;
 
 void inicializar_memoria_instrucciones()
 {
     /*Inicializo la lista de procesos*/
     lista_procesos = list_create();
-
 }
-
 
 /*Para cargar un proceso a memoria tengo que agregarlo a la lista de procesos,
 esto implica que debo añadir a la lista el pid, path y una lista de instrucciones*/
 
-void cargar_proceso_a_memoria(int32_t pid, char* path)
+void cargar_proceso_a_memoria(int32_t pid, char *path)
 {
-    /*Para obtener la lista de instrucciones primero debo usar el path para 
+    /*Para obtener la lista de instrucciones primero debo usar el path para
     leer las instrucciones que hay en un archivo de pseudocodigo*/
     t_list *instrucciones = list_create();
     instrucciones = leer_instrucciones(path);
@@ -26,10 +24,9 @@ void cargar_proceso_a_memoria(int32_t pid, char* path)
     proceso->path = strdup(path);
     proceso->instrucciones = instrucciones;
     list_add(lista_procesos, proceso);
-
 }
 
-t_list* leer_instrucciones(char* path)
+t_list *leer_instrucciones(char *path)
 {
     /*Un ejemplo de las instrucciones que pueden venir en el archivo son las siguientes:
     SET AX 1
@@ -40,7 +37,8 @@ t_list* leer_instrucciones(char* path)
     que las voy leyendo. Cada instruccion es una linea nueva. La CPU luego se encargará de interpretar
     estos strings*/
     FILE *archivo = fopen(path, "r");
-    if(archivo == NULL){
+    if (archivo == NULL)
+    {
         perror("Error al abrir el archivo");
         return NULL;
     }
@@ -53,7 +51,7 @@ t_list* leer_instrucciones(char* path)
 
     while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        t_instruccion* instruccion = malloc(sizeof(t_instruccion));
+        t_instruccion *instruccion = malloc(sizeof(t_instruccion));
         instruccion->num_instruccion = numero_instruccion;
         instruccion->instruccion = strdup(linea);
         list_add(instrucciones, instruccion);
@@ -64,14 +62,17 @@ t_list* leer_instrucciones(char* path)
     return instrucciones;
 }
 
-
-void eliminar_proceso(t_pcb *pcb){
-    //busco el proceso en la lista
-    for(int i = 0; i < list_size(lista_procesos); i++){
+void eliminar_proceso(t_pcb *pcb)
+{
+    // busco el proceso en la lista
+    for (int i = 0; i < list_size(lista_procesos); i++)
+    {
         t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
-        if (proceso->pid == pcb->pid){
+        if (proceso->pid == pcb->pid)
+        {
             free(proceso->path);
-            for(int j = 0; j < list_size(proceso->instrucciones); j++){
+            for (int j = 0; j < list_size(proceso->instrucciones); j++)
+            {
                 char *instruccion = list_get(proceso->instrucciones, j);
                 free(instruccion);
             }
@@ -83,18 +84,23 @@ void eliminar_proceso(t_pcb *pcb){
     }
 }
 
-t_instruccion* proxima_instruccion(t_pcb *pcb){
-    for(int i = 0; i < list_size(lista_procesos); i++){
-        //busca el proceso en la lista de procesos por pid
+t_instruccion *proxima_instruccion(t_pcb *pcb)
+{
+    for (int i = 0; i < list_size(lista_procesos); i++)
+    {
+        // busca el proceso en la lista de procesos por pid
         t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
-        if (proceso->pid == pcb->pid){
+        if (proceso->pid == pcb->pid)
+        {
 
-            //busco la instruccion con el pc 
-            for(int j = 0; j < list_size(proceso->instrucciones); j++){
+            // busco la instruccion con el pc
+            for (int j = 0; j < list_size(proceso->instrucciones); j++)
+            {
 
-                t_instruccion* instruccion = list_get(proceso->instrucciones, j);
-                
-                if(instruccion->num_instruccion == pcb->program_counter){
+                t_instruccion *instruccion = list_get(proceso->instrucciones, j);
+
+                if (instruccion->num_instruccion == pcb->program_counter)
+                {
                     return instruccion;
                 }
             }
