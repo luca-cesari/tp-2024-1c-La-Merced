@@ -1,8 +1,9 @@
 #include "servidor.h"
 
-//Variable compartida entre ambos hilos para saber si se debe interrumpir la ejecucion
+//Defino variable compartida entre ambos hilos para saber si se debe interrumpir la ejecucion
 int hay_interrupcion = 0;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex;
+pthread_mutex_init(&mutex, NULL);
 
 void iniciar_servidor()
 {
@@ -80,7 +81,7 @@ void recibir_interrupcion_del_kernel(int32_t fd_interrupt)
 void interrumpir()
 {
   
-  //Necesito modificar una la variable hay_interrupcion para que el hilo del dispatch se de cuenta que debe interrumpir la ejecucion
+  
   pthread_mutex_lock(&mutex);
   hay_interrupcion = 1; 
   pthread_mutex_unlock(&mutex);
