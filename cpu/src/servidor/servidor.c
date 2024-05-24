@@ -1,5 +1,9 @@
 #include "servidor.h"
 
+//Variable compartida entre ambos hilos para saber si se debe interrumpir la ejecucion
+int hay_interrupcion = 0;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void iniciar_servidor()
 {
 
@@ -11,6 +15,7 @@ void iniciar_servidor()
 
   *fd_dispatch = crear_servidor(puerto_escucha_dispatch);
   *fd_interrupt = crear_servidor(puerto_escucha_interrupt);
+
 
   pthread_t hilo_dispatch, hilo_interrupt;
   pthread_create(&hilo_dispatch, NULL, &escuchar_dispatch, fd_dispatch);
@@ -40,7 +45,8 @@ void *atender_kernel_interrupt(void *fd_ptr)
   {
     return NULL;
   }
-  //...
+  recibir_interrupcion_del_kernel(fd_interrupt);
+
   return NULL;
 }
 
@@ -54,11 +60,29 @@ void *escuchar_dispatch(void *fd_dispatch)
 }
 void *escuchar_interrupt(void *fd_interrupt)
 {
-
+  
   while (1)
   {
     esperar_cliente(*((int32_t *)fd_interrupt), &escuchar_interrupt);
   }
 
   return NULL;
+}
+
+void recibir_interrupcion_del_kernel(int32_t fd_interrupt)
+{
+  if (recibir_senial(fd_interrupt) == 1) //Se recibe que hubo una interrupcion desde el kernel
+  {
+    interrumpir();
+  }
+}
+
+void interrumpir()
+{
+  
+  //Necesito modificar una la variable hay_interrupcion para que el hilo del dispatch se de cuenta que debe interrumpir la ejecucion
+  pthread_mutex_lock(&mutex);
+  hay_interrupcion = 1; 
+  pthread_mutex_unlock(&mutex);
+
 }
