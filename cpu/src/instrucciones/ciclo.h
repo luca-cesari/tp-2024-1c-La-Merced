@@ -3,13 +3,13 @@
 #include <protocol/registers.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <commons/string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
 #include "instrucciones.h"
-
 
 
 /// ESTRUCTURAS DECODE ////////
