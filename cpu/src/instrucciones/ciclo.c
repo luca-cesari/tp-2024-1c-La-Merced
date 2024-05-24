@@ -9,7 +9,6 @@ char *fetch()
    return "SET AX 10";
 }
 
-
 void (*decode(char *char_instruccion))(Parametros)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
@@ -86,7 +85,7 @@ void execute(void (*instruccion)(Parametros), char *char_instruccion)
    instruccion(obtener_parametros(instruc_parametros));
 }
 
-void aumentar_program_counter() ///VER SI VA  ACA
+void aumentar_program_counter() /// VER SI VA  ACA
 {
    registros_cpu.PC += 1;
 }
@@ -98,19 +97,18 @@ void check_interrupt()
 
 void ciclo_instruccion()
 {
-   char *char_instruccion = fetch();
-
-   void (*instruccion)(Parametros) = decode(char_instruccion);
-   if (instruccion != NULL)
+   while (1)
    {
-      execute(instruccion, char_instruccion); // no hace mucho, revisar
-   }
-   else
-   {
-      printf("Error: instrucción desconocida '%s'\n", char_instruccion);
-   }
+      char *char_instruccion = fetch();
 
-   check_interrupt();
+      void (*instruccion)(Parametros) = decode(char_instruccion);
+
+      execute(instruccion, char_instruccion);
+
+      check_desalojo(); // si ocurren simultaneamente pesa mas I/O
+
+      check_interrupt();
+   }
 }
 
 ///////// ESTRUCTURAS AUXILIARES ///////////
