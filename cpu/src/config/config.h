@@ -29,6 +29,8 @@ typedef enum
 void iniciar_config(void);
 mem_config get_memoria_config(void);
 kernel_config get_kernel_config(void);
+char *get_puerto_escucha_dispatch(void);
+char *get_puerto_escucha_interrupt(void);
 u_int32_t get_cant_entradas_tlb(void);
 algoritmo_tlb get_algoritmo_tlb(void);
 void destruir_config(void);

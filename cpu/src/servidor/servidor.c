@@ -13,38 +13,34 @@ void iniciar_servidor()
   *fd_dispatch = crear_servidor(puerto_escucha_interrupt);
 
   pthread_t hilo_dispatch, hilo_interrupt;
-  pthread_create(&hilo_dispatch, NULL, &escuchar_conexiones, fd_dispatch);
-  pthread_create(&hilo_interrupt, NULL, &escuchar_conexiones, fd_interrupt);
+  pthread_create(&hilo_dispatch, NULL, &escuchar_dispatch, fd_dispatch);
+  pthread_create(&hilo_interrupt, NULL, &escuchar_interrupt, fd_interrupt);
   pthread_detach(hilo_dispatch);
   pthread_detach(hilo_interrupt);
 }
 
-void *atender_kernel(void *fd_ptr)
+void *atender_kernel_dispatch(void *fd_ptr)
 {
-  int32_t fd_conexion = *((int32_t *)fd_ptr);
 
-  if (recibir_cliente(fd_conexion) != KERNEL)
+  int32_t fd_dispatch = *((int32_t *)fd_ptr);
+  uint32_t modulo_cliente = recibir_cliente(fd_dispatch);
+  if (modulo_cliente != KERNEL)
   {
-    printf("Error de Cliente \n");
     return NULL;
   }
+  //...
+  return NULL;
+}
+void *atender_kernel_interrupt(void *fd_ptr)
+{
 
-  if (fd_conexion == *fd_dispatch)
+  int32_t fd_interrupt = *((int32_t *)fd_ptr);
+  uint32_t modulo_cliente = recibir_cliente(fd_interrupt);
+  if (modulo_cliente != KERNEL)
   {
-    printf("Kernel conectado por Dispatch \n");
-    while (1)
-    {
-      recibir_mensaje(fd_dispatch);
-    }
+    return NULL;
   }
-  else
-  {
-    printf("Kernel conectado por Interrupt \n");
-    while (1)
-    {
-      recibir_mensaje(fd_interrupt);
-    }
-  }
+  //...
   return NULL;
 }
 
