@@ -55,13 +55,10 @@ void jnz(Parametros parametros)
    }
 }
 
-void io_gen_sleep(Parametros parametros) // falta dato pcb que lo consigue de la conexion con kernel
+void io_gen_sleep(Parametros parametros)
 {
-   t_io_request *io_request = crear_io_request(pcb.pid, parametros.parametro1.dato.interfaz, "IO_GEN_SLEEP", parametros.parametro2.dato.valor); // ver implementacion gen_sleep en entrada/salida
-   actualizar_pcb_io_request(pcb, io_request);
-   enviar_pcb(fd_dispatch, pcb);
+   t_io_request *io_request = crear_io_request(pcb.pid, parametros.parametro1.dato.interfaz, "IO_GEN_SLEEP", string_itoa(parametros.parametro2.dato.valor)); // ver implementacion gen_sleep en entrada/salida
 }
-
 t_pcb actualizar_pcb_io_request(t_pcb *pcb, t_io_request *io_request) // VER SI VA ACA
 {
    pcb->program_counter = registros_cpu.PC;
