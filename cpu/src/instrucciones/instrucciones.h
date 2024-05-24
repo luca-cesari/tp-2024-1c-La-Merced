@@ -1,40 +1,29 @@
 #ifndef INSTRUCCIONES_H
 #define INSTRUCCIONES_H
-#include <registros/registros.h>
+#include <protocol/registers.h>
 #include <stdlib.h>
 #include <string.h>
+#include <protocol/pcb.h>
+#include <protocol/io_request.h>
 #include <commons/string.h>
-#include <stdio.h>
+#include "ciclo.h"
 
-// void instruction_fetch ();
-// void instruction_decode();
-// void instruction_execute();
-// void check_interrupt ();
-
-// typedef enum {
-//     SET,
-//     SUM,
-//     SUB,
-//     JNZ,
-//     IO_GEN_SLEEP
-// } instruccion;
-
-// QUE ES MEJOR, ENUM O DEFINE
-
-#define SET "SET"
-#define SUM "SUM"
-#define SUB "SUB"
-#define JNZ "JNZ"
-#define IO_GEN_SLEEP "IO_GEN_SLEEP"
+/// ESTRUCTURAS DECODE ////////
 
 // ver porque los registros pueden ser de 32 o 8 bits => de que tipo son
-void *set(char *registro, char *valor);
-void *sum(char *registro_destino, char *registro_origen);
-void *sub(char *registro_destino, char *registro_origen);
-void *jnz(char *registro, char *instruccion);
-void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
+// void *set(char *registro, char *valor);
+// void *sum(char *registro_destino, char *registro_origen);
+// void *sub(char *registro_destino, char *registro_origen);
+// void *jnz(char *registro, char *instruccion);
+// void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-// Instrucciones
+void set(Parametros);
+void sum(Parametros);
+void sub(Parametros);
+void jnz(Parametros);
+void io_gen_sleep(Parametros);
+
+// Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)
 //  MOV_OUT (Registro Dirección, Registro Datos)

@@ -20,7 +20,7 @@ typedef enum
    EXECUTED,
 } t_io_response;
 
-t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumantos);
+t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumentos);
 t_packet *serializar_io_request(t_io_request *io_request);
 void enviar_io_request(int32_t fd_conexion, t_io_request *io_request);
 t_io_request *recibir_io_request(int32_t fd_conexion);

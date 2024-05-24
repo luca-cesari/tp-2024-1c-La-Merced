@@ -1,13 +1,13 @@
 #include "io_request.h"
 
-t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumantos)
+t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumentos)
 {
    t_io_request *io_request = malloc(sizeof(t_io_request));
 
    io_request->pid = pid;
    io_request->inteface_name = nombre_interfaz;
    io_request->instruction = instruccion;
-   io_request->arguments = argumantos;
+   io_request->arguments = argumentos;
 
    return io_request;
 }

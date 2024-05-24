@@ -1,39 +1,73 @@
 #include "instrucciones.h"
 
-void *generar_instruccion(char **instruc_parametros)
+
+void set(Parametros parametros)
 {
-   char *instruccion = instruc_parametros[0];
-   if (strcmp(instruccion, SET) == 0)
+   if (parametros.parametro1.tipo_dato == INT32)
    {
-      return set(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, SUM) == 0)
-   {
-      return sum(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, SUB) == 0)
-   {
-      return sub(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, JNZ) == 0)
-   {
-      return jnz(instruc_parametros[1], instruc_parametros[2]);
-   }
-   else if (strcmp(instruccion, IO_GEN_SLEEP) == 0)
-   {
-      return io_gen_sleep(instruc_parametros[1], instruc_parametros[2]);
+      *(parametros.parametro1.dato.registro_u32) = parametros.parametro2.dato.valor;
    }
    else
    {
-      // En caso de instrucción desconocida
-      printf("Instrucción desconocida: %s\n", instruccion);
+      *(parametros.parametro1.dato.registro_u8) = parametros.parametro2.dato.valor;
    }
 }
 
-void *procesar_instruccion(int PC)
+void sum(Parametros parametros)
 {
-   char **instruccion_parametros;
-   char *instruccion_completa = obtener_instruccion(PC); // ver porque esta funcion es de memoria, y no la conoce supuestamente, hay que hacer cosas con paquetes o no se
-   instruccion_parametros = string_split(instruccion_completa, " ");
-   return generar_instruccion(instruccion_parametros);
+   if (parametros.parametro1.tipo_dato == INT32)
+   {
+      *(parametros.parametro1.dato.registro_u32) += *(parametros.parametro2.dato.registro_u32);
+   }
+   else
+   {
+      *(parametros.parametro1.dato.registro_u8) += *(parametros.parametro2.dato.registro_u8);
+   }
+}
+
+void sub(Parametros parametros)
+{
+   if (parametros.parametro1.tipo_dato == INT32)
+   {
+      *(parametros.parametro1.dato.registro_u32) -= *(parametros.parametro2.dato.registro_u32);
+   }
+   else
+   {
+      *(parametros.parametro1.dato.registro_u8) -= *(parametros.parametro2.dato.registro_u8);
+   }
+}
+
+void jnz(Parametros parametros)
+{
+
+   if (parametros.parametro1.tipo_dato == INT32)
+   {
+      if (*(parametros.parametro1.dato.registro_u32) != 0)
+      {
+         //Esto descomentarlo cuando tengamos registros_cpu en este archivo
+         //registros_cpu.PC = parametros.parametro2.dato.valor;
+      }
+   }
+   else
+   {
+      if (*(parametros.parametro1.dato.registro_u8) != 0)
+      {
+         //Esto descomentarlo cuando tengamos registros_cpu en este archivo
+         //registros_cpu.PC = parametros.parametro2.dato.valor;
+      }
+   }
+}
+
+void io_gen_sleep(Parametros parametros)
+{
+
+   //Esto hay que descomentarlo una vez que se le pase el PCB por parámetro
+   //t_io_request *io_request = crear_io_request(pcb.pid, parametros.parametro1.dato.interfaz, "IO_GEN_SLEEP", string_itoa(parametros.parametro2.dato.valor)); // ver implementacion gen_sleep en entrada/salida
+}
+t_pcb actualizar_pcb_io_request(t_pcb *pcb, t_io_request *io_request) // VER SI VA ACA
+{
+   //Esto descomentarlo cuando tengamos registros_cpu en este archivo
+   //pcb->program_counter = registros_cpu.PC;
+   //pcb->cpu_registers = registros_cpu.registers_generales;
+   //pcb->io_request = io_request;
 }
