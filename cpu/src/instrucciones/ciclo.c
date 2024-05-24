@@ -5,6 +5,9 @@ t_dictionary *instrucciones;
 t_dictionary *registros;
 t_registers registros_cpu;
 
+extern int hay_interrupcion;
+extern pthread_mutex_t mutexInterrupcion;
+
 
 char *fetch()
 {
@@ -94,10 +97,16 @@ void aumentar_program_counter() /// VER SI VA  ACA
 
 void check_interrupt()
 {
-   printf("Check interrupt\n");
+   pthread_mutex_lock(&mutexInterrupcion);
+   if(hay_interrupcion == 1){
+      //Desalojar()
+   }
+   pthread_mutex_unlock(&mutexInterrupcion);
+
+
 }
 
- check_desalojo()
+void check_desalojo()
  {
       printf("Check desalojo\n");
    

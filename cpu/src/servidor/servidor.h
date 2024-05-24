@@ -7,7 +7,6 @@
 #include "protocol/protocol.h"
 #include "config/config.h"
 
-extern int hay_interrupcion;
 
 void iniciar_servidor();
 void *atender_kernel_dispatch(void *fd_ptr);

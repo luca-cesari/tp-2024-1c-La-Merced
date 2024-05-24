@@ -2,11 +2,12 @@
 
 //Defino variable compartida entre ambos hilos para saber si se debe interrumpir la ejecucion
 int hay_interrupcion = 0;
-pthread_mutex_t mutex;
-pthread_mutex_init(&mutex, NULL);
+pthread_mutex_t mutexInterrupcion;
+
 
 void iniciar_servidor()
 {
+  pthread_mutex_init(&mutexInterrupcion, NULL);
 
   char *puerto_escucha_dispatch = get_puerto_escucha_dispatch();
   char *puerto_escucha_interrupt = get_puerto_escucha_interrupt();
@@ -82,8 +83,8 @@ void interrumpir()
 {
   
   
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&mutexInterrupcion);
   hay_interrupcion = 1; 
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&mutexInterrupcion);
 
 }
