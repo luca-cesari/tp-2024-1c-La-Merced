@@ -24,7 +24,7 @@ typedef struct
    {
       u_int8_t *registro_u8;
       u_int32_t *registro_u32;
-      int valor;
+      u_int8_t valor;
       char *interfaz;
    } dato;
 } Parametro;

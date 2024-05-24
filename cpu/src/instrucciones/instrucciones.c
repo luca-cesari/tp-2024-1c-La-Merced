@@ -142,11 +142,10 @@ Parametro buscar_operando(char *parametro)
          return operando;
       }
    }
-   else // falta interfaz
+   else 
    {
-      // en caso de operando desconocido
-      printf("Operando desconocido: %s\n", parametro);
-      operando.tipo_dato = NONE;
+      operando.tipo_dato = INTERFAZ;
+      operando.dato= parametro;
       return operando;
    }
 }
