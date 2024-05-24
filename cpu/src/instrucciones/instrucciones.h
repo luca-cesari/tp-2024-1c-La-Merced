@@ -8,6 +8,8 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
+#include <protocol/pcb.h>
+#include <protocol/io_request.h>
 
 /// ESTRUCTURAS DECODE ////////
 typedef struct
