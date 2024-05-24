@@ -8,7 +8,6 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
-#include <main.c>
 
 ///ESTRUCTURAS DECODE ////////
 typedef struct

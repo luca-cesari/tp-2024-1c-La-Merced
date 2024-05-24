@@ -3,14 +3,15 @@
 
 #include <commons/config.h>
 
+#include <protocol/protocol.h>
 #include <sockets/sockets.h>
 
 void hablar_con_memoria(int32_t fd_memoria)
 {
     printf("Memoria conectada \n");
-    enviar_mensaje(fd_memoria, 21); // mensaje de prueba
+    // enviar_mensaje("21", fd_memoria); // mensaje de prueba
 
-    recibir_mensaje(fd_memoria); // para bloquear nd mas
+    // recibir_mensaje(fd_memoria); // para bloquear nd mas
 }
 
 void *escuchar_dispatch(void *fd_ptr)
@@ -26,7 +27,7 @@ void *escuchar_dispatch(void *fd_ptr)
     printf("Kernel conectado por Dispatch \n");
     while (1)
     {
-        recibir_mensaje(fd_dispatch);
+        // recibir_mensaje(fd_dispatch);
     }
 
     return NULL;
@@ -44,7 +45,7 @@ void *escuchar_interrupt(void *fd_ptr)
     printf("Kernel conectado por Interrupt \n");
     while (1)
     {
-        recibir_mensaje(fd_interrupt);
+        // recibir_mensaje(fd_interrupt);
     }
 
     return NULL;
@@ -63,10 +64,10 @@ int main(void)
     puerto_dispatch = config_get_string_value(config, "PUERTO_ESCUCHA_DISPATCH");
     puerto_interrupt = config_get_string_value(config, "PUERTO_ESCUCHA_INTERRUPT");
 
-    int32_t fd_escucha_dispatch = iniciar_servidor(puerto_dispatch);
+    int32_t fd_escucha_dispatch = crear_servidor(puerto_dispatch);
     esperar_cliente(fd_escucha_dispatch, &escuchar_dispatch);
 
-    int32_t fd_escucha_interrupt = iniciar_servidor(puerto_interrupt);
+    int32_t fd_escucha_interrupt = crear_servidor(puerto_interrupt);
     esperar_cliente(fd_escucha_interrupt, &escuchar_interrupt);
 
     // Conectar con memoria
