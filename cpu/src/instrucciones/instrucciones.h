@@ -9,10 +9,10 @@
 #include <limits.h>
 #include <commons/collections/dictionary.h>
 
-///ESTRUCTURAS DECODE ////////
+/// ESTRUCTURAS DECODE ////////
 typedef struct
 {
-  enum
+   enum
    {
       INT32,
       INT8,
@@ -26,7 +26,7 @@ typedef struct
       u_int32_t *registro_u32;
       int valor;
       char *interfaz;
-   }dato;
+   } dato;
 } Parametro;
 
 typedef struct
@@ -36,7 +36,6 @@ typedef struct
    // Parametro parametro3;
    // Parametro parametro4;
 } Parametros;
-
 
 char *fetch();
 void (*decode(char *char_instruccion))(Parametros);
@@ -55,7 +54,6 @@ void check_interrupt();
 // void *sub(Parametros);
 // void *jnz(Parametros);
 // void *io_gen_sleep(Parametros);
-
 
 /// FUNCIONES DECODE ////////////
 
