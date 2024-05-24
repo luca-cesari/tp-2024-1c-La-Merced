@@ -1,8 +1,10 @@
 #include "ciclo.h"
 
+
 t_dictionary *instrucciones;
 t_dictionary *registros;
 t_registers registros_cpu;
+
 
 char *fetch()
 {
@@ -68,7 +70,7 @@ Parametro buscar_operando(char *parametro)
    else
    {
       operando.tipo_dato = INTERFAZ;
-      operando.dato = parametro;
+      operando.dato.interfaz = parametro;
       return operando;
    }
 }
@@ -94,6 +96,12 @@ void check_interrupt()
 {
    printf("Check interrupt\n");
 }
+
+ check_desalojo()
+ {
+      printf("Check desalojo\n");
+   
+ }
 
 void ciclo_instruccion()
 {

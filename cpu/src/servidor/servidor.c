@@ -10,7 +10,7 @@ void iniciar_servidor()
   int32_t *fd_interrupt = malloc(sizeof(int32_t));
 
   *fd_dispatch = crear_servidor(puerto_escucha_dispatch);
-  *fd_dispatch = crear_servidor(puerto_escucha_interrupt);
+  *fd_interrupt = crear_servidor(puerto_escucha_interrupt);
 
   pthread_t hilo_dispatch, hilo_interrupt;
   pthread_create(&hilo_dispatch, NULL, &escuchar_dispatch, fd_dispatch);

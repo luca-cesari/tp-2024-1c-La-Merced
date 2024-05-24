@@ -8,6 +8,9 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
+#include "instrucciones.h"
+
+
 
 /// ESTRUCTURAS DECODE ////////
 typedef struct
@@ -41,6 +44,7 @@ char *fetch();
 void (*decode(char *char_instruccion))(Parametros);
 void execute(void (*instruccion)(Parametros), char *char_instruccion);
 void check_interrupt();
+void check_desalojo();
 
 /// FUNCIONES DECODE ////////////
 

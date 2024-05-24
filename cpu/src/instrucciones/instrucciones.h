@@ -5,8 +5,8 @@
 #include <string.h>
 #include <protocol/pcb.h>
 #include <protocol/io_request.h>
-#include <ciclo.h>
 #include <commons/string.h>
+#include "ciclo.h"
 
 /// ESTRUCTURAS DECODE ////////
 
