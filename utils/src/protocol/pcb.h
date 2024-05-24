@@ -14,7 +14,7 @@ typedef struct
    u_int32_t pid;
    int32_t program_counter;
    u_int32_t quantum;
-   t_registers cpu_registers;
+   t_registers_generales cpu_registers;
    t_bitarray *psw;
    t_io_request *io_request; // non managed (initialization, serialization, deserialization, deletion)
    char *executable_path;

@@ -49,7 +49,7 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->program_counter = *(int32_t *)list_get(paquete, 1);
    pcb->quantum = *(u_int32_t *)list_get(paquete, 2);
 
-   pcb->cpu_registers = *(t_registers *)list_get(paquete, 3);
+   pcb->cpu_registers = *(t_registers_generales *)list_get(paquete, 3);
    pcb->psw = bitarray_create_with_mode(list_get(paquete, 4), *(size_t *)list_get(paquete, 5), *(bit_numbering_t *)list_get(paquete, 6));
    pcb->executable_path = strdup(list_get(paquete, 7));
 

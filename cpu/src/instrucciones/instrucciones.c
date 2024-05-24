@@ -162,14 +162,14 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
 
 void set_diccionario_registros(t_dictionary *registros)
 {
-   dictionary_put(registros, "AX", &(registros_cpu.AX));
-   dictionary_put(registros, "BX", &(registros_cpu.BX));
-   dictionary_put(registros, "CX", &(registros_cpu.CX));
-   dictionary_put(registros, "DX", &(registros_cpu.DX));
-   dictionary_put(registros, "EAX", &(registros_cpu.EAX));
-   dictionary_put(registros, "EBX", &(registros_cpu.EBX));
-   dictionary_put(registros, "ECX", &(registros_cpu.ECX));
-   dictionary_put(registros, "EDX", &(registros_cpu.EDX));
+   dictionary_put(registros, "AX", &(registros_cpu.registers_generales.AX));
+   dictionary_put(registros, "BX", &(registros_cpu.registers_generales.BX));
+   dictionary_put(registros, "CX", &(registros_cpu.registers_generales.CX));
+   dictionary_put(registros, "DX", &(registros_cpu.registers_generales.DX));
+   dictionary_put(registros, "EAX", &(registros_cpu.registers_generales.EAX));
+   dictionary_put(registros, "EBX", &(registros_cpu.registers_generales.EBX));
+   dictionary_put(registros, "ECX", &(registros_cpu.registers_generales.ECX));
+   dictionary_put(registros, "EDX", &(registros_cpu.registers_generales.EDX));
 }
 
 //////////FUNCIONES AUXILIARES////////////
