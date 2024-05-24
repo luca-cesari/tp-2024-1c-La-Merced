@@ -100,6 +100,8 @@ void check_interrupt()
    pthread_mutex_lock(&mutexInterrupcion);
    if(hay_interrupcion == 1){
       //Desalojar()
+      //Aca habría que enviar el PCB al kernel con el motivo de desalojo(Que en este caso sería una interrupción)
+
    }
    pthread_mutex_unlock(&mutexInterrupcion);
 
