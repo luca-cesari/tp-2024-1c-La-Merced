@@ -1,6 +1,6 @@
 #include "instrucciones.h"
 
-extern t_registers registros_cpu;
+extern t_pcb *pcb;
 
 void set(Parametros parametros)
 {
@@ -45,14 +45,14 @@ void jnz(Parametros parametros)
    {
       if (*(parametros.parametro1.dato.registro_u32) != 0)
       {
-         registros_cpu.PC = parametros.parametro2.dato.valor;
+         pcb->program_counter = parametros.parametro2.dato.valor;
       }
    }
    else
    {
       if (*(parametros.parametro1.dato.registro_u8) != 0)
       {
-         registros_cpu.PC = parametros.parametro2.dato.valor;
+         pcb->program_counter = parametros.parametro2.dato.valor;
       }
    }
 }
