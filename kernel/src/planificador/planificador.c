@@ -88,6 +88,12 @@ static void *consumir_io(void *cola_io)
       case EXECUTED:
          push_proceso(cola_ready, pcb);
          break;
+      case -1: // cuando una interfaz se desconecta
+         pasar_a_exit(pcb, BLOCKED);
+         q_estado *cola = desconectar_interfaz(cola_blocked, io->fd_conexion);
+         // hay q pasar toda la cola a exit
+         destruir_estado(cola);
+         return NULL;
       }
    }
 
