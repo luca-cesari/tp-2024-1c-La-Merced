@@ -4,12 +4,14 @@
 t_pcb *crear_pcb(char *ejecutable)
 {
    t_pcb *pcb = malloc(sizeof(t_pcb));
-   pcb->pid = 0; // hay q ver que onda con esto, tiene q ser autoincremental en todo el sistema
+   pcb->pid = 0;
    pcb->program_counter = 0;
    pcb->quantum = 0;
    pcb->cpu_registers = crear_registros();
    pcb->psw = bitarray_create_with_mode(NULL, 1, LSB_FIRST);
+   pcb->io_request = crear_io_request();
    pcb->executable_path = strdup(ejecutable);
+   pcb->motivo_de_desalojo = NULL;
 
    return pcb;
 }
@@ -21,15 +23,13 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->pid), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->program_counter), sizeof(int32_t));
    agregar_a_paquete(paquete, &(pcb->quantum), sizeof(u_int32_t));
-
-   // capaz es mejor usar un serializar_registers para este
-   agregar_a_paquete(paquete, &(pcb->cpu_registers), sizeof(t_registers));
-
+   agregar_a_paquete(paquete, &(pcb->cpu_registers), sizeof(t_registers_generales));
    agregar_a_paquete(paquete, pcb->psw->bitarray, pcb->psw->size);
    agregar_a_paquete(paquete, &(pcb->psw->size), sizeof(size_t));
    agregar_a_paquete(paquete, &(pcb->psw->mode), sizeof(bit_numbering_t));
+   serializar_io_request(pcb->io_request);
    agregar_a_paquete(paquete, pcb->executable_path, strlen(pcb->executable_path) + 1);
-
+   agregar_a_paquete(paquete, &(pcb->motivo_de_desalojo), strlen(pcb->motivo_de_desalojo) + 1);
    return paquete;
 }
 
@@ -61,6 +61,7 @@ void destruir_pcb(t_pcb *pcb)
 {
    free(pcb->cpu_registers);
    bitarray_destroy(pcb->psw);
+   destruir_io_request(pcb->io_request);
    free(pcb->executable_path);
    free(pcb);
 }
