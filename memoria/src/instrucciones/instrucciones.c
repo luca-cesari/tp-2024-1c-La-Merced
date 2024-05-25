@@ -84,7 +84,7 @@ void eliminar_proceso(t_pcb *pcb)
     }
 }
 
-t_instruccion *proxima_instruccion(t_pcb *pcb)
+char *proxima_instruccion(t_pcb *pcb)
 {
     for (int i = 0; i < list_size(lista_procesos); i++)
     {
@@ -101,7 +101,7 @@ t_instruccion *proxima_instruccion(t_pcb *pcb)
 
                 if (instruccion->num_instruccion == pcb->program_counter)
                 {
-                    return instruccion;
+                    return instruccion->instruccion;
                 }
             }
         }

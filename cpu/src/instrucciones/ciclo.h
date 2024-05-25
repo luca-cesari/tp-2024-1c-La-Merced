@@ -10,7 +10,7 @@
 #include <limits.h>
 #include <commons/collections/dictionary.h>
 #include "instrucciones.h"
-
+#include "conexion/memoria.h"
 
 /// ESTRUCTURAS DECODE ////////
 typedef struct

@@ -1,6 +1,5 @@
 #include "ciclo.h"
 
-
 t_dictionary *instrucciones;
 t_dictionary *registros;
 t_registers registros_cpu;
@@ -8,10 +7,11 @@ t_registers registros_cpu;
 extern int hay_interrupcion;
 extern pthread_mutex_t mutexInterrupcion;
 
-
 char *fetch()
 {
-   return "SET AX 10";
+   enviar_pcb_memoria(pcb);
+   char *instruccion = recibir_instruccion(fd_memoria); // no se por que no me lo toma
+   return instruccion;
 }
 
 void (*decode(char *char_instruccion))(Parametros)
@@ -98,21 +98,18 @@ void aumentar_program_counter() /// VER SI VA  ACA
 void check_interrupt()
 {
    pthread_mutex_lock(&mutexInterrupcion);
-   if(hay_interrupcion == 1){
-      //Desalojar()
-      //Aca habría que enviar el PCB al kernel con el motivo de desalojo(Que en este caso sería una interrupción)
-
+   if (hay_interrupcion == 1)
+   {
+      // Desalojar()
+      // Aca habría que enviar el PCB al kernel con el motivo de desalojo(Que en este caso sería una interrupción)
    }
    pthread_mutex_unlock(&mutexInterrupcion);
-
-
 }
 
 void check_desalojo()
- {
-      printf("Check desalojo\n");
-   
- }
+{
+   printf("Check desalojo\n");
+}
 
 void ciclo_instruccion()
 {
