@@ -9,7 +9,16 @@ q_estado *cola_exit;
 
 q_blocked *cola_blocked;
 
-static void *consumir_io(void *cola_io);
+static void *consumir_io(void *);
+
+static void *crear_proceso();
+static void *finalizar_proceso();
+
+static void *planificar_por_fifo();
+static void *planificar_por_rr();
+static void *planificar_por_vrr();
+
+static void *cronometrar_quantum(void *);
 
 void inicializar_planificador()
 {
@@ -100,7 +109,7 @@ static void *consumir_io(void *cola_io)
    return NULL;
 }
 
-void *crear_proceso()
+static void *crear_proceso()
 {
    while (1)
    {
@@ -130,7 +139,7 @@ void pasar_a_exit(t_pcb *pcb, char *q_flag)
    push_proceso(cola_exit, pcb);
 }
 
-void *finalizar_proceso()
+static void *finalizar_proceso()
 {
    while (1)
    {
@@ -144,7 +153,7 @@ void *finalizar_proceso()
    return NULL;
 }
 
-void *planificar_por_fifo()
+static void *planificar_por_fifo()
 {
    while (1)
    {
@@ -165,7 +174,7 @@ void *planificar_por_fifo()
    return NULL;
 }
 
-void *planificar_por_rr()
+static void *planificar_por_rr()
 {
    u_int32_t quantum = get_quantum();
 
@@ -188,13 +197,13 @@ void *planificar_por_rr()
    return NULL;
 }
 
-void *planificar_por_vrr()
+static void *planificar_por_vrr()
 {
    // usar un temporal aca
    return NULL;
 }
 
-void *cronometrar_quantum(void *milisegundos)
+static void *cronometrar_quantum(void *milisegundos)
 {
    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
