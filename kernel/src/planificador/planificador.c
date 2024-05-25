@@ -14,6 +14,9 @@ static void *consumir_io(void *);
 static void *crear_proceso();
 static void *finalizar_proceso();
 
+static void pasar_a_exit(t_pcb *, motivo_finalizacion);
+static void pasar_a_siguiente(t_pcb *);
+
 static void *planificar_por_fifo();
 static void *planificar_por_rr();
 static void *planificar_por_vrr();
@@ -131,11 +134,9 @@ static void *crear_proceso()
    return NULL;
 }
 
-void pasar_a_exit(t_pcb *pcb, char *q_flag)
+static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 {
-   if (strcmp(q_flag, NEW))
-      sem_post(&grado_multiprogramacion);
-
+   pcb->motivo_finalizacion = motivo;
    push_proceso(cola_exit, pcb);
 }
 
@@ -153,6 +154,23 @@ static void *finalizar_proceso()
    return NULL;
 }
 
+static void pasar_a_siguiente(t_pcb *pcb)
+{
+   switch (pcb->motivo_desalojo)
+   {
+   case QUANTUM:
+      push_proceso(cola_ready, pcb);
+      break;
+   case IO:
+      if (bloquear_proceso(cola_blocked, pcb))
+         pasar_a_exit(pcb, INVALID_INTERFACE);
+      break;
+   case TERMINATED:
+      pasar_a_exit(pcb, SUCCESS);
+      break;
+   }
+}
+
 static void *planificar_por_fifo()
 {
    while (1)
@@ -161,14 +179,8 @@ static void *planificar_por_fifo()
       enviar_pcb_cpu(pre_exec);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
-      if (pos_exec == NULL)
-      {
-         pasar_a_exit(pre_exec, EXEC);
-         continue;
-      }
-
       destruir_pcb(pre_exec);
-      // capaz analizar que onda, si necesita I/O o si termino
+      pasar_a_siguiente(pos_exec);
    }
 
    return NULL;
@@ -190,8 +202,8 @@ static void *planificar_por_rr()
       t_pcb *pos_exec = recibir_pcb_cpu();
       pthread_cancel(rutina_cronometro);
 
-      // lo mismo que en fifo
-      // chequear si necesita I/O o si termino
+      destruir_pcb(pre_exec);
+      pasar_a_siguiente(pos_exec);
    }
 
    return NULL;

@@ -65,13 +65,5 @@ void ingresar_proceso(char *ruta_ejecutable);
  */
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion);
 
-/**
- * @brief Indica la finalización de un proceso.
- *        Recibe un PCB y lo pasa a la cola de exit.
- *
- * @param pcb PCB del proceso a finalizar.
- * @param q_flag Flag que indica el estado de donde fue llamado.
- */
-void pasar_a_exit(t_pcb *pcb, char *q_flag);
 
 #endif // PLANIFICADOR_H
