@@ -11,7 +11,9 @@ t_pcb *crear_pcb(char *ejecutable)
    pcb->psw = bitarray_create_with_mode(NULL, 1, LSB_FIRST);
    pcb->io_request = NULL;
    pcb->executable_path = strdup(ejecutable);
-   pcb->motivo_desalojo = NONE;
+   pcb->motivo_desalojo = NONE; // o NULL
+   pcb->motivo_finalizacion = NULL;
+   pcb->estado = NEW; // o NULL
 
    return pcb;
 }
@@ -30,6 +32,9 @@ t_packet *serializar_pcb(t_pcb *pcb)
    serializar_io_request(pcb->io_request);
    agregar_a_paquete(paquete, pcb->executable_path, strlen(pcb->executable_path) + 1);
    agregar_a_paquete(paquete, &(pcb->motivo_desalojo), sizeof(motivo_desalojo));
+   agregar_a_paquete(paquete, &(pcb->motivo_finalizacion), sizeof(motivo_finalizacion));
+   agregar_a_paquete(paquete, &(pcb->estado), sizeof(estado));
+
    return paquete;
 }
 
@@ -53,6 +58,8 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->io_request = (t_io_request *)list_get(paquete, 7);
    pcb->executable_path = strdup(list_get(paquete, 8));
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 9);
+   pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 10);
+   pcb->estado = *(estado *)list_get(paquete, 11);
 
    list_destroy(paquete);
    return pcb;

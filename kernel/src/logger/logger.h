@@ -5,27 +5,9 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <commons/log.h>
+#include <protocol/pcb.h>
 
 #define LOG_FILE "kernel.log"
-
-#define NEW "NEW"
-#define READY "READY"
-#define EXEC "EXEC"
-#define BLOCKED "BLOCKED"
-#define EXIT "EXIT"
-
-typedef enum
-{
-   SUCCESS,
-   INVALID_RESOURCE,
-   INVALID_WRITE
-} motivo_finalizacion;
-
-typedef enum
-{
-   INTERFAZ,
-   RECURSO
-} motivo_bloqueo;
 
 void iniciar_logger(void);
 void destruir_logger(void);

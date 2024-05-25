@@ -17,6 +17,29 @@ typedef enum
    NONE
 } motivo_desalojo;
 
+typedef enum
+{
+   NEW,
+   READY,
+   EXEC,
+   EXIT
+} estado;
+
+typedef enum
+{
+   SUCCESS,
+   INVALID_RESOURCE,
+   INVALID_INTERFACE,
+   INTERRUPTED_BY_USER,
+   OUT_OF_MEMORY
+} motivo_finalizacion;
+
+typedef enum
+{
+   INTERFAZ,
+   RECURSO
+} motivo_bloqueo;
+
 typedef struct
 {
    u_int32_t pid;
@@ -27,6 +50,8 @@ typedef struct
    t_io_request *io_request; // non managed (initialization, serialization, deserialization, deletion)
    char *executable_path;
    motivo_desalojo motivo_desalojo;
+   motivo_finalizacion motivo_finalizacion;
+   estado estado;
 } t_pcb;
 
 t_pcb *crear_pcb(char *ejecutable);
