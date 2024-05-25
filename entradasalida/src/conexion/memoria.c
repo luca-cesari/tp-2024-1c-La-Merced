@@ -7,7 +7,7 @@ int8_t conectar_con_memoria()
    mem_config mem = get_memoria_config();
 
    fd_memoria = crear_conexion(mem.ip, mem.puerto);
-   int32_t response = handshake(fd_memoria, KERNEL);
+   int32_t response = handshake(fd_memoria, E_S);
    if (response == -1)
    {
       liberar_conexion(fd_memoria);

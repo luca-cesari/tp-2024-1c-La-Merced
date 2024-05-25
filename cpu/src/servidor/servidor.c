@@ -4,41 +4,47 @@
 int hay_interrupcion = 0;
 pthread_mutex_t mutexInterrupcion;
 
+sem_t fin_de_proceso;
+
 void iniciar_servidor()
 {
+
+  sem_init(&fin_de_proceso, 0, 0);
   pthread_mutex_init(&mutexInterrupcion, NULL);
 
   char *puerto_escucha_dispatch = get_puerto_escucha_dispatch();
   char *puerto_escucha_interrupt = get_puerto_escucha_interrupt();
 
-  int32_t *fd_dispatch = malloc(sizeof(int32_t));
-  int32_t *fd_interrupt = malloc(sizeof(int32_t));
+  int32_t fd_dispatch = crear_servidor(puerto_escucha_dispatch);
+  int32_t fd_interrupt = crear_servidor(puerto_escucha_interrupt);
 
-  *fd_dispatch = crear_servidor(puerto_escucha_dispatch);
-  *fd_interrupt = crear_servidor(puerto_escucha_interrupt);
+  esperar_cliente(fd_dispatch, &atender_kernel_dispatch);
+  esperar_cliente(fd_interrupt, &atender_kernel_interrupt);
 
-  pthread_t hilo_dispatch, hilo_interrupt;
-  pthread_create(&hilo_dispatch, NULL, &escuchar_dispatch, fd_dispatch);
-  pthread_create(&hilo_interrupt, NULL, &escuchar_interrupt, fd_interrupt);
-  pthread_detach(hilo_dispatch);
-  pthread_detach(hilo_interrupt);
+  sem_wait(&fin_de_proceso);
 }
 
 void *atender_kernel_dispatch(void *fd_ptr)
 {
-
   int32_t fd_dispatch = *((int32_t *)fd_ptr);
   uint32_t modulo_cliente = recibir_cliente(fd_dispatch);
   if (modulo_cliente != KERNEL)
   {
+    liberar_conexion(fd_dispatch);
+    sem_post(&fin_de_proceso);
     return NULL;
   }
+
+  printf("Kernel conectado por dispatch \n");
+
   while (1)
   {
     t_pcb *pcb = recibir_pcb(fd_dispatch);
     ciclo_instruccion(pcb);
     enviar_pcb(fd_dispatch, pcb);
   }
+
+  sem_post(&fin_de_proceso);
   return NULL;
 }
 
@@ -49,29 +55,16 @@ void *atender_kernel_interrupt(void *fd_ptr)
   uint32_t modulo_cliente = recibir_cliente(fd_interrupt);
   if (modulo_cliente != KERNEL)
   {
+    liberar_conexion(fd_interrupt);
+    sem_post(&fin_de_proceso);
     return NULL;
   }
+
+  printf("Kernel conectado por interrupt \n");
+
   recibir_interrupcion_del_kernel(fd_interrupt);
 
-  return NULL;
-}
-
-void *escuchar_dispatch(void *fd_dispatch)
-{
-  while (1)
-  {
-    esperar_cliente(*((int32_t *)fd_dispatch), &escuchar_dispatch);
-  }
-  return NULL;
-}
-void *escuchar_interrupt(void *fd_interrupt)
-{
-
-  while (1)
-  {
-    esperar_cliente(*((int32_t *)fd_interrupt), &escuchar_interrupt);
-  }
-
+  sem_post(&fin_de_proceso);
   return NULL;
 }
 
@@ -85,7 +78,6 @@ void recibir_interrupcion_del_kernel(int32_t fd_interrupt)
 
 void interrumpir()
 {
-
   pthread_mutex_lock(&mutexInterrupcion);
   hay_interrupcion = 1;
   pthread_mutex_unlock(&mutexInterrupcion);

@@ -12,7 +12,9 @@
 int main(int argc, char **argv)
 {
     char *nombre_interfaz = argv[1];
+    printf("Nombre de la interfaz: %s\n", nombre_interfaz);
     char *ruta_config = argv[2];
+    printf("Ruta del archivo de configuracion: %s\n", ruta_config);
 
     iniciar_config(ruta_config);
     iniciar_logger(nombre_interfaz);
