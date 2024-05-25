@@ -28,8 +28,14 @@ void log_finalizacion_proceso(u_int32_t pid, motivo_finalizacion motivo)
    case INVALID_RESOURCE:
       motivo_str = "INVALID_RESOURCE";
       break;
-   case INVALID_WRITE:
-      motivo_str = "INVALID_WRITE";
+   case INVALID_INTERFACE:
+      motivo_str = "INVALID_INTERFACE";
+      break;
+   case INTERRUPTED_BY_USER:
+      motivo_str = "INTERRUPTED_BY_USER";
+      break;
+   case OUT_OF_MEMORY:
+      motivo_str = "OUT_OF_MEMORY";
       break;
    default:
       motivo_str = "UNKNOWN";
