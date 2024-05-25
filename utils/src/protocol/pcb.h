@@ -13,8 +13,7 @@ typedef enum
 {
    TERMINATED,
    QUANTUM,
-   IO,
-   NONE
+   IO
 } motivo_desalojo;
 
 typedef enum
@@ -31,8 +30,7 @@ typedef enum
    INVALID_RESOURCE,
    INVALID_INTERFACE,
    INTERRUPTED_BY_USER,
-   OUT_OF_MEMORY,
-   ZERO
+   OUT_OF_MEMORY
 } motivo_finalizacion;
 
 typedef enum

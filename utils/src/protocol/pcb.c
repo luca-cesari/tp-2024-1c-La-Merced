@@ -11,9 +11,9 @@ t_pcb *crear_pcb(char *ejecutable)
    pcb->psw = bitarray_create_with_mode(NULL, 1, LSB_FIRST);
    pcb->io_request = NULL;
    pcb->executable_path = strdup(ejecutable);
-   pcb->motivo_desalojo = NONE; // o NULL
-   pcb->motivo_finalizacion = ZERO;
-   pcb->estado = NEW; // o NULL
+   pcb->motivo_desalojo = -1;
+   pcb->motivo_finalizacion = -1;
+   pcb->estado = -1;
 
    return pcb;
 }
