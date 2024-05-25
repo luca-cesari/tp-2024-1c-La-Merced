@@ -2,8 +2,10 @@
 #define CPU_SERVIDOR_H
 
 #include <stdlib.h>
+#include <semaphore.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
+
 #include "protocol/protocol.h"
 #include "protocol/pcb.h"
 #include "config/config.h"
