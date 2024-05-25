@@ -9,7 +9,7 @@ t_pcb *crear_pcb(char *ejecutable)
    pcb->quantum = 0;
    pcb->cpu_registers = crear_registros();
    pcb->psw = bitarray_create_with_mode(NULL, 1, LSB_FIRST);
-   pcb->io_request = crear_io_request();
+   pcb->io_request = NULL;
    pcb->executable_path = strdup(ejecutable);
    pcb->motivo_de_desalojo = NULL;
 
@@ -59,7 +59,6 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
 
 void destruir_pcb(t_pcb *pcb)
 {
-   free(pcb->cpu_registers);
    bitarray_destroy(pcb->psw);
    destruir_io_request(pcb->io_request);
    free(pcb->executable_path);

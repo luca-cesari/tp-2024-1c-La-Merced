@@ -45,13 +45,13 @@ void ingresar_proceso(char *ruta_ejecutable);
 
 /**
  * @brief Conecta una interfaz de entrada/salida a la cola de BLOCKED.
+ *
  * @param nombre_interfaz nombre de la interfaz a conectar, único en todo el sistema.
  * @param fd_conexion file descriptor de la conexión a la interfaz de entrada/salida
  */
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion);
 
 /**
- * @fn crear_proceso
  * @brief Planificador largo plazo, pasa de new a ready.
  *        No se ocupa de la transicion de bloqueado a ready
  */

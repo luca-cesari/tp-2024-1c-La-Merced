@@ -9,8 +9,7 @@ q_estado *cola_exit;
 
 q_blocked *cola_blocked;
 
-int8_t desalojado;
-pthread_mutex_t desalojado_mutex;
+static void *consumir_io(void *cola_io);
 
 void inicializar_planificador()
 {
@@ -67,7 +66,32 @@ void ingresar_proceso(char *ruta_ejecutable)
 
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
 {
-   conectar_interfaz(cola_blocked, nombre_interfaz, fd_conexion);
+   io_queue *cola_io = crear_io_queue(nombre_interfaz, fd_conexion);
+   conectar_nueva_interfaz(cola_blocked, cola_io, &consumir_io);
+}
+
+static void *consumir_io(void *cola_io)
+{
+   io_queue *io = (io_queue *)cola_io;
+
+   while (1)
+   {
+      t_pcb *pcb = pop_proceso(io->cola);
+      enviar_io_request(io->fd_conexion, pcb->io_request);
+      int32_t response = recibir_senial(io->fd_conexion);
+
+      switch (response)
+      {
+      case INVALID_INSTRUCTION:
+         pasar_a_exit(pcb, BLOCKED);
+         break;
+      case EXECUTED:
+         push_proceso(cola_ready, pcb);
+         break;
+      }
+   }
+
+   return NULL;
 }
 
 void *crear_proceso()
@@ -77,7 +101,7 @@ void *crear_proceso()
       t_pcb *pcb = pop_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
-      if (reservar_paginas(pcb))
+      if (memoria_iniciar_proceso(pcb->pid, pcb->executable_path))
       {
          pasar_a_exit(pcb, NEW);
          continue;
@@ -94,7 +118,7 @@ void *crear_proceso()
 
 void pasar_a_exit(t_pcb *pcb, char *q_flag)
 {
-   if (strcmp(q_flag, NEW) == 0)
+   if (strcmp(q_flag, NEW))
       sem_post(&grado_multiprogramacion);
 
    push_proceso(cola_exit, pcb);
@@ -105,7 +129,11 @@ void *finalizar_proceso()
    while (1)
    {
       t_pcb *pcb = pop_proceso(cola_exit);
-      liberar_memoria(pcb);
+      if (memoria_finalizar_proceso(pcb->pid))
+      {
+         log_finalizacion_proceso(pcb->pid, SUCCESS); // no es correcto esto, habria q guardar un exit code en el pcb
+         destruir_pcb(pcb);
+      }
    }
    return NULL;
 }
@@ -135,33 +163,22 @@ void *planificar_por_rr()
 {
    u_int32_t quantum = get_quantum();
 
-   // mepa q no hace falta alocar memoria
-   pthread_mutex_init(&desalojado_mutex, NULL);
-
    while (1)
    {
       t_pcb *pre_exec = pop_proceso(cola_ready);
       enviar_pcb_cpu(pre_exec);
-
-      pthread_mutex_lock(&desalojado_mutex);
-      desalojado = 0;
-      pthread_mutex_unlock(&desalojado_mutex);
 
       pthread_t rutina_cronometro;
       pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(quantum));
       pthread_detach(rutina_cronometro);
 
       t_pcb *pos_exec = recibir_pcb_cpu();
-
-      pthread_mutex_lock(&desalojado_mutex);
-      desalojado = 1;
-      pthread_mutex_unlock(&desalojado_mutex);
+      pthread_cancel(rutina_cronometro);
 
       // lo mismo que en fifo
       // chequear si necesita I/O o si termino
    }
 
-   pthread_mutex_destroy(&desalojado_mutex);
    return NULL;
 }
 
@@ -171,23 +188,18 @@ void *planificar_por_vrr()
    return NULL;
 }
 
-// ES UN ASCO COMO SE MANEJA
-// pero deberia funcionar, y eso es lo q importa por el momento
 void *cronometrar_quantum(void *milisegundos)
 {
-   u_int32_t segundos = (*(u_int32_t *)milisegundos) / 1000;
-   sleep(segundos);
+   pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+   pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
-   pthread_mutex_lock(&desalojado_mutex);
-   if (desalojado)
+   u_int32_t segundos = (*(u_int32_t *)milisegundos) / 1000;
+   for (u_int32_t i = 0; i < segundos; ++i)
    {
-      pthread_mutex_unlock(&desalojado_mutex);
-      return NULL;
+      sleep(1);
+      pthread_testcancel();
    }
-   else
-   {
-      enviar_interrupcion();
-      pthread_mutex_unlock(&desalojado_mutex);
-      return NULL;
-   }
+
+   enviar_interrupcion();
+   return NULL;
 }
