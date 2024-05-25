@@ -11,7 +11,7 @@ t_pcb *crear_pcb(char *ejecutable)
    pcb->psw = bitarray_create_with_mode(NULL, 1, LSB_FIRST);
    pcb->io_request = NULL;
    pcb->executable_path = strdup(ejecutable);
-   pcb->motivo_de_desalojo = NULL;
+   pcb->motivo_desalojo = NONE;
 
    return pcb;
 }
@@ -29,7 +29,7 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->psw->mode), sizeof(bit_numbering_t));
    serializar_io_request(pcb->io_request);
    agregar_a_paquete(paquete, pcb->executable_path, strlen(pcb->executable_path) + 1);
-   agregar_a_paquete(paquete, &(pcb->motivo_de_desalojo), strlen(pcb->motivo_de_desalojo) + 1);
+   agregar_a_paquete(paquete, &(pcb->motivo_desalojo), sizeof(motivo_desalojo));
    return paquete;
 }
 
@@ -48,10 +48,11 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->pid = *(u_int32_t *)list_get(paquete, 0);
    pcb->program_counter = *(int32_t *)list_get(paquete, 1);
    pcb->quantum = *(u_int32_t *)list_get(paquete, 2);
-
    pcb->cpu_registers = *(t_registers_generales *)list_get(paquete, 3);
    pcb->psw = bitarray_create_with_mode(list_get(paquete, 4), *(size_t *)list_get(paquete, 5), *(bit_numbering_t *)list_get(paquete, 6));
-   pcb->executable_path = strdup(list_get(paquete, 7));
+   pcb->io_request = (t_io_request *)list_get(paquete, 7);
+   pcb->executable_path = strdup(list_get(paquete, 8));
+   pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 9);
 
    list_destroy(paquete);
    return pcb;

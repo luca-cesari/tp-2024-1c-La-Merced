@@ -9,6 +9,14 @@
 #include "registers.h"
 #include "io_request.h"
 
+typedef enum
+{
+   EXIT,
+   QUANTUM,
+   IO,
+   NONE
+} motivo_desalojo;
+
 typedef struct
 {
    u_int32_t pid;
@@ -18,7 +26,7 @@ typedef struct
    t_bitarray *psw;
    t_io_request *io_request; // non managed (initialization, serialization, deserialization, deletion)
    char *executable_path;
-   char *motivo_de_desalojo;
+   motivo_desalojo motivo_desalojo;
 } t_pcb;
 
 t_pcb *crear_pcb(char *ejecutable);
