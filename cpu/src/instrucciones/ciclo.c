@@ -90,15 +90,16 @@ char **instruccion_parametros(char *char_instruccion)
 
 void execute(void (*instruccion)(Parametros), char *char_instruccion)
 {
-   // aumentar_program_counter();
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
+
+   aumentar_program_counter();
 }
 
-// void aumentar_program_counter() /// VER SI VA  ACA
-// {
-//    registros_cpu.PC += 1;
-// }
+void aumentar_program_counter() /// VER SI VA  ACA
+{
+   pcb->program_counter += 1;
+}
 
 int check_interrupt()
 {
@@ -161,7 +162,7 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
    dictionary_put(instrucciones, "SUB", &sub);
    dictionary_put(instrucciones, "JNZ", &jnz);
    dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
-   dictionary_put(instrucciones, "EXIT", &exit);
+   dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
 
 void set_diccionario_registros(t_dictionary *registros)

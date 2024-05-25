@@ -22,10 +22,7 @@ void sum(Parametros parametros);
 void sub(Parametros parametros);
 void jnz(Parametros parametros);
 void io_gen_sleep(Parametros parametros);
-void exit(Parametros parametros);
-
-/////AUX///////
-int hay_io_request(int valor);
+void exit_instruction(Parametros parametros);
 
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
