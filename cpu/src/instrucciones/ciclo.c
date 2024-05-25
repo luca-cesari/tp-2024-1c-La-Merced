@@ -54,7 +54,7 @@ Parametro buscar_operando(char *parametro)
    Parametro operando;
    if (parametro == NULL)
    {
-      operando.tipo_dato = NONE;
+      operando.tipo_dato = NINGUNO;
       return operando;
    }
    else if (es_numero(parametro))
