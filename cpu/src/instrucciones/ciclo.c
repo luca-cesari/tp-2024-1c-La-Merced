@@ -95,16 +95,14 @@ void aumentar_program_counter() /// VER SI VA  ACA
    registros_cpu.PC += 1;
 }
 
-void check_interrupt()
+int check_interrupt()
 {
    pthread_mutex_lock(&mutexInterrupcion);
    if(hay_interrupcion == 1){
-      //Desalojar()
-      //Aca habría que enviar el PCB al kernel con el motivo de desalojo(Que en este caso sería una interrupción)
-
+      pthread_mutex_unlock(&mutexInterrupcion);
+      return 1;
    }
-   pthread_mutex_unlock(&mutexInterrupcion);
-
+   return 0;
 
 }
 
@@ -126,7 +124,12 @@ void ciclo_instruccion()
 
       check_desalojo(); // si ocurren simultaneamente pesa mas I/O
 
-      check_interrupt();
+      if(check_interrupt())
+      {
+         //Ver que hacer aca para interrumpir
+      }
+
+
    }
 }
 

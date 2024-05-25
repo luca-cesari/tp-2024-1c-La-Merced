@@ -10,40 +10,15 @@
 #include <limits.h>
 #include <commons/collections/dictionary.h>
 #include "instrucciones.h"
+#include "estructuras.h"
 
 
-/// ESTRUCTURAS DECODE ////////
-typedef struct
-{
-   enum
-   {
-      INT32,
-      INT8,
-      VALOR,
-      INTERFAZ,
-      NONE,
-   } tipo_dato;
-   union
-   {
-      u_int8_t *registro_u8;
-      u_int32_t *registro_u32;
-      u_int8_t valor;
-      char *interfaz;
-   } dato;
-} Parametro;
 
-typedef struct
-{
-   Parametro parametro1;
-   Parametro parametro2;
-   // Parametro parametro3;
-   // Parametro parametro4;
-} Parametros;
 
 char *fetch();
 void (*decode(char *char_instruccion))(Parametros);
 void execute(void (*instruccion)(Parametros), char *char_instruccion);
-void check_interrupt();
+int check_interrupt();
 void check_desalojo();
 
 /// FUNCIONES DECODE ////////////
