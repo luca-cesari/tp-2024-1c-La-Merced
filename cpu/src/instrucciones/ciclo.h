@@ -13,15 +13,12 @@
 #include "conexion/memoria.h"
 #include "estructuras.h"
 
-
-
-
-
 char *fetch();
 void (*decode(char *char_instruccion))(Parametros);
 void execute(void (*instruccion)(Parametros), char *char_instruccion);
 int check_interrupt();
 void check_desalojo();
+void ciclo_instruccion(t_pcb *pcb_kernel);
 
 /// FUNCIONES DECODE ////////////
 
