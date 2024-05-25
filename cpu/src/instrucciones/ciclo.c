@@ -2,7 +2,7 @@
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
-t_registers registros_cpu;
+t_registers registros_cpu; //Setearlo con el PCB
 
 extern int hay_interrupcion;
 extern pthread_mutex_t mutexInterrupcion;
@@ -95,15 +95,17 @@ void aumentar_program_counter() /// VER SI VA  ACA
    registros_cpu.PC += 1;
 }
 
-void check_interrupt()
+int check_interrupt()
 {
    pthread_mutex_lock(&mutexInterrupcion);
-   if (hay_interrupcion == 1)
-   {
-      // Desalojar()
-      // Aca habría que enviar el PCB al kernel con el motivo de desalojo(Que en este caso sería una interrupción)
+
+
+   if(hay_interrupcion == 1){
+      pthread_mutex_unlock(&mutexInterrupcion);
+      return 1;
    }
-   pthread_mutex_unlock(&mutexInterrupcion);
+   return 0;
+
 }
 
 void check_desalojo()
@@ -123,7 +125,12 @@ void ciclo_instruccion()
 
       check_desalojo(); // si ocurren simultaneamente pesa mas I/O
 
-      check_interrupt();
+      if(check_interrupt())
+      {
+         //Ver que hacer aca para interrumpir
+      }
+
+
    }
 }
 
@@ -164,43 +171,10 @@ int es_numero(char *parametro)
    }
    return 1; // es un numero
 }
-// VER QUE  OPCION ES MEJOR
 
-// int es_numero_isDigit(const char *cadena) {
-//     size_t longitud = strlen(cadena);
-//     for (size_t i = 0; i < longitud; i++) {
-//         if (!isdigit(cadena[i])) {
-//             return 0; // No es un número
-//         }
-//     }
-//     return 1; // Es un número
-// }
 
 int char_a_numero(char *parametro)
 {
    return atoi(parametro);
 }
 
-// VER QUE  OPCION ES MEJOR
-
-// long char_a_numero_robusto(char *parametro)
-// {
-//    char *endptr;
-//    errno = 0;
-//    long num = strtol(parametro, &endptr, 10); // el long tiene un maximo de tamanio permitido , 10 hace referencia a la base del numero, en este caso decimal
-
-//    if (errno == ERANGE)
-//    {
-//       printf("Error de desbordamiento.\n");
-//       return 0;
-//    }
-//    else if (*endptr != '\0')
-//    {
-//       printf("La conversión no fue completamente exitosa. Parte de la cadena no convertida: %s\n", endptr);
-//       return 0;
-//    }
-//    else
-//    {
-//       return num;
-//    }
-// }

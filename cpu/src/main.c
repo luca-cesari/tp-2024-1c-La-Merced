@@ -4,6 +4,8 @@
 #include <protocol/protocol.h>
 #include <sockets/sockets.h>
 #include "servidor/servidor.h"
+#include "logger/logger.h"
+#include "conexion/memoria.h"
 
 int main(void)
 {

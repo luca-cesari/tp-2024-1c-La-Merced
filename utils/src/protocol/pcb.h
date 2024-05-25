@@ -18,6 +18,7 @@ typedef struct
    t_bitarray *psw;
    t_io_request *io_request; // non managed (initialization, serialization, deserialization, deletion)
    char *executable_path;
+   char *motivo_de_desalojo; 
 } t_pcb;
 
 t_pcb *crear_pcb(char *ejecutable);

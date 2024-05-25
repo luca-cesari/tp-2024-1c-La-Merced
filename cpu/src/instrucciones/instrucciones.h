@@ -6,7 +6,7 @@
 #include <protocol/pcb.h>
 #include <protocol/io_request.h>
 #include <commons/string.h>
-#include "ciclo.h"
+#include "estructuras.h"
 
 /// ESTRUCTURAS DECODE ////////
 
@@ -17,11 +17,11 @@
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-void set(Parametros);
-void sum(Parametros);
-void sub(Parametros);
-void jnz(Parametros);
-void io_gen_sleep(Parametros);
+void set(Parametros parametros);
+void sum(Parametros parametros);
+void sub(Parametros parametros);
+void jnz(Parametros parametros);
+void io_gen_sleep(Parametros parametros);
 
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
