@@ -11,7 +11,7 @@
 
 typedef enum
 {
-   EXIT,
+   TERMINATED,
    QUANTUM,
    IO,
    NONE
@@ -31,7 +31,8 @@ typedef enum
    INVALID_RESOURCE,
    INVALID_INTERFACE,
    INTERRUPTED_BY_USER,
-   OUT_OF_MEMORY
+   OUT_OF_MEMORY,
+   ZERO
 } motivo_finalizacion;
 
 typedef enum

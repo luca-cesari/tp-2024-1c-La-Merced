@@ -12,7 +12,7 @@ t_pcb *crear_pcb(char *ejecutable)
    pcb->io_request = NULL;
    pcb->executable_path = strdup(ejecutable);
    pcb->motivo_desalojo = NONE; // o NULL
-   pcb->motivo_finalizacion = NULL;
+   pcb->motivo_finalizacion = ZERO;
    pcb->estado = NEW; // o NULL
 
    return pcb;
