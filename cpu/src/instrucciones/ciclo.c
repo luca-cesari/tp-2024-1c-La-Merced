@@ -85,15 +85,15 @@ char **instruccion_parametros(char *char_instruccion)
 
 void execute(void (*instruccion)(Parametros), char *char_instruccion)
 {
-   aumentar_program_counter();
+   // aumentar_program_counter();
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
 }
 
-void aumentar_program_counter() /// VER SI VA  ACA
-{
-   registros_cpu.PC += 1;
-}
+// void aumentar_program_counter() /// VER SI VA  ACA
+// {
+//    registros_cpu.PC += 1;
+// }
 
 int check_interrupt()
 {
