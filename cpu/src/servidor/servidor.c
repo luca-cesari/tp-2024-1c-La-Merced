@@ -11,17 +11,11 @@ void iniciar_servidor()
   char *puerto_escucha_dispatch = get_puerto_escucha_dispatch();
   char *puerto_escucha_interrupt = get_puerto_escucha_interrupt();
 
-  int32_t *fd_dispatch = malloc(sizeof(int32_t));
-  int32_t *fd_interrupt = malloc(sizeof(int32_t));
+  int32_t fd_dispatch = crear_servidor(puerto_escucha_dispatch);
+  int32_t fd_interrupt = crear_servidor(puerto_escucha_interrupt);
 
-  *fd_dispatch = crear_servidor(puerto_escucha_dispatch);
-  *fd_interrupt = crear_servidor(puerto_escucha_interrupt);
-
-  pthread_t hilo_dispatch, hilo_interrupt;
-  pthread_create(&hilo_dispatch, NULL, &escuchar_dispatch, fd_dispatch);
-  pthread_create(&hilo_interrupt, NULL, &escuchar_interrupt, fd_interrupt);
-  pthread_join(hilo_dispatch, NULL);  // Esto lo cambie a join para que el hilo sea bloqueante
-  pthread_join(hilo_interrupt, NULL); // Esto lo cambie a join para que el hilo sea bloqueante
+  esperar_cliente(fd_dispatch, &atender_kernel_dispatch);
+  esperar_cliente(fd_interrupt, &atender_kernel_interrupt);
 }
 
 void *atender_kernel_dispatch(void *fd_ptr)
@@ -31,8 +25,10 @@ void *atender_kernel_dispatch(void *fd_ptr)
   uint32_t modulo_cliente = recibir_cliente(fd_dispatch);
   if (modulo_cliente != KERNEL)
   {
+    liberar_conexion(fd_dispatch);
     return NULL;
   }
+
   printf("Kernel conectado por dispatch \n");
 
   while (1)
@@ -51,31 +47,13 @@ void *atender_kernel_interrupt(void *fd_ptr)
   uint32_t modulo_cliente = recibir_cliente(fd_interrupt);
   if (modulo_cliente != KERNEL)
   {
+    liberar_conexion(fd_interrupt);
     return NULL;
   }
 
   printf("Kernel conectado por interrupt \n");
 
   recibir_interrupcion_del_kernel(fd_interrupt);
-
-  return NULL;
-}
-
-void *escuchar_dispatch(void *fd_dispatch)
-{
-  while (1)
-  {
-    esperar_cliente(*((int32_t *)fd_dispatch), &escuchar_dispatch);
-  }
-  return NULL;
-}
-void *escuchar_interrupt(void *fd_interrupt)
-{
-
-  while (1)
-  {
-    esperar_cliente(*((int32_t *)fd_interrupt), &escuchar_interrupt);
-  }
 
   return NULL;
 }
@@ -90,7 +68,6 @@ void recibir_interrupcion_del_kernel(int32_t fd_interrupt)
 
 void interrumpir()
 {
-
   pthread_mutex_lock(&mutexInterrupcion);
   hay_interrupcion = 1;
   pthread_mutex_unlock(&mutexInterrupcion);
