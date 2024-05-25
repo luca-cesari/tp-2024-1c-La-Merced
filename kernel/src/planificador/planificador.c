@@ -83,10 +83,10 @@ static void *consumir_io(void *cola_io)
       switch (response)
       {
       case INVALID_INSTRUCTION:
-         /* code */
+         pasar_a_exit(pcb, BLOCKED);
          break;
       case EXECUTED:
-         /* code */
+         push_proceso(cola_ready, pcb);
          break;
       }
    }
