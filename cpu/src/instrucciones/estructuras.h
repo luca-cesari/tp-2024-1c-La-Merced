@@ -10,7 +10,7 @@ typedef struct
       INT8,
       VALOR,
       INTERFAZ,
-      NONE,
+      NINGUNO
    } tipo_dato;
    union
    {

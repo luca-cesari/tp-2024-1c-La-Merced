@@ -11,14 +11,14 @@ char *fetch()
 {
    enviar_pcb_memoria(pcb);
    char *instruccion = recibir_instruccion();
+   log_fetch_instruccion(pcb->pid, pcb->program_counter);
+
    return instruccion;
 }
 
 void (*decode(char *char_instruccion))(Parametros)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
-   // char **instruccion_parametros;
-   // instruccion_parametros = string_split(char_instruccion_completa, " ");
    instrucciones = dictionary_create();
    set_diccionario_instrucciones(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
    if (dictionary_has_key(instrucciones, instruc_parametros[0]))
@@ -33,12 +33,15 @@ void (*decode(char *char_instruccion))(Parametros)
    }
 }
 
-Parametros obtener_parametros(char **parametros) // CHEQUEAR SI ES QUE RECIBE NONE
+Parametros obtener_parametros(char **parametros)
 {
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    Parametros struct_parametros;
    struct_parametros.parametro1 = buscar_operando(parametros[1]);
-   struct_parametros.parametro2 = buscar_operando(parametros[2]);
+   if(parametros[1] != NULL) //Esto hay que arreglarlo, sirve solamente para el EXIT del segundo checkpoint
+   {
+      struct_parametros.parametro2 = buscar_operando(parametros[2]);
+   }
    // struct_parametros.parametro3 = buscar_operando(parametros[3]) // siguientes checkpoints
    // struct_parametros.parametro4 = buscar_operando(parametros[4])
    return struct_parametros;
@@ -49,11 +52,15 @@ Parametro buscar_operando(char *parametro)
    registros = dictionary_create();
    set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
    Parametro operando;
-   if (es_numero(parametro))
+   if(parametro==NULL){
+      operando.tipo_dato = NONE;
+      return operando;
+   }
+   else if (es_numero(parametro))
    {
       operando.tipo_dato = VALOR;
       operando.dato.valor = char_a_numero(parametro);
-      return operando; // ver si usar el mas robusto
+      return operando; 
    }
    else if (dictionary_has_key(registros, parametro))
    {
@@ -85,15 +92,17 @@ char **instruccion_parametros(char *char_instruccion)
 
 void execute(void (*instruccion)(Parametros), char *char_instruccion)
 {
-   // aumentar_program_counter();
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
+
+   //log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); Esto traería problemas con la forma actual de obtener parámetros
+   aumentar_program_counter();
 }
 
-// void aumentar_program_counter() /// VER SI VA  ACA
-// {
-//    registros_cpu.PC += 1;
-// }
+void aumentar_program_counter() /// VER SI VA  ACA
+{
+   pcb->program_counter += 1;
+}
 
 int check_interrupt()
 {
@@ -110,10 +119,16 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   if(pcb->io_request!=NULL){
+   if(pcb->io_request!=NULL)
+   {
       pcb->motivo_desalojo = IO;
       return 1;
    }
+   if(pcb->motivo_desalojo == EXIT)
+   {
+      return 1;
+   }
+   
    return 0;
 }
 
@@ -150,6 +165,7 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
    dictionary_put(instrucciones, "SUB", &sub);
    dictionary_put(instrucciones, "JNZ", &jnz);
    dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
+   dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
 
 void set_diccionario_registros(t_dictionary *registros)

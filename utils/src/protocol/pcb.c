@@ -50,7 +50,7 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->quantum = *(u_int32_t *)list_get(paquete, 2);
    pcb->cpu_registers = *(t_registers_generales *)list_get(paquete, 3);
    pcb->psw = bitarray_create_with_mode(list_get(paquete, 4), *(size_t *)list_get(paquete, 5), *(bit_numbering_t *)list_get(paquete, 6));
-   pcb->io_request = *(t_io_request *)list_get(paquete, 7);
+   pcb->io_request = (t_io_request *)list_get(paquete, 7);
    pcb->executable_path = strdup(list_get(paquete, 8));
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 9);
 
