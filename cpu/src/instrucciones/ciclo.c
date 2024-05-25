@@ -102,17 +102,22 @@ int check_interrupt()
    if (hay_interrupcion == 1)
    {
       pthread_mutex_unlock(&mutexInterrupcion);
+      pcb->motivo_desalojo = QUANTUM;
       return 1;
    }
    return 0;
 }
 
-void check_desalojo()
+int check_desalojo()
 {
-   printf("Check desalojo\n");
+   if(pcb->io_request!=NULL){
+      pcb->motivo_desalojo = IO;
+      return 1;
+   }
+   return 0;
 }
 
-void ciclo_instruccion(t_pcb *pcb_kernel)
+void *ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
 
@@ -124,11 +129,14 @@ void ciclo_instruccion(t_pcb *pcb_kernel)
 
       execute(instruccion, char_instruccion);
 
-      check_desalojo(); // si ocurren simultaneamente pesa mas I/O
+      if (check_desalojo())
+      {
+         return NULL;
+      } // si ocurren simultaneamente pesa mas I/O
 
       if (check_interrupt())
       {
-         // Ver que hacer aca para interrumpir
+         return NULL;
       }
    }
 }

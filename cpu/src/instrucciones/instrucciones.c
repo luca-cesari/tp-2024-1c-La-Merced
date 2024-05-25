@@ -63,10 +63,4 @@ void io_gen_sleep(Parametros parametros)
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros.parametro1.dato.interfaz, "IO_GEN_SLEEP", string_itoa(parametros.parametro2.dato.valor)); // ver implementacion gen_sleep en entrada/salida
    pcb->io_request = io_request;
-   hay_io_request(1);
-}
-
-int hay_io_request(int valor)
-{
-   hay_iorequest = valor;
 }
