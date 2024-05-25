@@ -20,8 +20,8 @@ void iniciar_servidor()
   pthread_t hilo_dispatch, hilo_interrupt;
   pthread_create(&hilo_dispatch, NULL, &escuchar_dispatch, fd_dispatch);
   pthread_create(&hilo_interrupt, NULL, &escuchar_interrupt, fd_interrupt);
-  pthread_detach(hilo_dispatch);
-  pthread_detach(hilo_interrupt);
+  pthread_join(hilo_dispatch, NULL);  // Esto lo cambie a join para que el hilo sea bloqueante
+  pthread_join(hilo_interrupt, NULL); // Esto lo cambie a join para que el hilo sea bloqueante
 }
 
 void *atender_kernel_dispatch(void *fd_ptr)
@@ -33,6 +33,8 @@ void *atender_kernel_dispatch(void *fd_ptr)
   {
     return NULL;
   }
+  printf("Kernel conectado por dispatch \n");
+
   while (1)
   {
     t_pcb *pcb = recibir_pcb(fd_dispatch);
@@ -51,6 +53,9 @@ void *atender_kernel_interrupt(void *fd_ptr)
   {
     return NULL;
   }
+
+  printf("Kernel conectado por interrupt \n");
+
   recibir_interrupcion_del_kernel(fd_interrupt);
 
   return NULL;

@@ -4,25 +4,25 @@ mem_config config;
 
 void iniciar_servidor()
 {
-   config = get_memoria_config();
-   char *puerto_escucha = config.puerto_escucha;
+    config = get_memoria_config();
+    char *puerto_escucha = config.puerto_escucha;
 
-   int32_t *fd_escucha = malloc(sizeof(int32_t));
-   *fd_escucha = crear_servidor(puerto_escucha);
+    int32_t *fd_escucha = malloc(sizeof(int32_t));
+    *fd_escucha = crear_servidor(puerto_escucha);
 
-   pthread_t hilo_escucha;
-   pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, fd_escucha);
-   pthread_join(hilo_escucha, NULL); //Esto lo cambie a join para que el hilo sea bloqueante
+    pthread_t hilo_escucha;
+    pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, fd_escucha);
+    pthread_join(hilo_escucha, NULL); // Esto lo cambie a join para que el hilo sea bloqueante
 }
 
 void *escuchar_conexiones(void *fd_escucha)
 {
-   while (1)
-   {
-      esperar_cliente(*((int32_t *)fd_escucha), &atender_cliente);
-   }
+    while (1)
+    {
+        esperar_cliente(*((int32_t *)fd_escucha), &atender_cliente);
+    }
 
-   return NULL;
+    return NULL;
 }
 
 void *atender_cliente(void *fd_ptr)
@@ -30,7 +30,7 @@ void *atender_cliente(void *fd_ptr)
     int32_t fd_conexion = *((int32_t *)fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
-    uint32_t modulo_cliente = recibir_cliente(fd_conexion);
+    int32_t modulo_cliente = recibir_cliente(fd_conexion);
 
     switch (modulo_cliente)
     {
@@ -54,15 +54,14 @@ void *atender_cliente(void *fd_ptr)
 void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
-    
-    instruccion_kernel* instruccion_paquete = recibir_instruccion_del_kernel(fd_kernel);
+
+    instruccion_kernel *instruccion_paquete = recibir_instruccion_del_kernel(fd_kernel);
 
     switch (instruccion_paquete->tipo)
     {
     case INICIAR_PROCESO:
         printf("INICIAR_PROCESO \n");
-        cargar_proceso_a_memoria(instruccion_paquete->pid ,instruccion_paquete->parametros.path);
-        
+        cargar_proceso_a_memoria(instruccion_paquete->pid, instruccion_paquete->parametros.path);
 
         break;
     case FINALIZAR_PROCESO:
@@ -72,10 +71,7 @@ void escuchar_kernel(int32_t fd_kernel)
         printf("Error de instruccion \n");
         break;
     }
-    
-
 }
-
 
 void escuchar_cpu(int32_t fd_cpu)
 {
@@ -90,4 +86,3 @@ void escuchar_interfaz_es(int32_t fd_es)
     printf("Interfaz E/S conectada \n");
     recibir_mensaje(fd_es);
 }
-

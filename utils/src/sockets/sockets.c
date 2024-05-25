@@ -31,9 +31,7 @@ void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 
    *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);
    pthread_create(&thread, NULL, atender_cliente, fd_conexion_ptr);
-
    pthread_detach(thread);
-   free(fd_conexion_ptr);
 }
 
 int32_t recibir_cliente(int32_t fd_conexion)
