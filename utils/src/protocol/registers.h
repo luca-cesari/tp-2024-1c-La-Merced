@@ -32,7 +32,4 @@ typedef struct
 // como registros a secas o como puntero?
 t_registers_generales crear_registros();
 
-void serializar_registros(t_registers_generales *registers_, void **buffer, size_t *buffer_size);
-void deserializar_registros(t_registers_generales *registers, void *buffer, size_t buffer_size);
-
 #endif // UTILS_PROTOCOL_REGISTROS_H
