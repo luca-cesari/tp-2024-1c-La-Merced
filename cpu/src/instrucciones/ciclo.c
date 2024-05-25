@@ -38,7 +38,7 @@ Parametros obtener_parametros(char **parametros)
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    Parametros struct_parametros;
    struct_parametros.parametro1 = buscar_operando(parametros[1]);
-   if(parametros[1] != NULL) //Esto hay que arreglarlo, sirve solamente para el EXIT del segundo checkpoint
+   if (parametros[1] != NULL) // Esto hay que arreglarlo, sirve solamente para el TERMINATED del segundo checkpoint
    {
       struct_parametros.parametro2 = buscar_operando(parametros[2]);
    }
@@ -52,7 +52,8 @@ Parametro buscar_operando(char *parametro)
    registros = dictionary_create();
    set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
    Parametro operando;
-   if(parametro==NULL){
+   if (parametro == NULL)
+   {
       operando.tipo_dato = NONE;
       return operando;
    }
@@ -60,7 +61,7 @@ Parametro buscar_operando(char *parametro)
    {
       operando.tipo_dato = VALOR;
       operando.dato.valor = char_a_numero(parametro);
-      return operando; 
+      return operando;
    }
    else if (dictionary_has_key(registros, parametro))
    {
@@ -79,7 +80,7 @@ Parametro buscar_operando(char *parametro)
    }
    else
    {
-      operando.tipo_dato = INTERFAZ;
+      operando.tipo_dato = INTERF;
       operando.dato.interfaz = parametro;
       return operando;
    }
@@ -95,7 +96,7 @@ void execute(void (*instruccion)(Parametros), char *char_instruccion)
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
 
-   //log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); Esto traería problemas con la forma actual de obtener parámetros
+   // log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); Esto traería problemas con la forma actual de obtener parámetros
    aumentar_program_counter();
 }
 
@@ -119,16 +120,16 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   if(pcb->io_request!=NULL)
+   if (pcb->io_request != NULL)
    {
       pcb->motivo_desalojo = IO;
       return 1;
    }
-   if(pcb->motivo_desalojo == EXIT)
+   if (pcb->motivo_desalojo == TERMINATED)
    {
       return 1;
    }
-   
+
    return 0;
 }
 
