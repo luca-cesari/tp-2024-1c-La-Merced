@@ -65,7 +65,7 @@ void io_gen_sleep(Parametros parametros)
    pcb->io_request = io_request;
 }
 
-void exit(Parametros parametros)
+void exit_instruction(Parametros parametros)
 {
    pcb->motivo_desalojo = EXIT;
 }

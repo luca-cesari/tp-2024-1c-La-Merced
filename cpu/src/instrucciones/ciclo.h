@@ -29,5 +29,7 @@ Parametros obtener_parametros(char **parametros);
 Parametro buscar_operando(char *parametro);
 void set_diccionario_instrucciones(t_dictionary *);
 void set_diccionario_registros(t_dictionary *);
+void aumentar_program_counter();
+
 
 #endif // CICLO_H
