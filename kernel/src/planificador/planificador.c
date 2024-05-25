@@ -9,6 +9,8 @@ q_estado *cola_exit;
 
 q_blocked *cola_blocked;
 
+static void *consumir_io(void *cola_io);
+
 void inicializar_planificador()
 {
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
@@ -64,8 +66,32 @@ void ingresar_proceso(char *ruta_ejecutable)
 
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
 {
-   // no es solo conectar, habaria que lanzar una rutina por cada interfaz
-   conectar_interfaz(cola_blocked, nombre_interfaz, fd_conexion);
+   io_queue *cola_io = crear_io_queue(nombre_interfaz, fd_conexion);
+   conectar_nueva_interfaz(cola_blocked, cola_io, &consumir_io);
+}
+
+static void *consumir_io(void *cola_io)
+{
+   io_queue *io = (io_queue *)cola_io;
+
+   while (1)
+   {
+      t_pcb *pcb = pop_proceso(io->cola);
+      enviar_io_request(io->fd_conexion, pcb->io_request);
+      int32_t response = recibir_senial(io->fd_conexion);
+
+      switch (response)
+      {
+      case INVALID_INSTRUCTION:
+         /* code */
+         break;
+      case EXECUTED:
+         /* code */
+         break;
+      }
+   }
+
+   return NULL;
 }
 
 void *crear_proceso()
@@ -175,4 +201,5 @@ void *cronometrar_quantum(void *milisegundos)
    }
 
    enviar_interrupcion();
+   return NULL;
 }
