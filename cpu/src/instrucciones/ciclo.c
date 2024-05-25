@@ -11,6 +11,8 @@ char *fetch()
 {
    enviar_pcb_memoria(pcb);
    char *instruccion = recibir_instruccion();
+   log_fetch_instruccion(pcb->pid, pcb->program_counter);
+
    return instruccion;
 }
 
@@ -93,6 +95,7 @@ void execute(void (*instruccion)(Parametros), char *char_instruccion)
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
 
+   //log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); Esto traería problemas con la forma actual de obtener parámetros
    aumentar_program_counter();
 }
 

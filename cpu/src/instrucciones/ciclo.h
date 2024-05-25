@@ -12,6 +12,7 @@
 #include "instrucciones.h"
 #include "conexion/memoria.h"
 #include "estructuras.h"
+#include "logger/logger.h"
 
 char *fetch();
 void (*decode(char *char_instruccion))(Parametros);
