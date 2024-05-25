@@ -16,7 +16,6 @@
 #include "conexion/memoria.h"
 
 /**
- * @fn inicializar_planificador
  * @brief Inicializa el planificador del kernel.
  *
  * * Crea los estados.
@@ -24,9 +23,24 @@
  * * Lanza las rutinas de planificacion (crea los hilos).
  */
 void inicializar_planificador();
+
+/**
+ * @brief Destruye el planificador del kernel.
+ *
+ * * Destruye los estados.
+ * * Destruye los semaforos creados.
+ */
 void destruir_planificador();
 
+/**
+ * @brief Inicia la planificación de los procesos.
+ */
 void iniciar_planificacion();
+
+/**
+ * @brief Detiene la planificación a largo plazo.
+ *        Impide que se creen nuevos procesos y pase a ready.
+ */
 void detener_planificacion();
 
 /**
@@ -51,28 +65,5 @@ void ingresar_proceso(char *ruta_ejecutable);
  */
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion);
 
-/**
- * @brief Planificador largo plazo, pasa de new a ready.
- *        No se ocupa de la transicion de bloqueado a ready
- */
-void *crear_proceso();
-
-/**
- * @brief Indica la finalización de un proceso.
- *        Recibe un PCB y lo pasa a la cola de exit.
- *
- * @param pcb PCB del proceso a finalizar.
- * @param q_flag Flag que indica el estado de donde fue llamado.
- */
-void pasar_a_exit(t_pcb *pcb, char *q_flag);
-
-// ...
-void *finalizar_proceso();
-
-void *planificar_por_fifo();
-void *planificar_por_rr();
-void *planificar_por_vrr();
-
-void *cronometrar_quantum(void *milisegundos);
 
 #endif // PLANIFICADOR_H

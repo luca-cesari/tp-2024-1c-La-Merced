@@ -80,8 +80,6 @@ q_estado *desconectar_interfaz(q_blocked *estado, int32_t fd_conexion)
    io_queue *cola_io = list_remove(estado->io_queues, a_remover);
    pthread_mutex_unlock(&(estado->io_queues_mutex));
 
-   pthread_cancel(cola_io->rutina_consumo);
-
    q_estado *cola = cola_io->cola;
    free(cola_io); // esta bien esto?? no quiero usar destruir_io_queue porque no quiero borrar la cola
 
