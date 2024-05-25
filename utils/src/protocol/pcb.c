@@ -59,4 +59,8 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
 
 void destruir_pcb(t_pcb *pcb)
 {
+   free(pcb->cpu_registers);
+   bitarray_destroy(pcb->psw);
+   free(pcb->executable_path);
+   free(pcb);
 }
