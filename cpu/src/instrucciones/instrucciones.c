@@ -59,7 +59,6 @@ void jnz(Parametros parametros)
 
 void io_gen_sleep(Parametros parametros)
 {
-   //Descomentar cuando sepamos como obtenemos el PCB
-   //t_io_request *io_request = crear_io_request(pcb.pid, parametros.parametro1.dato.interfaz, "IO_GEN_SLEEP", string_itoa(parametros.parametro2.dato.valor)); // ver implementacion gen_sleep en entrada/salida
+   t_io_request *io_request = crear_io_request(pcb.pid, parametros.parametro1.dato.interfaz, "IO_GEN_SLEEP", string_itoa(parametros.parametro2.dato.valor)); // ver implementacion gen_sleep en entrada/salida
 }
 

@@ -7,12 +7,11 @@ t_pcb *pcb;
 
 extern int hay_interrupcion;
 extern pthread_mutex_t mutexInterrupcion;
-extern int32_t fd_memoria;
 
 char *fetch()
 {
    enviar_pcb_memoria(pcb);
-   char *instruccion = recibir_instruccion(fd_memoria);
+   char *instruccion = recibir_instruccion();
    return instruccion;
 }
 

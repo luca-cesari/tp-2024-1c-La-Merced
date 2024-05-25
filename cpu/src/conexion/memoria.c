@@ -21,7 +21,7 @@ void enviar_pcb_memoria(t_pcb *pcb)
    enviar_pcb(fd_memoria, pcb);
 }
 //
-char *recibir_instruccion(int32_t fd_memoria)
+char *recibir_instruccion()
 {
    char *instruccion = recibir_mensaje(fd_memoria);
 
