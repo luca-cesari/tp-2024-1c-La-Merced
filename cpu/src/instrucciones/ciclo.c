@@ -2,15 +2,17 @@
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
-t_registers registros_cpu; //Setearlo con el PCB
+t_registers registros_cpu; // Setearlo con el PCB
+t_pcb *pcb;
 
 extern int hay_interrupcion;
 extern pthread_mutex_t mutexInterrupcion;
+extern int32_t fd_memoria;
 
 char *fetch()
 {
    enviar_pcb_memoria(pcb);
-   char *instruccion = recibir_instruccion(fd_memoria); // no se por que no me lo toma
+   char *instruccion = recibir_instruccion(fd_memoria);
    return instruccion;
 }
 
@@ -99,13 +101,12 @@ int check_interrupt()
 {
    pthread_mutex_lock(&mutexInterrupcion);
 
-
-   if(hay_interrupcion == 1){
+   if (hay_interrupcion == 1)
+   {
       pthread_mutex_unlock(&mutexInterrupcion);
       return 1;
    }
    return 0;
-
 }
 
 void check_desalojo()
@@ -113,8 +114,9 @@ void check_desalojo()
    printf("Check desalojo\n");
 }
 
-void ciclo_instruccion()
+void ciclo_instruccion(t_pcb *pcb_kernel)
 {
+   pcb = pcb_kernel;
    while (1)
    {
       char *char_instruccion = fetch();
@@ -125,12 +127,10 @@ void ciclo_instruccion()
 
       check_desalojo(); // si ocurren simultaneamente pesa mas I/O
 
-      if(check_interrupt())
+      if (check_interrupt())
       {
-         //Ver que hacer aca para interrumpir
+         // Ver que hacer aca para interrumpir
       }
-
-
    }
 }
 
@@ -172,9 +172,7 @@ int es_numero(char *parametro)
    return 1; // es un numero
 }
 
-
 int char_a_numero(char *parametro)
 {
    return atoi(parametro);
 }
-
