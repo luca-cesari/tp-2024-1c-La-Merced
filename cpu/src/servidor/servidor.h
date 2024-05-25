@@ -5,8 +5,9 @@
 #include <pthread.h>
 #include <sockets/sockets.h>
 #include "protocol/protocol.h"
+#include "protocol/pcb.h"
 #include "config/config.h"
-
+#include "instrucciones/ciclo.h"
 
 void iniciar_servidor();
 void *atender_kernel_dispatch(void *fd_ptr);
