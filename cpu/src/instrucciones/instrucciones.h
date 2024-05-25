@@ -23,6 +23,9 @@ void sub(Parametros parametros);
 void jnz(Parametros parametros);
 void io_gen_sleep(Parametros parametros);
 
+/////AUX///////
+int hay_io_request(int valor);
+
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)

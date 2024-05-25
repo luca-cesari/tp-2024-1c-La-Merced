@@ -14,5 +14,6 @@ int8_t conectar_con_memoria();
 void hablar_con_memoria(int32_t fd_memoria);
 void liberar_conexion_memoria();
 void enviar_pcb_memoria(t_pcb *pcb);
+char *recibir_instruccion();
 
 #endif // CONEXION_MEMORIA_H

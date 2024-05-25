@@ -15,19 +15,16 @@ typedef struct
    u_int32_t EBX;
    u_int32_t ECX;
    u_int32_t EDX;
-   u_int32_t PC;
-   u_int32_t SI;
-   u_int32_t DI;
 
 } t_registers_generales;
 
-typedef struct
-{
-   u_int32_t PC;
-   u_int32_t SI;
-   u_int32_t DI;
-   t_registers_generales registers_generales;
-} t_registers;
+// typedef struct // no lo uso por ahora
+// {
+//    u_int32_t PC;
+//    u_int32_t SI;
+//    u_int32_t DI;
+//    t_registers_generales registers_generales;
+// } t_registers;
 
 // Los argumentos de las funciones me los autocompleto copilot
 // habria q revisar

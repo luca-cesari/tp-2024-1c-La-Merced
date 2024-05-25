@@ -2,7 +2,6 @@
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
-t_registers registros_cpu; // Setearlo con el PCB
 t_pcb *pcb;
 
 extern int hay_interrupcion;
@@ -86,15 +85,15 @@ char **instruccion_parametros(char *char_instruccion)
 
 void execute(void (*instruccion)(Parametros), char *char_instruccion)
 {
-   aumentar_program_counter();
+   // aumentar_program_counter();
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
 }
 
-void aumentar_program_counter() /// VER SI VA  ACA
-{
-   registros_cpu.PC += 1;
-}
+// void aumentar_program_counter() /// VER SI VA  ACA
+// {
+//    registros_cpu.PC += 1;
+// }
 
 int check_interrupt()
 {
@@ -103,19 +102,25 @@ int check_interrupt()
    if (hay_interrupcion == 1)
    {
       pthread_mutex_unlock(&mutexInterrupcion);
+      pcb->motivo_desalojo = QUANTUM;
       return 1;
    }
    return 0;
 }
 
-void check_desalojo()
+int check_desalojo()
 {
-   printf("Check desalojo\n");
+   if(pcb->io_request!=NULL){
+      pcb->motivo_desalojo = IO;
+      return 1;
+   }
+   return 0;
 }
 
-void ciclo_instruccion(t_pcb *pcb_kernel)
+void *ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
+
    while (1)
    {
       char *char_instruccion = fetch();
@@ -124,11 +129,14 @@ void ciclo_instruccion(t_pcb *pcb_kernel)
 
       execute(instruccion, char_instruccion);
 
-      check_desalojo(); // si ocurren simultaneamente pesa mas I/O
+      if (check_desalojo())
+      {
+         return NULL;
+      } // si ocurren simultaneamente pesa mas I/O
 
       if (check_interrupt())
       {
-         // Ver que hacer aca para interrumpir
+         return NULL;
       }
    }
 }
@@ -146,14 +154,14 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
 
 void set_diccionario_registros(t_dictionary *registros)
 {
-   dictionary_put(registros, "AX", &(registros_cpu.registers_generales.AX));
-   dictionary_put(registros, "BX", &(registros_cpu.registers_generales.BX));
-   dictionary_put(registros, "CX", &(registros_cpu.registers_generales.CX));
-   dictionary_put(registros, "DX", &(registros_cpu.registers_generales.DX));
-   dictionary_put(registros, "EAX", &(registros_cpu.registers_generales.EAX));
-   dictionary_put(registros, "EBX", &(registros_cpu.registers_generales.EBX));
-   dictionary_put(registros, "ECX", &(registros_cpu.registers_generales.ECX));
-   dictionary_put(registros, "EDX", &(registros_cpu.registers_generales.EDX));
+   dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
+   dictionary_put(registros, "BX", &(pcb->cpu_registers.BX));
+   dictionary_put(registros, "CX", &(pcb->cpu_registers.CX));
+   dictionary_put(registros, "DX", &(pcb->cpu_registers.DX));
+   dictionary_put(registros, "EAX", &(pcb->cpu_registers.EAX));
+   dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
+   dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
+   dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
 }
 
 //////////FUNCIONES AUXILIARES////////////
