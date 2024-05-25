@@ -2,7 +2,6 @@
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
-t_registers registros_cpu; // Setearlo con el PCB
 t_pcb *pcb;
 
 extern int hay_interrupcion;
@@ -116,6 +115,7 @@ void check_desalojo()
 void ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
+
    while (1)
    {
       char *char_instruccion = fetch();
@@ -146,14 +146,14 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
 
 void set_diccionario_registros(t_dictionary *registros)
 {
-   dictionary_put(registros, "AX", &(registros_cpu.registers_generales.AX));
-   dictionary_put(registros, "BX", &(registros_cpu.registers_generales.BX));
-   dictionary_put(registros, "CX", &(registros_cpu.registers_generales.CX));
-   dictionary_put(registros, "DX", &(registros_cpu.registers_generales.DX));
-   dictionary_put(registros, "EAX", &(registros_cpu.registers_generales.EAX));
-   dictionary_put(registros, "EBX", &(registros_cpu.registers_generales.EBX));
-   dictionary_put(registros, "ECX", &(registros_cpu.registers_generales.ECX));
-   dictionary_put(registros, "EDX", &(registros_cpu.registers_generales.EDX));
+   dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
+   dictionary_put(registros, "BX", &(pcb->cpu_registers.BX));
+   dictionary_put(registros, "CX", &(pcb->cpu_registers.CX));
+   dictionary_put(registros, "DX", &(pcb->cpu_registers.DX));
+   dictionary_put(registros, "EAX", &(pcb->cpu_registers.EAX));
+   dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
+   dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
+   dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
 }
 
 //////////FUNCIONES AUXILIARES////////////
