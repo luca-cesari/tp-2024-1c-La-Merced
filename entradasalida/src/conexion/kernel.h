@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
-#include <commons/string.h>
 #include <protocol/pcb.h>
 #include <protocol/io_request.h>
 
