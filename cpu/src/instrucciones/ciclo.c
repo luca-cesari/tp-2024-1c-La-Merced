@@ -19,8 +19,7 @@ char *fetch()
 void (*decode(char *char_instruccion))(Parametros)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
-   instrucciones = dictionary_create();
-   set_diccionario_instrucciones(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
+
    if (dictionary_has_key(instrucciones, instruc_parametros[0]))
    {
       return dictionary_get(instrucciones, instruc_parametros[0]);
@@ -49,8 +48,6 @@ Parametros obtener_parametros(char **parametros)
 
 Parametro buscar_operando(char *parametro)
 {
-   registros = dictionary_create();
-   set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
    Parametro operando;
    if (parametro == NULL)
    {
@@ -199,4 +196,13 @@ int es_numero(char *parametro)
 int char_a_numero(char *parametro)
 {
    return atoi(parametro);
+}
+
+void inicializar_diccionarios_inst_reg()
+{
+   instrucciones = dictionary_create();
+   registros = dictionary_create();
+
+   set_diccionario_instrucciones(instrucciones);
+   set_diccionario_registros(registros);
 }

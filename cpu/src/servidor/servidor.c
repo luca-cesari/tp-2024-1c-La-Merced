@@ -36,6 +36,7 @@ void *atender_kernel_dispatch(void *fd_ptr)
   }
 
   printf("Kernel conectado por dispatch \n");
+  inicializar_diccionarios_inst_reg();
 
   while (1)
   {
