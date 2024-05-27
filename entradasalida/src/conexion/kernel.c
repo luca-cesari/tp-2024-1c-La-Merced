@@ -6,7 +6,7 @@ int8_t conectar_con_kernel(char *nombre_interfaz)
 {
     kernel_config kernel = get_kernel_config();
 
-    int32_t fd_kernel = crear_conexion(kernel.ip, kernel.puerto);
+    fd_kernel = crear_conexion(kernel.ip, kernel.puerto);
     int32_t response = handshake(fd_kernel, E_S);
     if (response == -1)
     {
