@@ -8,7 +8,10 @@ void iniciar_rutina_interfaz_generica(void)
 
     while (1)
     {
-        t_io_request *peticion_io = esperar_instruccion();
+        printf("Esperando instruccion\n");
+        t_io_request *peticion_io = esperar_instruccion(); // no esta siendo bloqueante
+
+        printf("Instruccion recibida: %s\n", "no deberia alcanzar a imprimir esto");
 
         if (!dictionary_has_key(instruccion_funcion, peticion_io->instruction))
             enviar_respuesta(INVALID_INSTRUCTION);
