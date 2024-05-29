@@ -1,8 +1,8 @@
 #include "registers.h"
 
-t_registers_generales crear_registros()
+t_registers crear_registros()
 {
-   t_registers_generales registros;
+   t_registers registros;
 
    registros.AX = 0;
    registros.BX = 0;

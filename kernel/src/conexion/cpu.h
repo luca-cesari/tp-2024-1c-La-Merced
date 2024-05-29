@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <sockets/sockets.h>
-#include <protocol/pcb.h>
+#include <pcb/pcb.h>
 
 #include "config/config.h"
 

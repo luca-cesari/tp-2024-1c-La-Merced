@@ -170,39 +170,3 @@ char *recibir_mensaje(int32_t fd_conexion)
 
    return mensaje;
 }
-
-// INICIO Protocolo de comunicación entre Memoria y Kernel
-instruccion_kernel *recibir_instruccion_del_kernel(int32_t fd_kernel)
-{
-   t_list *paquete = recibir_paquete(fd_kernel);
-   instruccion_kernel *instruccion_paquete = malloc(sizeof(instruccion_kernel));
-
-   instruccion_paquete->tipo = *(tipo_instruccion *)list_get(paquete, 0);
-   instruccion_paquete->pid = *(int *)list_get(paquete, 1);
-
-   switch (instruccion_paquete->tipo)
-   {
-   case INICIAR_PROCESO:
-      instruccion_paquete->parametros.path = (char *)list_get(paquete, 2);
-      break;
-
-   default:
-      break;
-   }
-
-   list_destroy(paquete);
-   return instruccion_paquete;
-}
-
-void enviar_instruccion_a_memoria(int32_t fd_memoria, instruccion_kernel instruccion)
-{
-   t_packet *paquete = crear_paquete();
-   crear_buffer(paquete);
-   agregar_a_paquete(paquete, &instruccion.tipo, sizeof(instruccion.tipo));
-   agregar_a_paquete(paquete, &instruccion.pid, sizeof(instruccion.pid));
-   agregar_a_paquete(paquete, instruccion.parametros.path, strlen(instruccion.parametros.path) + 1);
-
-   enviar_paquete(paquete, fd_memoria);
-   eliminar_paquete(paquete);
-}
-// FIN Protocolo de comunicación entre Memoria y Kernel

@@ -7,7 +7,7 @@
 #include <semaphore.h>
 #include <commons/temporal.h>
 #include <mqueue/mqueue.h>
-#include <protocol/pcb.h>
+#include <pcb/pcb.h>
 
 #include "logger/logger.h"
 #include "estados.h"
@@ -64,6 +64,5 @@ void ingresar_proceso(char *ruta_ejecutable);
  * @param fd_conexion file descriptor de la conexión a la interfaz de entrada/salida
  */
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion);
-
 
 #endif // PLANIFICADOR_H

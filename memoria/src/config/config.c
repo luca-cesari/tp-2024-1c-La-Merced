@@ -12,12 +12,27 @@ void destruir_config(void)
    config_destroy(memoria_config);
 }
 
-mem_config get_memoria_config(void){
-    mem_config config;
-    config.puerto_escucha = config_get_string_value(memoria_config, "PUERTO_ESCUCHA");
-    config.tam_memoria = config_get_int_value(memoria_config, "TAM_MEMORIA");
-    config.tam_pagina = config_get_int_value(memoria_config, "TAM_PAGINA");
-    config.path_instrucciones = config_get_string_value(memoria_config, "PATH_INSTRUCCIONES");
-    config.retardo_respuesta = config_get_int_value(memoria_config, "RETARDO_RESPUESTA");
-    return config;
+char *get_puerto_escucha(void)
+{
+   return config_get_string_value(memoria_config, "PUERTO_ESCUCHA");
+}
+
+u_int32_t get_tamanio_memoria(void)
+{
+   return config_get_int_value(memoria_config, "TAM_MEMORIA");
+}
+
+u_int32_t get_tamanio_pagina(void)
+{
+   return config_get_int_value(memoria_config, "TAM_PAGINA");
+}
+
+char *get_path_instrucciones(void)
+{
+   return config_get_string_value(memoria_config, "PATH_INSTRUCCIONES");
+}
+
+u_int32_t get_retardo_respuesta(void)
+{
+   return config_get_int_value(memoria_config, "RETARDO_RESPUESTA");
 }

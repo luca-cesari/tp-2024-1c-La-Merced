@@ -4,13 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <commons/config.h>
-#include <commons/collections/dictionary.h>
 
 #define CONFIG_FILE "memoria.config"
 
 typedef struct
 {
-    char* puerto_escucha;
+    char *puerto_escucha;
     u_int32_t tam_memoria;
     u_int32_t tam_pagina;
     char *path_instrucciones;
@@ -20,6 +19,10 @@ typedef struct
 void iniciar_config(void);
 void destruir_config(void);
 
-mem_config get_memoria_config(void);
+char *get_puerto_escucha(void);
+u_int32_t get_tamanio_memoria(void);
+u_int32_t get_tamanio_pagina(void);
+char *get_path_instrucciones(void);
+u_int32_t get_retardo_respuesta(void);
 
 #endif // MEMORIA_CONFIG_H
