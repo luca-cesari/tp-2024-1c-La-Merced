@@ -30,9 +30,9 @@ void inicializar_planificador()
 
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
 
-   cola_new = crear_estado();
-   cola_ready = crear_estado();
-   cola_exit = crear_estado();
+   cola_new = crear_estado(NEW);
+   cola_ready = crear_estado(READY);
+   cola_exit = crear_estado(EXIT);
    cola_blocked = crear_estado_blocked();
 
    // .........................
@@ -98,13 +98,13 @@ static void *consumir_io(void *cola_io)
       switch (response)
       {
       case INVALID_INSTRUCTION:
-         pasar_a_exit(pcb, BLOCKED);
+         pasar_a_exit(pcb, INVALID_INTERFACE);
          break;
       case EXECUTED:
          push_proceso(cola_ready, pcb);
          break;
       case -1: // cuando una interfaz se desconecta
-         pasar_a_exit(pcb, BLOCKED);
+         pasar_a_exit(pcb, INVALID_INTERFACE);
          q_estado *cola = desconectar_interfaz(cola_blocked, io->fd_conexion);
          // hay q pasar toda la cola a exit
          destruir_estado(cola);
@@ -124,7 +124,9 @@ static void *crear_proceso()
       // ver si es la unica operacion que se hace antes de encolar a ready
       if (memoria_iniciar_proceso(pcb->pid, pcb->executable_path))
       {
-         pasar_a_exit(pcb, NEW);
+         // no deberia ser "out of memory",
+         // pero no hay otro tipo de error
+         pasar_a_exit(pcb, OUT_OF_MEMORY);
          continue;
       }
 
@@ -150,7 +152,7 @@ static void *finalizar_proceso()
       t_pcb *pcb = pop_proceso(cola_exit);
       if (memoria_finalizar_proceso(pcb->pid))
       {
-         log_finalizacion_proceso(pcb->pid, SUCCESS); // no es correcto esto, habria q guardar un exit code en el pcb
+         log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
          destruir_pcb(pcb);
       }
    }
@@ -162,11 +164,13 @@ static void pasar_a_siguiente(t_pcb *pcb)
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
+      log_fin_de_quantum(pcb->pid);
       push_proceso(cola_ready, pcb);
       break;
    case IO:
       if (bloquear_proceso(cola_blocked, pcb))
          pasar_a_exit(pcb, INVALID_INTERFACE);
+      log_motivo_bloqueo(pcb->pid, INTERFAZ, NULL);
       break;
    case TERMINATED:
       pasar_a_exit(pcb, SUCCESS);
