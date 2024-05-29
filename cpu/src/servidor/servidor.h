@@ -7,7 +7,7 @@
 #include <sockets/sockets.h>
 
 #include "protocol/protocol.h"
-#include "protocol/pcb.h"
+#include "pcb/pcb.h"
 #include "config/config.h"
 #include "instrucciones/ciclo.h"
 

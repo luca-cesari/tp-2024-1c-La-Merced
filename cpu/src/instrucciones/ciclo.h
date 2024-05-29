@@ -1,6 +1,6 @@
 #ifndef CICLO_H
 #define CICLO_H
-#include <protocol/registers.h>
+#include <registers/registers.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
