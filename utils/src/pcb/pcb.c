@@ -1,6 +1,5 @@
 #include "pcb.h"
 
-// revisar los valores iniciales
 t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
 {
    t_pcb *pcb = malloc(sizeof(t_pcb));
@@ -14,7 +13,7 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
    pcb->executable_path = strdup(ejecutable);
    pcb->motivo_desalojo = -1;
    pcb->motivo_finalizacion = -1;
-   pcb->estado = NEW;
+   pcb->estado = -1;
 
    return pcb;
 }
@@ -49,7 +48,7 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, pcb->executable_path, strlen(pcb->executable_path) + 1);
    agregar_a_paquete(paquete, &(pcb->motivo_desalojo), sizeof(motivo_desalojo));
    agregar_a_paquete(paquete, &(pcb->motivo_finalizacion), sizeof(motivo_finalizacion));
-   agregar_a_paquete(paquete, &(pcb->estado), sizeof(estado));
+   agregar_a_paquete(paquete, &(pcb->estado), sizeof(state));
 
    return paquete;
 }
@@ -92,7 +91,7 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->executable_path = strdup((char *)list_get(paquete, 17));
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 18);
    pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 19);
-   pcb->estado = *(estado *)list_get(paquete, 20);
+   pcb->estado = *(state *)list_get(paquete, 20);
 
    list_destroy(paquete);
    return pcb;

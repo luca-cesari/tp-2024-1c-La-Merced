@@ -16,7 +16,7 @@ typedef enum
    BLOCKED,
    EXEC,
    EXIT
-} estado;
+} state;
 
 typedef enum
 {
@@ -51,7 +51,7 @@ typedef struct
    char *executable_path;
    motivo_desalojo motivo_desalojo;
    motivo_finalizacion motivo_finalizacion;
-   estado estado;
+   state estado;
 } t_pcb;
 
 t_pcb *crear_pcb(u_int32_t pid, char *ejecutable);
