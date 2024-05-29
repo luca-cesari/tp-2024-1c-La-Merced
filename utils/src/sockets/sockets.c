@@ -26,7 +26,6 @@ void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 {
    pthread_t thread;
 
-   // hace falta liberarlo en algun lado?? ya lo hice
    int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
 
    *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);

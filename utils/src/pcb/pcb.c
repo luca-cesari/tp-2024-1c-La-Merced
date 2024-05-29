@@ -8,8 +8,9 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
    pcb->program_counter = 0;
    pcb->quantum = 0;
    pcb->cpu_registers = crear_registros();
-   pcb->psw = bitarray_create_with_mode(NULL, 1, LSB_FIRST);
-   pcb->io_request = NULL;
+   pcb->bitarray = malloc(1);
+   pcb->psw = bitarray_create_with_mode(pcb->bitarray, 1, LSB_FIRST);
+   pcb->io_request = crear_io_request(pcb->pid, "", "", "");
    pcb->executable_path = strdup(ejecutable);
    pcb->motivo_desalojo = -1;
    pcb->motivo_finalizacion = -1;
@@ -79,7 +80,10 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->cpu_registers.ECX = *(u_int32_t *)list_get(paquete, 9);
    pcb->cpu_registers.EDX = *(u_int32_t *)list_get(paquete, 10);
 
-   pcb->psw = bitarray_create_with_mode(list_get(paquete, 11),
+   pcb->bitarray = malloc(1);
+   *(pcb->bitarray) = *(char *)list_get(paquete, 11);
+
+   pcb->psw = bitarray_create_with_mode(pcb->bitarray,
                                         *(size_t *)list_get(paquete, 12),
                                         *(bit_numbering_t *)list_get(paquete, 13));
 

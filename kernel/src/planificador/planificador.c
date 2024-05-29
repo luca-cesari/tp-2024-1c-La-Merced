@@ -183,7 +183,7 @@ static void *planificar_por_fifo()
    while (1)
    {
       t_pcb *pre_exec = pop_proceso(cola_ready);
-      enviar_pcb_cpu(pre_exec);
+      enviar_pcb_cpu(pre_exec); // hasta aca todo bien
       t_pcb *pos_exec = recibir_pcb_cpu();
 
       destruir_pcb(pre_exec);

@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "config.h": "c",
-        "stdio.h": "c",
-        "dictionary.h": "c"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
-}
