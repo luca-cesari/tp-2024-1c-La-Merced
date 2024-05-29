@@ -1,6 +1,7 @@
 #include "planificador.h"
 
-// ver si va aca, puede q si, puede q no
+u_int32_t pid_count;
+
 sem_t grado_multiprogramacion;
 
 q_estado *cola_new;
@@ -25,6 +26,8 @@ static void *cronometrar_quantum(void *);
 
 void inicializar_planificador()
 {
+   pid_count = 0;
+
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
 
    cola_new = crear_estado();
@@ -71,7 +74,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
 
 void ingresar_proceso(char *ruta_ejecutable)
 {
-   t_pcb *pcb = crear_pcb(ruta_ejecutable);
+   t_pcb *pcb = crear_pcb(pid_count++, ruta_ejecutable);
    log_creacion_proceso(pcb->pid);
    push_proceso(cola_new, pcb);
 }

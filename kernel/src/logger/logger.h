@@ -5,7 +5,7 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <commons/log.h>
-#include <protocol/pcb.h>
+#include <pcb/pcb.h>
 
 #define LOG_FILE "kernel.log"
 

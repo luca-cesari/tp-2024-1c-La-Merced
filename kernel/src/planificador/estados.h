@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <semaphore.h>
-#include <protocol/pcb.h>
+#include <pcb/pcb.h>
 #include <mqueue/mqueue.h>
 
 typedef struct
