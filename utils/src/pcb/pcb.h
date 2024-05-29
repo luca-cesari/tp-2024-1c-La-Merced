@@ -46,6 +46,7 @@ typedef struct
    int32_t program_counter;
    u_int32_t quantum;
    t_registers cpu_registers;
+   char *bitarray;
    t_bitarray *psw;
    t_io_request *io_request;
    char *executable_path;
@@ -58,6 +59,7 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable);
 t_packet *serializar_pcb(t_pcb *pcb);
 void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
 t_pcb *recibir_pcb(int32_t fd_conexion);
+void print_pcb(t_pcb *pcb);
 void destruir_pcb(t_pcb *pcb);
 
 #endif // UTILS_PCB_H
