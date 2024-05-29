@@ -4,13 +4,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
+#include <mem_request/kernel.h>
+
 #include "config/config.h"
 #include "protocol/protocol.h"
 #include "instrucciones/instrucciones.h"
-
-
-
-
 
 /**
  * @brief Inicia el servidor Memoria. La función no es bloqueante,
@@ -22,6 +20,5 @@ void escuchar_kernel(int32_t fd_kernel);
 void escuchar_cpu(int32_t fd_cpu);
 void escuchar_interfaz_es(int32_t fd_es);
 void *atender_cliente(void *fd_ptr);
-
 
 #endif // MEMORIA_SERVIDOR_H

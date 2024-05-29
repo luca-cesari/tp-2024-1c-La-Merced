@@ -1,11 +1,9 @@
 #include "servidor.h"
 
-mem_config config;
-
 void iniciar_servidor()
 {
-    config = get_memoria_config();
-    char *puerto_escucha = config.puerto_escucha;
+
+    char *puerto_escucha = get_puerto_escucha();
 
     int32_t *fd_escucha = malloc(sizeof(int32_t));
     *fd_escucha = crear_servidor(puerto_escucha);
@@ -55,18 +53,19 @@ void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
 
-    instruccion_kernel *instruccion_paquete = recibir_instruccion_del_kernel(fd_kernel);
+    t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
 
-    switch (instruccion_paquete->tipo)
+    switch (mem_request->tipo)
     {
     case INICIAR_PROCESO:
         printf("INICIAR_PROCESO \n");
-        cargar_proceso_a_memoria(instruccion_paquete->pid, instruccion_paquete->parametros.path);
-
+        cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
         break;
+
     case FINALIZAR_PROCESO:
         printf("FINALIZAR_PROCESO \n");
         break;
+
     default:
         printf("Error de instruccion \n");
         break;
