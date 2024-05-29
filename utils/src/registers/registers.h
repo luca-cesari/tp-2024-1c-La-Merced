@@ -16,7 +16,7 @@ typedef struct
    u_int32_t ECX;
    u_int32_t EDX;
 
-} t_registers_generales;
+} t_registers;
 
 // typedef struct // no lo uso por ahora
 // {
@@ -30,6 +30,6 @@ typedef struct
 // habria q revisar
 
 // como registros a secas o como puntero?
-t_registers_generales crear_registros();
+t_registers crear_registros();
 
 #endif // UTILS_PROTOCOL_REGISTROS_H

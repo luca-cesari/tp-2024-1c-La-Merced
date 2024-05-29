@@ -1,9 +1,7 @@
-#ifndef UTILS_PROTOCOL_IO_REQUEST_H
-#define UTILS_PROTOCOL_IO_REQUEST_H
+#ifndef UTILS_IO_REQUEST_H
+#define UTILS_IO_REQUEST_H
 
-#include <stdlib.h>
-
-#include "protocol.h"
+#include <protocol/protocol.h>
 
 typedef struct
 {
@@ -22,8 +20,13 @@ typedef enum
 
 t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumentos);
 t_packet *serializar_io_request(t_io_request *io_request);
-void enviar_io_request(int32_t fd_conexion, t_io_request *io_request);
-t_io_request *recibir_io_request(int32_t fd_conexion);
+void print_io_request(t_io_request *io_request);
 void destruir_io_request(t_io_request *io_request);
 
-#endif // UTILS_PROTOCOL_IO_REQUEST_H
+void enviar_io_request(int32_t fd_conexion, t_io_request *io_request);
+t_io_request *recibir_io_request(int32_t fd_conexion);
+
+void enviar_io_response(int32_t fd_conexion, t_io_response response);
+t_io_response recibir_io_response(int32_t fd_conexion);
+
+#endif // UTILS_IO_REQUEST_H
