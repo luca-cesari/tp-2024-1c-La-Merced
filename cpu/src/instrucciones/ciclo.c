@@ -4,9 +4,6 @@ t_dictionary *instrucciones;
 t_dictionary *registros;
 t_pcb *pcb;
 
-extern int hay_interrupcion;
-extern pthread_mutex_t mutexInterrupcion;
-
 char *fetch()
 {
    enviar_pcb_memoria(pcb);
@@ -104,11 +101,8 @@ void aumentar_program_counter() /// VER SI VA  ACA
 
 int check_interrupt()
 {
-   pthread_mutex_lock(&mutexInterrupcion);
-
-   if (hay_interrupcion == 1)
+   if (hay_interrupcion())
    {
-      pthread_mutex_unlock(&mutexInterrupcion);
       pcb->motivo_desalojo = QUANTUM;
       return 1;
    }

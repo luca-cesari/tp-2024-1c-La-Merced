@@ -8,6 +8,8 @@ int main(void)
     iniciar_config();
     iniciar_logger();
 
+    inicializar_interrupcion();
+
     // Capaz es un poco confuso la expresion del condicional
     // pero básicamente falla en caso de -1 (o sea, true)
     if (conectar_con_memoria()) // Conexion con Memoria
