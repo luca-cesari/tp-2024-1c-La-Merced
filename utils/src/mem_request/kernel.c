@@ -24,8 +24,8 @@ void enviar_kernel_mem_request(int32_t fd_memoria, t_kernel_mem_req *mem_request
 {
    t_packet *paquete = crear_paquete();
    crear_buffer(paquete);
-   agregar_a_paquete(paquete, &mem_request->tipo, sizeof(t_kernel_mem_req));
-   agregar_a_paquete(paquete, &mem_request->pid, sizeof(u_int32_t));
+   agregar_a_paquete(paquete, &(mem_request->tipo), sizeof(t_kernel_mem_req));
+   agregar_a_paquete(paquete, &(mem_request->pid), sizeof(u_int32_t));
    agregar_a_paquete(paquete, mem_request->parametros.path, strlen(mem_request->parametros.path) + 1);
 
    enviar_paquete(paquete, fd_memoria);
