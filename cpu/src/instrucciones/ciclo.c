@@ -1,7 +1,6 @@
 #include "ciclo.h"
 
 t_dictionary *instrucciones;
-t_dictionary *registros;
 t_pcb *pcb;
 
 char *fetch()
@@ -13,7 +12,7 @@ char *fetch()
    return instruccion;
 }
 
-void (*decode(char *char_instruccion))(Parametros)
+void (*decode(char *char_instruccion))(char **param)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
 
@@ -29,74 +28,19 @@ void (*decode(char *char_instruccion))(Parametros)
    }
 }
 
-Parametros obtener_parametros(char **parametros)
-{
-   // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
-   Parametros struct_parametros;
-   struct_parametros.parametro1 = buscar_operando(parametros[1]);
-   if (parametros[1] != NULL) // Esto hay que arreglarlo, sirve solamente para el TERMINATED del segundo checkpoint
-   {
-      struct_parametros.parametro2 = buscar_operando(parametros[2]);
-   }
-   // struct_parametros.parametro3 = buscar_operando(parametros[3]) // siguientes checkpoints
-   // struct_parametros.parametro4 = buscar_operando(parametros[4])
-   return struct_parametros;
-}
-
-Parametro buscar_operando(char *parametro)
-{
-   Parametro operando;
-   if (parametro == NULL)
-   {
-      operando.tipo_dato = NINGUNO;
-      return operando;
-   }
-   else if (es_numero(parametro))
-   {
-      operando.tipo_dato = VALOR;
-      operando.dato.valor = char_a_numero(parametro);
-      return operando;
-   }
-   else if (dictionary_has_key(registros, parametro))
-   {
-      if (string_starts_with(parametro, "E"))
-      {
-         operando.tipo_dato = INT32;
-         operando.dato.registro_u32 = dictionary_get(registros, parametro);
-         return operando;
-      }
-      else
-      {
-         operando.tipo_dato = INT8;
-         operando.dato.registro_u8 = dictionary_get(registros, parametro);
-         return operando;
-      }
-   }
-   else
-   {
-      operando.tipo_dato = INTERF;
-      operando.dato.interfaz = parametro;
-      return operando;
-   }
-}
-
 char **instruccion_parametros(char *char_instruccion)
 {
    return string_split(char_instruccion, " ");
 }
 
-void execute(void (*instruccion)(Parametros), char *char_instruccion)
+void execute(void (*instruccion)(char **param), char *char_instruccion)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
-   instruccion(obtener_parametros(instruc_parametros));
+   char **parametros = eliminar_primer_elemento(instruc_parametros);
+   instruccion(parametros);
 
-   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); // Esto traería problemas con la forma actual de obtener parámetros
+   // log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], parametros); // CORREGIR EN EL LOGGER TIPOS Y MODO
    aumentar_program_counter();
-}
-
-void aumentar_program_counter() /// VER SI VA  ACA
-{
-   pcb->program_counter += 1;
 }
 
 int check_interrupt()
@@ -132,7 +76,7 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
    {
       char *char_instruccion = fetch();
 
-      void (*instruccion)(Parametros) = decode(char_instruccion);
+      void (*instruccion)(char **param) = decode(char_instruccion);
 
       execute(instruccion, char_instruccion);
 
@@ -160,43 +104,38 @@ void set_diccionario_instrucciones(t_dictionary *instrucciones)
    dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
 
-void set_diccionario_registros(t_dictionary *registros)
-{
-   dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
-   dictionary_put(registros, "BX", &(pcb->cpu_registers.BX));
-   dictionary_put(registros, "CX", &(pcb->cpu_registers.CX));
-   dictionary_put(registros, "DX", &(pcb->cpu_registers.DX));
-   dictionary_put(registros, "EAX", &(pcb->cpu_registers.EAX));
-   dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
-   dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
-   dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
-}
-
 //////////FUNCIONES AUXILIARES////////////
 
-int es_numero(char *parametro)
-{
-   while (*parametro)
-   {
-      if (*parametro < '0' || *parametro > '9')
-      {
-         return 0; // tiene un caracter no numerico
-      }
-      parametro++;
-   }
-   return 1; // es un numero
-}
-
-int char_a_numero(char *parametro)
-{
-   return atoi(parametro);
-}
-
-void inicializar_diccionarios_inst_reg()
+void inicializar_diccionario_instrucciones()
 {
    instrucciones = dictionary_create();
-   registros = dictionary_create();
-
    set_diccionario_instrucciones(instrucciones);
-   set_diccionario_registros(registros);
+}
+
+char **eliminar_primer_elemento(char **array)
+{
+   // Calcular el tamaño del array
+   int tamano = 0;
+   while (array[tamano] != NULL)
+   {
+      tamano++;
+   }
+
+   // Verificar que el array no esté vacío
+   if (tamano > 0)
+   {
+      // Desplazar todos los punteros una posición hacia la izquierda
+      for (int i = 0; i < tamano - 1; i++)
+      {
+         array[i] = array[i + 1];
+      }
+      // Establecer el último puntero a NULL para marcar el final del array
+      array[tamano - 1] = NULL;
+   }
+   return array;
+}
+
+void aumentar_program_counter() /// VER SI VA  ACA
+{
+   pcb->program_counter += 1;
 }

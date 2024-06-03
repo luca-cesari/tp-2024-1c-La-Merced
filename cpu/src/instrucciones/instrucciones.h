@@ -6,6 +6,7 @@
 #include <pcb/pcb.h>
 #include <io_request/io_request.h>
 #include <commons/string.h>
+#include <commons/collections/dictionary.h>
 #include "estructuras.h"
 
 /// ESTRUCTURAS DECODE ////////
@@ -17,12 +18,18 @@
 // void *jnz(char *registro, char *instruccion);
 // void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
-void set(Parametros parametros);
-void sum(Parametros parametros);
-void sub(Parametros parametros);
-void jnz(Parametros parametros);
-void io_gen_sleep(Parametros parametros);
-void exit_instruction(Parametros parametros);
+void set(char **parametros);
+void sum(char **parametros);
+void sub(char **parametros);
+void jnz(char **parametros);
+void io_gen_sleep(char **parametros);
+void exit_instruction(char **parametros);
+
+///////FUNCINES OBTENER PARAMETROS //
+// int es_numero(char *parametro);
+int char_a_numero(char *parametro);
+void set_diccionario_registros(t_dictionary *);
+void inicializar_diccionario_registros();
 
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
