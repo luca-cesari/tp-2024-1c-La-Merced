@@ -4,9 +4,6 @@ t_dictionary *instrucciones;
 t_dictionary *registros;
 t_pcb *pcb;
 
-extern int hay_interrupcion;
-extern pthread_mutex_t mutexInterrupcion;
-
 char *fetch()
 {
    enviar_pcb_memoria(pcb);
@@ -19,8 +16,7 @@ char *fetch()
 void (*decode(char *char_instruccion))(Parametros)
 {
    char **instruc_parametros = instruccion_parametros(char_instruccion);
-   instrucciones = dictionary_create();
-   set_diccionario_instrucciones(instrucciones); // ver porque cada vez que busque operando tiene que llenar el diciconario
+
    if (dictionary_has_key(instrucciones, instruc_parametros[0]))
    {
       return dictionary_get(instrucciones, instruc_parametros[0]);
@@ -38,7 +34,7 @@ Parametros obtener_parametros(char **parametros)
    // RECIBE UN ARRAY CON LA INTRUCCION EN LA PRIMERA POSICION, POR LO QUE HAY QUE COMENZAR DESDE 1
    Parametros struct_parametros;
    struct_parametros.parametro1 = buscar_operando(parametros[1]);
-   if(parametros[1] != NULL) //Esto hay que arreglarlo, sirve solamente para el EXIT del segundo checkpoint
+   if (parametros[1] != NULL) // Esto hay que arreglarlo, sirve solamente para el TERMINATED del segundo checkpoint
    {
       struct_parametros.parametro2 = buscar_operando(parametros[2]);
    }
@@ -49,18 +45,17 @@ Parametros obtener_parametros(char **parametros)
 
 Parametro buscar_operando(char *parametro)
 {
-   registros = dictionary_create();
-   set_diccionario_registros(registros); // ver porque cada vez que busque operando tiene que llenar el diciconario
    Parametro operando;
-   if(parametro==NULL){
-      operando.tipo_dato = NONE;
+   if (parametro == NULL)
+   {
+      operando.tipo_dato = NINGUNO;
       return operando;
    }
    else if (es_numero(parametro))
    {
       operando.tipo_dato = VALOR;
       operando.dato.valor = char_a_numero(parametro);
-      return operando; 
+      return operando;
    }
    else if (dictionary_has_key(registros, parametro))
    {
@@ -79,7 +74,7 @@ Parametro buscar_operando(char *parametro)
    }
    else
    {
-      operando.tipo_dato = INTERFAZ;
+      operando.tipo_dato = INTERF;
       operando.dato.interfaz = parametro;
       return operando;
    }
@@ -95,7 +90,7 @@ void execute(void (*instruccion)(Parametros), char *char_instruccion)
    char **instruc_parametros = instruccion_parametros(char_instruccion);
    instruccion(obtener_parametros(instruc_parametros));
 
-   //log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); Esto traería problemas con la forma actual de obtener parámetros
+   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], instruc_parametros[1]); // Esto traería problemas con la forma actual de obtener parámetros
    aumentar_program_counter();
 }
 
@@ -106,11 +101,8 @@ void aumentar_program_counter() /// VER SI VA  ACA
 
 int check_interrupt()
 {
-   pthread_mutex_lock(&mutexInterrupcion);
-
-   if (hay_interrupcion == 1)
+   if (hay_interrupcion())
    {
-      pthread_mutex_unlock(&mutexInterrupcion);
       pcb->motivo_desalojo = QUANTUM;
       return 1;
    }
@@ -119,16 +111,16 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   if(pcb->io_request!=NULL)
+   if (pcb->io_request != NULL)
    {
       pcb->motivo_desalojo = IO;
       return 1;
    }
-   if(pcb->motivo_desalojo == EXIT)
+   if (pcb->motivo_desalojo == TERMINATED)
    {
       return 1;
    }
-   
+
    return 0;
 }
 
@@ -198,4 +190,13 @@ int es_numero(char *parametro)
 int char_a_numero(char *parametro)
 {
    return atoi(parametro);
+}
+
+void inicializar_diccionarios_inst_reg()
+{
+   instrucciones = dictionary_create();
+   registros = dictionary_create();
+
+   set_diccionario_instrucciones(instrucciones);
+   set_diccionario_registros(registros);
 }

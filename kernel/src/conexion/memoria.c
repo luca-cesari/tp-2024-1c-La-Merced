@@ -21,13 +21,10 @@ int8_t conectar_con_memoria()
 
 int8_t memoria_iniciar_proceso(u_int32_t pid, char *path)
 {
-   instruccion_kernel instruccion;
-   instruccion.tipo = INICIAR_PROCESO;
-   instruccion.pid = pid;
-   instruccion.parametros.path = path;
+   t_kernel_mem_req *mem_request = crear_kernel_mem_request(INICIAR_PROCESO, pid, path);
 
    pthread_mutex_lock(&mutex_memoria);
-   enviar_instruccion_a_memoria(fd_memoria, instruccion);
+   enviar_kernel_mem_request(fd_memoria, mem_request);
    pthread_mutex_unlock(&mutex_memoria);
 
    // habria que esperar la respuesta de la memoria

@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
-#include <protocol/pcb.h>
+#include <pcb/pcb.h>
+#include <mem_request/kernel.h>
 
 #include "config/config.h"
 

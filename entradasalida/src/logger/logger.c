@@ -4,8 +4,9 @@ t_log *io_logger;
 
 void iniciar_logger(char *nombre_interfaz)
 {
+   
    char *archivo_log = string_new();
-   string_append(&archivo_log, nombre_interfaz);
+   string_append(&archivo_log, string_duplicate(nombre_interfaz));
    string_append(&archivo_log, "_");
    string_append(&archivo_log, LOG_FILE);
    io_logger = log_create(archivo_log, "IO", true, LOG_LEVEL_INFO);

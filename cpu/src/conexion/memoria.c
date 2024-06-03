@@ -16,11 +16,12 @@ int8_t conectar_con_memoria()
 
    return 0;
 }
+
 void enviar_pcb_memoria(t_pcb *pcb)
 {
    enviar_pcb(fd_memoria, pcb);
 }
-//
+
 char *recibir_instruccion()
 {
    char *instruccion = recibir_mensaje(fd_memoria);

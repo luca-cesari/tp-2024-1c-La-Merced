@@ -24,6 +24,23 @@ t_packet *serializar_io_request(t_io_request *io_request)
    return paquete;
 }
 
+void print_io_request(t_io_request *io_request)
+{
+   printf("[+] IO Request:\n");
+   printf("    - PID: %d\n", io_request->pid);
+   printf("    - Interface Name: %s\n", io_request->inteface_name);
+   printf("    - Instruction: %s\n", io_request->instruction);
+   printf("    - Arguments: %s\n", io_request->arguments);
+}
+
+void destruir_io_request(t_io_request *io_request)
+{
+   free(io_request->inteface_name);
+   free(io_request->instruction);
+   free(io_request->arguments);
+   free(io_request);
+}
+
 void enviar_io_request(int32_t fd_conexion, t_io_request *io_request)
 {
    t_packet *paquete = serializar_io_request(io_request);
@@ -45,10 +62,12 @@ t_io_request *recibir_io_request(int32_t fd_conexion)
    return io_request;
 }
 
-void destruir_io_request(t_io_request *io_request)
+void enviar_io_response(int32_t fd_conexion, t_io_response response)
 {
-   free(io_request->inteface_name);
-   free(io_request->instruction);
-   free(io_request->arguments);
-   free(io_request);
+   enviar_senial(response, fd_conexion);
+}
+
+t_io_response recibir_io_response(int32_t fd_conexion)
+{
+   return recibir_senial(fd_conexion);
 }

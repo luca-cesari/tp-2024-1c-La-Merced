@@ -1,6 +1,7 @@
 #ifndef UTILS_PROTOCOL_H
 #define UTILS_PROTOCOL_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -43,29 +44,5 @@ int32_t recibir_senial(int32_t fd_conexion);
 
 void enviar_mensaje(char *mensaje, int32_t fd_conexion);
 char *recibir_mensaje(int32_t fd_conexion);
-
-// INICIO Protocolo de comunicación entre Memoria y Kernel
-typedef enum
-{
-    INICIAR_PROCESO,
-    FINALIZAR_PROCESO,
-    // Otros tipos de instrucciones si los hay
-} tipo_instruccion;
-
-typedef struct
-{
-    tipo_instruccion tipo;
-    int pid; // El PID está presente en todos los casos
-    union
-    {
-        char *path; // Presente solo para INICIAR_PROCESO
-        // Otros parámetros específicos para otros tipos de instrucciones si los hay
-    } parametros;
-} instruccion_kernel;
-
-instruccion_kernel *recibir_instruccion_del_kernel(int32_t fd_kernel);
-void enviar_instruccion_a_memoria(int32_t fd_memoria, instruccion_kernel instruccion);
-
-// FIN Protocolo de comunicación entre Memoria y Kernel
 
 #endif // UTILS_PROTOCOL_H

@@ -1,6 +1,7 @@
 #ifndef CICLO_H
 #define CICLO_H
-#include <protocol/registers.h>
+
+#include <registers/registers.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
@@ -9,10 +10,12 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
+
 #include "instrucciones.h"
 #include "conexion/memoria.h"
 #include "estructuras.h"
 #include "logger/logger.h"
+#include "interrupcion/interrupcion.h"
 
 char *fetch();
 void (*decode(char *char_instruccion))(Parametros);
@@ -31,6 +34,6 @@ Parametro buscar_operando(char *parametro);
 void set_diccionario_instrucciones(t_dictionary *);
 void set_diccionario_registros(t_dictionary *);
 void aumentar_program_counter();
-
+void inicializar_diccionarios_inst_reg();
 
 #endif // CICLO_H

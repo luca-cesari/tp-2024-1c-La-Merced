@@ -16,7 +16,7 @@ io_queue *crear_io_queue(char *nombre_interfaz, int32_t fd_conexion)
 
    io->nombre_interfaz = nombre_interfaz;
    io->fd_conexion = fd_conexion;
-   io->cola = crear_estado();
+   io->cola = crear_estado(BLOCKED);
    // io->rutina_consumo = 0;
 
    return io;
@@ -54,6 +54,7 @@ int32_t bloquear_proceso(q_blocked *estado, t_pcb *pcb)
       return -1;
 
    push_proceso(io->cola, pcb);
+   
    return 0;
 }
 
@@ -79,8 +80,6 @@ q_estado *desconectar_interfaz(q_blocked *estado, int32_t fd_conexion)
    pthread_mutex_lock(&(estado->io_queues_mutex));
    io_queue *cola_io = list_remove(estado->io_queues, a_remover);
    pthread_mutex_unlock(&(estado->io_queues_mutex));
-
-   pthread_cancel(cola_io->rutina_consumo);
 
    q_estado *cola = cola_io->cola;
    free(cola_io); // esta bien esto?? no quiero usar destruir_io_queue porque no quiero borrar la cola

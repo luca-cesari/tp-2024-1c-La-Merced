@@ -1,10 +1,10 @@
 #ifndef INSTRUCCIONES_H
 #define INSTRUCCIONES_H
-#include <protocol/registers.h>
+#include <registers/registers.h>
 #include <stdlib.h>
 #include <string.h>
-#include <protocol/pcb.h>
-#include <protocol/io_request.h>
+#include <pcb/pcb.h>
+#include <io_request/io_request.h>
 #include <commons/string.h>
 #include "estructuras.h"
 
