@@ -86,19 +86,6 @@ void set_diccionario_registros(t_dictionary *registros)
    dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
 }
 
-// int es_numero(char *parametro)
-// {
-//    while (*parametro)
-//    {
-//       if (*parametro < '0' || *parametro > '9')
-//       {
-//          return 0; // tiene un caracter no numerico
-//       }
-//       parametro++;
-//    }
-//    return 1; // es un numero
-// }
-
 int char_a_numero(char *parametro)
 {
    return atoi(parametro);
