@@ -43,46 +43,34 @@ t_list *leer_instrucciones(char *path)
         perror("Error al abrir el archivo");
         return NULL;
     }
+
     char *linea = NULL;
     size_t len = 0;
     ssize_t read;
     t_list *instrucciones = list_create();
 
-    int32_t numero_instruccion = 0; // cambio la inicializacion a 0 porq el en el pcb arranca en 0
-
     while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        t_instruccion *instruccion = malloc(sizeof(t_instruccion));
-        instruccion->num_instruccion = numero_instruccion;
-        instruccion->instruccion = strdup(linea);
-        list_add(instrucciones, instruccion);
-        numero_instruccion++;
+        list_add(instrucciones, strdup(linea));
     }
-    fclose(archivo);
+
     free(linea);
+    fclose(archivo);
     return instrucciones;
 }
 
 void eliminar_proceso(t_pcb *pcb)
 {
-    // busco el proceso en la lista
-    for (int i = 0; i < list_size(lista_procesos); i++)
+    int es_proceso_buscado(void *elemento)
     {
-        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
-        if (proceso->pid == pcb->pid)
-        {
-            free(proceso->path);
-            for (int j = 0; j < list_size(proceso->instrucciones); j++)
-            {
-                char *instruccion = list_get(proceso->instrucciones, j);
-                free(instruccion);
-            }
-            list_destroy(proceso->instrucciones);
-            list_remove(lista_procesos, i);
-            free(proceso);
-            break;
-        }
-    }
+        return ((t_proceso_instrucciones *)elemento)->pid == pcb->pid;
+    };
+    t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
+
+    list_remove_element(lista_procesos, proceso);
+    free(proceso->path);
+    list_destroy_and_destroy_elements(proceso->instrucciones, free);
+    free(proceso);
 }
 
 char *proxima_instruccion(t_pcb *pcb)
@@ -91,12 +79,9 @@ char *proxima_instruccion(t_pcb *pcb)
     {
         return ((t_proceso_instrucciones *)elemento)->pid == pcb->pid;
     };
-
     t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
 
-    t_instruccion *instrucion = (t_instruccion *)list_get(proceso->instrucciones, pcb->program_counter);
-
-    printf("%s", instrucion->instruccion);
-
-    return instrucion->instruccion;
+    char *instrucion = (char *)list_get(proceso->instrucciones, pcb->program_counter);
+    printf("%s", instrucion);
+    return instrucion;
 }

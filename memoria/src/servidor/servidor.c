@@ -69,7 +69,7 @@ void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
 
-    while (1)
+    while (1) // igualmente hay q hacer un switch despues de la operacion pedida por cpu
     {
         t_pcb *pcb = recibir_pcb(fd_cpu);
         char *instruccion = proxima_instruccion(pcb);
