@@ -4,14 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "commons/collections/list.h"
+#include <commons/collections/list.h>
 #include <pcb/pcb.h>
-
-typedef struct
-{
-    int32_t num_instruccion;
-    char *instruccion;
-} t_instruccion;
 
 typedef struct
 {
@@ -23,7 +17,6 @@ typedef struct
 /**
  * @brief Inicializa la memoria de instrucciones, es decir la lista de procesos
  **/
-
 void inicializar_memoria_instrucciones();
 
 /**
@@ -33,7 +26,6 @@ void inicializar_memoria_instrucciones();
  * @param pid
  * @param path
  */
-
 void cargar_proceso_a_memoria(int32_t pid, char *path);
 
 /**

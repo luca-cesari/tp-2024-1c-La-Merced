@@ -7,15 +7,6 @@
 
 #define CONFIG_FILE "memoria.config"
 
-typedef struct
-{
-    char *puerto_escucha;
-    u_int32_t tam_memoria;
-    u_int32_t tam_pagina;
-    char *path_instrucciones;
-    u_int32_t retardo_respuesta;
-} mem_config;
-
 void iniciar_config(void);
 void destruir_config(void);
 

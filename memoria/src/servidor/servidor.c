@@ -2,25 +2,13 @@
 
 void iniciar_servidor()
 {
-
     char *puerto_escucha = get_puerto_escucha();
+    int32_t fd_escucha = crear_servidor(puerto_escucha);
 
-    int32_t *fd_escucha = malloc(sizeof(int32_t));
-    *fd_escucha = crear_servidor(puerto_escucha);
-
-    pthread_t hilo_escucha;
-    pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, fd_escucha);
-    pthread_join(hilo_escucha, NULL); // Esto lo cambie a join para que el hilo sea bloqueante
-}
-
-void *escuchar_conexiones(void *fd_escucha)
-{
     while (1)
     {
-        esperar_cliente(*((int32_t *)fd_escucha), &atender_cliente);
+        esperar_cliente(fd_escucha, &atender_cliente);
     }
-
-    return NULL;
 }
 
 void *atender_cliente(void *fd_ptr)
@@ -53,31 +41,40 @@ void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
 
-    t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
-
-    switch (mem_request->tipo)
+    while (1)
     {
-    case INICIAR_PROCESO:
-        printf("INICIAR_PROCESO \n");
-        cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
-        break;
+        t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
 
-    case FINALIZAR_PROCESO:
-        printf("FINALIZAR_PROCESO \n");
-        break;
+        switch (mem_request->operacion)
+        {
+        case INICIAR_PROCESO:
+            printf("INICIAR_PROCESO \n");
+            cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
+            break;
 
-    default:
-        printf("Error de instruccion \n");
-        break;
+        case FINALIZAR_PROCESO:
+            printf("FINALIZAR_PROCESO \n");
+            // ...
+            break;
+
+        default:
+            printf("Error de instruccion \n");
+            // ...
+            break;
+        }
     }
 }
 
 void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
-    recibir_mensaje(fd_cpu);
 
-    recibir_mensaje(fd_cpu); // block
+    while (1) // igualmente hay q hacer un switch despues de la operacion pedida por cpu
+    {
+        t_pcb *pcb = recibir_pcb(fd_cpu);
+        char *instruccion = proxima_instruccion(pcb);
+        enviar_mensaje(instruccion, fd_cpu);
+    }
 }
 
 void escuchar_interfaz_es(int32_t fd_es)
