@@ -75,7 +75,7 @@ void eliminar_paquete(t_packet *paquete)
    free(paquete);
 }
 
-int32_t recibir_operacion(int fd_conexion)
+int32_t recibir_operacion(int32_t fd_conexion)
 {
    op_code code;
    if (recv(fd_conexion, &code, sizeof(int32_t), MSG_WAITALL) > 0)
@@ -101,13 +101,18 @@ void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
 
 t_list *recibir_paquete(int32_t fd_conexion)
 {
-   int32_t buffer_size;
+   int32_t buffer_size = 0;
    void *buffer;
    int32_t offset = 0;
    t_list *valores = list_create();
    int32_t tamanio;
 
+   if (recibir_operacion(fd_conexion) != PACKET)
+      return NULL;
+
    buffer = recibir_buffer(&buffer_size, fd_conexion);
+
+   printf("tamanio buffer %d\n", buffer_size);
 
    while (offset < buffer_size)
    {
@@ -137,6 +142,9 @@ void enviar_senial(int32_t signal, int32_t fd_conexion)
 
 int32_t recibir_senial(int32_t fd_conexion)
 {
+   if (recibir_operacion(fd_conexion) != SIGNAL)
+      return -5;
+
    int32_t signal;
    recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
    return signal;
@@ -162,6 +170,9 @@ void enviar_mensaje(char *mensaje, int32_t fd_conexion)
 
 char *recibir_mensaje(int32_t fd_conexion)
 {
+   if (recibir_operacion(fd_conexion) != MESSAGE)
+      return NULL;
+
    int32_t tamanio_mensaje;
    recv(fd_conexion, &tamanio_mensaje, sizeof(int32_t), MSG_WAITALL);
 

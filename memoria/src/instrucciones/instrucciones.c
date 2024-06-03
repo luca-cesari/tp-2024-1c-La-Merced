@@ -16,6 +16,7 @@ void cargar_proceso_a_memoria(int32_t pid, char *path)
     /*Para obtener la lista de instrucciones primero debo usar el path para
     leer las instrucciones que hay en un archivo de pseudocodigo*/
     t_list *instrucciones = list_create();
+    printf()
     instrucciones = leer_instrucciones(path);
     /*Una vez que tengo la lista de instrucciones, puedo crear un proceso de instrucciones
     y añadirlo a la lista de procesos*/
