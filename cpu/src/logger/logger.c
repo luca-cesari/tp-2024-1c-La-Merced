@@ -17,10 +17,9 @@ void log_fetch_instruccion(u_int32_t pid, u_int32_t pc)
    log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pid, pc);
 }
 
-void log_instruccion_ejecutada(u_int32_t pid, char* instruccion, char* parametros){
-
+void log_instruccion_ejecutada(u_int32_t pid, char *instruccion, char *parametros)
+{
    log_info(cpu_logger, "PID: %d - Ejecutando:: %s - %s", pid, instruccion, parametros);
-
 }
 
 void log_tlb_hit(u_int32_t pid, int numero_pagina)
