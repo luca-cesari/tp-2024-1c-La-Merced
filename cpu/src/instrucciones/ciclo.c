@@ -39,7 +39,7 @@ void execute(void (*instruccion)(char **param), char *char_instruccion)
    char **parametros = eliminar_primer_elemento(instruc_parametros);
    instruccion(parametros);
 
-   // log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], parametros); // CORREGIR EN EL LOGGER TIPOS Y MODO
+   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], *parametros);
    aumentar_program_counter();
 }
 
