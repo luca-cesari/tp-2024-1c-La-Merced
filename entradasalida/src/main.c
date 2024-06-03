@@ -28,7 +28,7 @@ int main(int argc, char **argv)
         iniciar_rutina_interfaz_generica();
         break;
     case STDIN:
-        inicializar_interfaz_stdin();
+        iniciar_rutina_interfaz_stdin();
         break;
     case STDOUT:
         inicializar_interfaz_stdout();
