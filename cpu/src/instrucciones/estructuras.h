@@ -29,4 +29,6 @@ typedef struct
    // Parametro parametro4;
 } Parametros;
 
+// typedef Parametro vector_parametros[5];
+
 #endif
