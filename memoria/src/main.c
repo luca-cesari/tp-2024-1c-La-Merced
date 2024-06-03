@@ -11,5 +11,8 @@ int main(void)
     inicializar_memoria_instrucciones();
     iniciar_servidor();
 
-    return 0;
+    destruir_config();
+    destruir_logger();
+
+    return EXIT_SUCCESS;
 }

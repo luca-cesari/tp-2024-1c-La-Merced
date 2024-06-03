@@ -16,7 +16,7 @@ void cargar_proceso_a_memoria(int32_t pid, char *path)
     /*Para obtener la lista de instrucciones primero debo usar el path para
     leer las instrucciones que hay en un archivo de pseudocodigo*/
     t_list *instrucciones = list_create();
-    printf("%s", path);
+
     instrucciones = leer_instrucciones(path);
     /*Una vez que tengo la lista de instrucciones, puedo crear un proceso de instrucciones
     y añadirlo a la lista de procesos*/
@@ -48,7 +48,7 @@ t_list *leer_instrucciones(char *path)
     ssize_t read;
     t_list *instrucciones = list_create();
 
-    int32_t numero_instruccion = 1; // inicializo el numero en 1
+    int32_t numero_instruccion = 0; // cambio la inicializacion a 0 porq el en el pcb arranca en 0
 
     while ((read = getline(&linea, &len, archivo)) != -1)
     {
@@ -87,25 +87,16 @@ void eliminar_proceso(t_pcb *pcb)
 
 char *proxima_instruccion(t_pcb *pcb)
 {
-    for (int i = 0; i < list_size(lista_procesos); i++)
+    int es_proceso_buscado(void *elemento)
     {
-        // busca el proceso en la lista de procesos por pid
-        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
-        if (proceso->pid == pcb->pid)
-        {
+        return ((t_proceso_instrucciones *)elemento)->pid == pcb->pid;
+    };
 
-            // busco la instruccion con el pc
-            for (int j = 0; j < list_size(proceso->instrucciones); j++)
-            {
+    t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
 
-                t_instruccion *instruccion = list_get(proceso->instrucciones, j);
+    t_instruccion *instrucion = (t_instruccion *)list_get(proceso->instrucciones, pcb->program_counter);
 
-                if (instruccion->num_instruccion == pcb->program_counter)
-                {
-                    return instruccion->instruccion;
-                }
-            }
-        }
-    }
-    return NULL;
+    printf("%s", instrucion->instruccion);
+
+    return instrucion->instruccion;
 }
