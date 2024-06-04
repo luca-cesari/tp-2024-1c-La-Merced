@@ -88,5 +88,6 @@ char *proxima_instruccion(t_pcb *pcb)
 
     char *instrucion = (char *)list_get(proceso->instrucciones, pcb->program_counter);
     printf("%s", instrucion);
+    sem_post(&hay_proceso_en_lista);
     return instrucion;
 }
