@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <semaphore.h>
 #include <commons/collections/list.h>
 #include <pcb/pcb.h>
 
@@ -12,6 +13,7 @@ typedef struct
     int32_t pid;
     char *path;
     t_list *instrucciones;
+    // sem_t 
 } t_proceso_instrucciones;
 
 /**
