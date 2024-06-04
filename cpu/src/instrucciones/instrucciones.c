@@ -2,8 +2,8 @@
 
 t_dictionary *registros;
 extern t_pcb *pcb;
-int hay_iorequest = 0;
-pthread_mutex_t mutex_io_request;
+
+
 
 void set(char **parametros)
 {

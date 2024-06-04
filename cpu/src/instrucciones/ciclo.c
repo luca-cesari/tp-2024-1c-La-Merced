@@ -57,7 +57,8 @@ int check_desalojo()
 void *ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
-
+   inicializar_diccionario_registros();
+   
    while (1)
    {
       char *char_instruccion = fetch();
