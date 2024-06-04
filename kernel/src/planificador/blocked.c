@@ -17,7 +17,6 @@ io_queue *crear_io_queue(char *nombre_interfaz, int32_t fd_conexion)
    io->nombre_interfaz = nombre_interfaz;
    io->fd_conexion = fd_conexion;
    io->cola = crear_estado(BLOCKED);
-   // io->rutina_consumo = 0;
 
    return io;
 }
@@ -44,14 +43,10 @@ int32_t bloquear_proceso(q_blocked *estado, t_pcb *pcb)
    io_queue *io_encontrado = list_find(estado->io_queues, (void *)_es_interfaz_buscada);
    pthread_mutex_unlock(&(estado->io_queues_mutex));
 
-   // hace falta verificar de nuevo
-   // porque supuestamente siempre itera hasta el ultimo
-   // nunca es NULL
    if (io_encontrado == NULL)
       return -1;
 
    push_proceso(io_encontrado->cola, pcb);
-
    return 0;
 }
 
