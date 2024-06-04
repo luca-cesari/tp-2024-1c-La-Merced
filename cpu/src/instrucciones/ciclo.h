@@ -26,8 +26,6 @@ void *ciclo_instruccion(t_pcb *pcb_kernel);
 
 /// FUNCIONES DECODE ////////////
 
-char **instruccion_parametros(char *char_instruccion);
-void set_diccionario_instrucciones(t_dictionary *);
 void inicializar_diccionario_instrucciones();
 
 //// FUNCIONES EXECUTE////////

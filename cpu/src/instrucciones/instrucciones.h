@@ -1,5 +1,6 @@
 #ifndef INSTRUCCIONES_H
 #define INSTRUCCIONES_H
+
 #include <registers/registers.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +8,7 @@
 #include <io_request/io_request.h>
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
+
 #include "estructuras.h"
 
 /// ESTRUCTURAS DECODE ////////
@@ -26,7 +28,6 @@ void io_gen_sleep(char **parametros);
 void exit_instruction(char **parametros);
 
 ///////FUNCINES OBTENER PARAMETROS //
-int char_a_numero(char *parametro);
 void set_diccionario_registros(t_dictionary *);
 void inicializar_diccionario_registros();
 

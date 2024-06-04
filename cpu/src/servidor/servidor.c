@@ -31,7 +31,7 @@ void *atender_kernel_dispatch(void *fd_ptr)
 
    printf("Kernel conectado por dispatch \n");
    inicializar_diccionario_instrucciones();
-   inicializar_diccionario_registros();
+   
 
    while (1)
    {

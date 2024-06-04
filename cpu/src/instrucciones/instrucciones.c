@@ -2,12 +2,12 @@
 
 t_dictionary *registros;
 extern t_pcb *pcb;
-int hay_iorequest = 0;
-pthread_mutex_t mutex_io_request;
+
+
 
 void set(char **parametros)
 {
-   int valor = char_a_numero(parametros[1]);
+   int valor = atoi(parametros[1]);
    if (string_starts_with(parametros[0], "E"))
    {
       u_int32_t *registro = dictionary_get(registros, parametros[0]);
@@ -56,7 +56,7 @@ void jnz(char **parametros)
 {
    if (dictionary_get(registros, parametros[0]) != 0)
    {
-      int valor = char_a_numero(parametros[1]);
+      int valor = atoi(parametros[1]);
       pcb->program_counter = valor;
    }
 }
@@ -72,10 +72,10 @@ void exit_instruction(char **parametros)
    pcb->motivo_desalojo = TERMINATED;
 }
 
-/////// FUNCIONES OBTENER PARAMETROS ////////////
-
-void set_diccionario_registros(t_dictionary *registros)
+void inicializar_diccionario_registros()
 {
+   registros = dictionary_create();
+
    dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
    dictionary_put(registros, "BX", &(pcb->cpu_registers.BX));
    dictionary_put(registros, "CX", &(pcb->cpu_registers.CX));
@@ -84,15 +84,4 @@ void set_diccionario_registros(t_dictionary *registros)
    dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
    dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
    dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
-}
-
-int char_a_numero(char *parametro)
-{
-   return atoi(parametro);
-}
-
-void inicializar_diccionario_registros()
-{
-   registros = dictionary_create();
-   set_diccionario_registros(registros);
 }
