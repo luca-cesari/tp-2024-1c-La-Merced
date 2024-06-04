@@ -32,15 +32,17 @@ void leer_script(char *ruta_script)
 {
    FILE *script;
    char *linea = NULL;
+   size_t len = 0;
+   ssize_t read;
 
    script = fopen(ruta_script, "r");
    if (script == NULL)
    {
-      printf("No se pudo abrir el script \n");
+      perror("Error al abrir el script");
       return;
    }
 
-   while (getline(&linea, NULL, script) != -1)
+   while ((read = getline(&linea, &len, script)) != -1)
    {
       char **vec_comando = string_split(linea, " ");
       char *operacion = vec_comando[0];
