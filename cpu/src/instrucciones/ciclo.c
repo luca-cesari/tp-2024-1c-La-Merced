@@ -22,10 +22,10 @@ void execute(void (*instruccion)(char **param), char *char_instruccion)
 {
    char **instruc_parametros = string_split(char_instruccion, " ");
    char **parametros = eliminar_primer_elemento(instruc_parametros);
+   aumentar_program_counter();
    instruccion(parametros);
 
    log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], *parametros);
-   aumentar_program_counter();
 }
 
 int check_interrupt()
@@ -40,14 +40,14 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   if (strcmp(pcb->io_request->inteface_name, "")) // es muy asqueroso (fix a futuro)
+   if (pcb->motivo_desalojo == TERMINATED)
    {
-      pcb->motivo_desalojo = IO;
       return 1;
    }
 
-   if (pcb->motivo_desalojo == TERMINATED)
+   if (strcmp(pcb->io_request->inteface_name, "")) // es muy asqueroso (fix a futuro)
    {
+      pcb->motivo_desalojo = IO;
       return 1;
    }
 

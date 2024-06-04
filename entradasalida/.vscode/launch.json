@@ -8,7 +8,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
-      "args": ["Int1", "entradasalida.config"],
+      "args": ["Interfaz1", "entradasalida.config"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
