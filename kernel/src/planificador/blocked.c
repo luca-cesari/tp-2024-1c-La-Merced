@@ -34,27 +34,14 @@ void conectar_nueva_interfaz(q_blocked *estado, io_queue *io, void *(*rutina_con
 
 int32_t bloquear_proceso(q_blocked *estado, t_pcb *pcb)
 {
-   // io_queue *io = NULL;
-
-   pthread_mutex_lock(&(estado->io_queues_mutex));
-
    int _es_interfaz_buscada(void *elemento)
    {
       io_queue *io = (io_queue *)elemento;
       return strcmp(io->nombre_interfaz, pcb->io_request->inteface_name) == 0;
    };
 
+   pthread_mutex_lock(&(estado->io_queues_mutex));
    io_queue *io_encontrado = list_find(estado->io_queues, (void *)_es_interfaz_buscada);
-
-   // t_list_iterator *iterador = list_iterator_create(estado->io_queues);
-   // while (list_iterator_has_next(iterador))
-   // {
-   //    io = list_iterator_next(iterador);
-   //    if (io->nombre_interfaz == pcb->io_request->inteface_name)
-   //       break;
-   // }
-   // list_iterator_destroy(iterador); // si destruyo el iterador, io sigue vivo?
-
    pthread_mutex_unlock(&(estado->io_queues_mutex));
 
    // hace falta verificar de nuevo
