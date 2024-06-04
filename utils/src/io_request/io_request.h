@@ -20,6 +20,7 @@ typedef enum
 
 t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumentos);
 t_packet *serializar_io_request(t_io_request *io_request);
+void vaciar_io_request(t_io_request *io_request);
 void print_io_request(t_io_request *io_request);
 void destruir_io_request(t_io_request *io_request);
 

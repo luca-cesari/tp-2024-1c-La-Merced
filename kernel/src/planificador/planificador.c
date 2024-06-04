@@ -95,6 +95,12 @@ static void *consumir_io(void *cola_io)
       enviar_io_request(io->fd_conexion, pcb->io_request);
       int32_t response = recibir_senial(io->fd_conexion);
 
+      // se resetea el campo io_req
+      // principalmente para EXECUTED,
+      // así no afectaría cuando vuelva a la CPU.
+      // en otros casos no debería ser relevante
+      vaciar_io_request(pcb->io_request);
+
       switch (response)
       {
       case INVALID_INSTRUCTION:
