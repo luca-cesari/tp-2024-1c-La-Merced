@@ -24,6 +24,17 @@ t_packet *serializar_io_request(t_io_request *io_request)
    return paquete;
 }
 
+void vaciar_io_request(t_io_request *io_request)
+{
+   free(io_request->inteface_name);
+   free(io_request->instruction);
+   free(io_request->arguments);
+
+   io_request->inteface_name = strdup("");
+   io_request->instruction = strdup("");
+   io_request->arguments = strdup("");
+}
+
 void print_io_request(t_io_request *io_request)
 {
    printf("[+] IO Request:\n");
