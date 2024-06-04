@@ -5,9 +5,9 @@ t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instr
    t_io_request *io_request = malloc(sizeof(t_io_request));
 
    io_request->pid = pid;
-   io_request->inteface_name = nombre_interfaz;
-   io_request->instruction = instruccion;
-   io_request->arguments = argumentos;
+   io_request->inteface_name = strdup(nombre_interfaz);
+   io_request->instruction = strdup(instruccion);
+   io_request->arguments = strdup(argumentos);
 
    return io_request;
 }

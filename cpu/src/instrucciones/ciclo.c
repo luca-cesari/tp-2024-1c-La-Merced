@@ -40,7 +40,7 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   if (pcb->io_request != NULL)
+   if (strcmp(pcb->io_request->inteface_name, "")) // es muy asqueroso (fix a futuro)
    {
       pcb->motivo_desalojo = IO;
       return 1;
@@ -58,7 +58,7 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
    inicializar_diccionario_registros();
-   
+
    while (1)
    {
       char *char_instruccion = fetch();
