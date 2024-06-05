@@ -32,7 +32,7 @@ void *mlist_peek(t_mutext_list *lista_mutex)
    return elemento;
 }
 
-void *mlist_push_as_queue(t_mutext_list *lista_mutex, void *elemento)
+void mlist_push_as_queue(t_mutext_list *lista_mutex, void *elemento)
 {
    mlist_add(lista_mutex, elemento);
 }
@@ -100,7 +100,7 @@ void mlist_remove_and_destroy_by_condition(t_mutext_list *lista_mutex, int32_t (
 void mlist_clean(t_mutext_list *lista_mutex, void (*destructor)(void *))
 {
    pthread_mutex_lock(&(lista_mutex->mutex));
-   list_remove_and_destroy_element(lista_mutex->list, (void *)destructor);
+   list_clean_and_destroy_elements(lista_mutex->list, destructor);
    pthread_mutex_unlock(&(lista_mutex->mutex));
 }
 

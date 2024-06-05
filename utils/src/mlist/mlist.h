@@ -47,9 +47,8 @@ void *mlist_peek(t_mutext_list *lista_mutex);
  *
  * @param lista_mutex
  * @param elemento
- * @return void*
  */
-void *mlist_push_as_queue(t_mutext_list *lista_mutex, void *elemento);
+void mlist_push_as_queue(t_mutext_list *lista_mutex, void *elemento);
 
 /**
  * @brief
