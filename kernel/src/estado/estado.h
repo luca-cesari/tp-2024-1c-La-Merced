@@ -1,5 +1,5 @@
-#ifndef PLANIFICADOR_ESTADOS_H
-#define PLANIFICADOR_ESTADOS_H
+#ifndef ESTADO_H
+#define ESTADO_H
 
 #include <stdlib.h>
 #include <semaphore.h>
@@ -20,4 +20,4 @@ void push_proceso(q_estado *, t_pcb *);
 void *pop_proceso(q_estado *);
 void destruir_estado(q_estado *);
 
-#endif // PLANIFICADOR_ESTADOS_H
+#endif // ESTADO_H

@@ -1,17 +1,15 @@
+#ifndef BLOCKED_H
+#define BLOCKED_H
 
-#ifndef PLANIFICADOR_BLOCKED_H
-#define PLANIFICADOR_BLOCKED_H
+#include "io_queue.h"
+#include "resource_queue.h"
 
-#include "estados.h"
-
-typedef struct
-{
-   char *nombre_interfaz;
-   int32_t fd_conexion;
-   q_estado *cola;
-   pthread_t rutina_consumo;
-} io_queue;
-
+/**
+ * MODIFICAR:
+ * - usar mlist.
+ * - agregar resource_queues
+ *
+ */
 typedef struct
 {
    t_list *io_queues;
@@ -19,7 +17,7 @@ typedef struct
 } q_blocked;
 
 q_blocked *crear_estado_blocked(void);
-io_queue *crear_io_queue(char *, int32_t);
+void destruir_estado_blocked(q_blocked *);
 
 /**
  * @brief
@@ -31,7 +29,5 @@ io_queue *crear_io_queue(char *, int32_t);
 void conectar_nueva_interfaz(q_blocked *estado, io_queue *cola_io, void *(*rutina_consumo)(void *));
 int32_t bloquear_proceso(q_blocked *, t_pcb *);
 q_estado *desconectar_interfaz(q_blocked *, int32_t);
-void destruir_estado_blocked(q_blocked *);
-void destruir_io_queue(void *);
 
-#endif // PLANIFICADOR_BLOCKED_H
+#endif // BLOCKED_H

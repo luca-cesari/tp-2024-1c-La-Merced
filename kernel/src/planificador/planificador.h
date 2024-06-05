@@ -10,8 +10,8 @@
 #include <pcb/pcb.h>
 
 #include "logger/logger.h"
-#include "estados.h"
-#include "blocked.h"
+#include "estado/estado.h"
+#include "blocked/blocked.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 

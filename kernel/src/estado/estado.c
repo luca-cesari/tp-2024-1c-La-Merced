@@ -1,4 +1,4 @@
-#include "estados.h"
+#include "estado.h"
 
 q_estado *crear_estado(state codigo_estado)
 {
