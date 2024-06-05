@@ -130,7 +130,7 @@ t_list *recibir_paquete(int32_t fd_conexion)
 
 void enviar_senial(int32_t signal, int32_t fd_conexion)
 {
-   op_code code = SIGNAL;
+   op_code code = NUMBER;
    void *buffer = malloc(sizeof(int32_t) * 2);
 
    memcpy(buffer, &code, sizeof(int32_t));
@@ -142,7 +142,7 @@ void enviar_senial(int32_t signal, int32_t fd_conexion)
 
 int32_t recibir_senial(int32_t fd_conexion)
 {
-   if (recibir_operacion(fd_conexion) != SIGNAL)
+   if (recibir_operacion(fd_conexion) != NUMBER)
       return -5;
 
    int32_t signal;

@@ -9,7 +9,7 @@ typedef struct
    /* data */
 } resource_queue;
 
-resource_queue *crear_resource_queue(void);
-void destruir_resource_queue(resource_queue *);
+resource_queue *crear_resource_queue(char* nombre_recurso, int32_t instancias);
+void destruir_resource_queue(resource_queue *cola_recurso);
 
 #endif // BLOCKED_RESOURCE_QUEUE_H

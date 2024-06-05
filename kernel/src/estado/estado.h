@@ -5,7 +5,6 @@
 #include <semaphore.h>
 #include <pcb/pcb.h>
 #include <mlist/mlist.h>
-#include <mqueue/mqueue.h>
 
 #include "logger/logger.h"
 
@@ -17,13 +16,14 @@ typedef struct
 } q_estado;
 
 q_estado *crear_estado(state coigo_estado);
-void push_proceso(q_estado *, t_pcb *);
-void *pop_proceso(q_estado *);
+void push_proceso(q_estado *estado, t_pcb *pcb);
+void *pop_proceso(q_estado *estado);
 
 /**
  * @brief No tiene en cuenta si adentro del estado había procesos encolados
  *
+ * @param estado
  */
-void destruir_estado(q_estado *);
+void destruir_estado(q_estado *estado);
 
 #endif // ESTADO_H

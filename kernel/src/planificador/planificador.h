@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <commons/temporal.h>
-#include <mqueue/mqueue.h>
+// #include <mqueue/mqueue.h>
 #include <pcb/pcb.h>
 
 #include "logger/logger.h"
@@ -53,6 +53,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
 
 /**
  * @brief Función encargada de generar un PCB y encolarlo para ser planificado.
+ *
  * @param ruta_ejecutable Ruta del archivo ejecutable.
  */
 void ingresar_proceso(char *ruta_ejecutable);

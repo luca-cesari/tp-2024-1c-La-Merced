@@ -22,7 +22,9 @@ typedef enum
 {
    TERMINATED,
    QUANTUM,
-   IO
+   IO,
+   WAIT,
+   SIGNAL
 } motivo_desalojo;
 
 typedef enum
