@@ -81,14 +81,17 @@ void destruir_planificador()
    destruir_estado_blocked(cola_blocked);
 }
 
+// TODO
 void iniciar_planificacion()
 {
 }
 
+// TODO
 void detener_planificacion()
 {
 }
 
+// TODO
 void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
 
 void ingresar_proceso(char *ruta_ejecutable)
@@ -146,6 +149,7 @@ static void *consumir_io(void *cola_io)
    return NULL;
 }
 
+// TODO
 static void *crear_proceso()
 {
    while (1)
@@ -176,6 +180,7 @@ static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
    push_proceso(cola_exit, pcb);
 }
 
+// TODO
 static void *finalizar_proceso()
 {
    while (1)
@@ -190,6 +195,7 @@ static void *finalizar_proceso()
    return NULL;
 }
 
+// TODO
 static void pasar_a_siguiente(t_pcb *pcb)
 {
    switch (pcb->motivo_desalojo)
@@ -204,6 +210,7 @@ static void pasar_a_siguiente(t_pcb *pcb)
       log_motivo_bloqueo(pcb->pid, INTERFAZ, NULL);
       break;
    case WAIT:
+      // INCOMPLETO
       if (bloquear_para_recurso(cola_blocked, pcb))
          pasar_a_exit(pcb, INVALID_RESOURCE);
       break;
@@ -220,6 +227,9 @@ static void *planificar_por_fifo()
    while (1)
    {
       t_pcb *pre_exec = pop_proceso(cola_ready);
+      pre_exec->estado = EXEC;
+      log_cambio_de_estado(pre_exec->pid, READY, EXEC);
+
       enviar_pcb_cpu(pre_exec); // hasta aca todo bien
       t_pcb *pos_exec = recibir_pcb_cpu();
 
@@ -253,6 +263,7 @@ static void *planificar_por_rr()
    return NULL;
 }
 
+// TODO
 static void *planificar_por_vrr()
 {
    // usar un temporal aca
