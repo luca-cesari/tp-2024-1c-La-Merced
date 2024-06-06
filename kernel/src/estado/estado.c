@@ -17,7 +17,7 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
    mlist_push_as_queue(estado->lista, pcb);
 
    state anterior = pcb->estado;
-   pcb->estado = estado->cod_estado;
+   set_estado_pcb(pcb, estado->cod_estado);
    log_cambio_de_estado(pcb->pid, anterior, pcb->estado);
 
    sem_post(estado->hay_proceso);

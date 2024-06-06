@@ -127,7 +127,7 @@ static void *consumir_io(void *cola_io)
       // principalmente para EXECUTED,
       // así no afectaría cuando vuelva a la CPU.
       // en otros casos no debería ser relevante
-      vaciar_io_request(pcb->io_request);
+      reset_io_request(pcb);
 
       switch (response)
       {
@@ -176,7 +176,7 @@ static void *crear_proceso()
 
 static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 {
-   pcb->motivo_finalizacion = motivo;
+   set_motivo_finalizacion(pcb, motivo);
    push_proceso(cola_exit, pcb);
 }
 
@@ -227,7 +227,7 @@ static void *planificar_por_fifo()
    while (1)
    {
       t_pcb *pre_exec = pop_proceso(cola_ready);
-      pre_exec->estado = EXEC;
+      set_estado_pcb(pre_exec, EXEC);
       log_cambio_de_estado(pre_exec->pid, READY, EXEC);
 
       enviar_pcb_cpu(pre_exec); // hasta aca todo bien

@@ -61,6 +61,10 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable);
 t_packet *serializar_pcb(t_pcb *pcb);
 void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
 t_pcb *recibir_pcb(int32_t fd_conexion);
+void set_estado_pcb(t_pcb *pcb, state estado);
+void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo);
+void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo);
+void reset_io_request(t_pcb *pcb);
 void print_pcb(t_pcb *pcb);
 void destruir_pcb(t_pcb *pcb);
 

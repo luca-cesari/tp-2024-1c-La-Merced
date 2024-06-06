@@ -101,6 +101,26 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    return pcb;
 }
 
+void set_estado_pcb(t_pcb *pcb, state estado)
+{
+   pcb->estado = estado;
+}
+
+void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo)
+{
+   pcb->motivo_desalojo = motivo;
+}
+
+void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo)
+{
+   pcb->motivo_finalizacion = motivo;
+}
+
+void reset_io_request(t_pcb *pcb)
+{
+   vaciar_io_request(pcb->io_request);
+}
+
 void print_pcb(t_pcb *pcb)
 {
    printf("PID: %d\n", pcb->pid);
