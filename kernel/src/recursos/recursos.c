@@ -4,21 +4,28 @@ t_mutext_list *recursos;
 
 static t_recurso *crear_recurso(char *nombre_recurso, u_int32_t instancias);
 static void agregar_recurso(char *nombre_recurso, void *ptr_instancias);
-static void destruir_recurso(t_recurso *recurso);
+static void destruir_recurso(void *ptr_recurso);
 
 void inicializar_recursos()
 {
    t_dictionary *config_recursos = get_recursos();
+
+   recursos = mlist_create();
    dictionary_iterator(config_recursos, &agregar_recurso);
+
    dictionary_destroy_and_destroy_elements(config_recursos, &free);
 }
 
+// TODO
 int32_t consumir_recurso(t_pcb *pcb, char *nombre_recurso)
 {
+   return 0;
 }
 
+// TODO
 int32_t liberar_recurso(t_pcb *pcb, char *nombre_recurso)
 {
+   return 0;
 }
 
 void destruir_recursos()
@@ -43,8 +50,9 @@ static void agregar_recurso(char *nombre_recurso, void *ptr_instancias)
    mlist_add(recursos, recurso);
 }
 
-static void destruir_recurso(t_recurso *recurso)
+static void destruir_recurso(void *ptr_recurso)
 {
+   t_recurso *recurso = (t_recurso *)ptr_recurso;
    free(recurso->nombre_recurso);
    free(recurso);
 }

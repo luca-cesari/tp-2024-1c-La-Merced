@@ -101,6 +101,12 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    return pcb;
 }
 
+void actualizar_pcb(t_pcb **pcb, t_pcb *nuevo_pcb)
+{
+   destruir_pcb(*pcb);
+   *pcb = nuevo_pcb;
+}
+
 void set_estado_pcb(t_pcb *pcb, state estado)
 {
    pcb->estado = estado;

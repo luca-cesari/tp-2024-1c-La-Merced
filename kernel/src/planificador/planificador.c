@@ -226,15 +226,15 @@ static void *planificar_por_fifo()
 {
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso(cola_ready);
-      set_estado_pcb(pre_exec, EXEC);
-      log_cambio_de_estado(pre_exec->pid, READY, EXEC);
+      t_pcb *proceso = pop_proceso(cola_ready);
+      set_estado_pcb(proceso, EXEC);
+      log_cambio_de_estado(proceso->pid, READY, EXEC);
 
-      enviar_pcb_cpu(pre_exec); // hasta aca todo bien
+      enviar_pcb_cpu(proceso);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
-      destruir_pcb(pre_exec);
-      pasar_a_siguiente(pos_exec);
+      actualizar_pcb(&proceso, pos_exec);
+      pasar_a_siguiente(proceso);
    }
 
    return NULL;
