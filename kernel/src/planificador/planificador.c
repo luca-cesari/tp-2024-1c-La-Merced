@@ -10,6 +10,7 @@ q_estado *cola_exit;
 
 q_blocked *cola_blocked;
 
+static void finalizar_proceso_por_desconexion(void *proceso);
 static void *consumir_io(void *);
 
 static void *crear_proceso();
@@ -35,14 +36,32 @@ void inicializar_planificador()
    cola_exit = crear_estado(EXIT);
    cola_blocked = crear_estado_blocked();
 
-   // .........................
+   // ...................................................................
+
+   void *(*planificador_corto_plazo)(void *) = NULL;
+   algoritmo_planificacion algoritmo = get_algoritmo_planificacion();
+
+   switch (algoritmo)
+   {
+   case FIFO:
+      planificador_corto_plazo = &planificar_por_fifo;
+      break;
+   case RR:
+      planificador_corto_plazo = &planificar_por_rr;
+      break;
+   case VRR:
+      planificador_corto_plazo = &planificar_por_vrr;
+      break;
+   default:
+      return;
+   }
 
    pthread_t rutina_crear_proceso;
    pthread_create(&rutina_crear_proceso, NULL, &crear_proceso, NULL);
    pthread_detach(rutina_crear_proceso);
 
    pthread_t rutina_planificacion_corto_plazo;
-   pthread_create(&rutina_planificacion_corto_plazo, NULL, &planificar_por_fifo, NULL);
+   pthread_create(&rutina_planificacion_corto_plazo, NULL, planificador_corto_plazo, NULL);
    pthread_detach(rutina_planificacion_corto_plazo);
 
    pthread_t rutina_finalizar_proceso;
@@ -62,14 +81,17 @@ void destruir_planificador()
    destruir_estado_blocked(cola_blocked);
 }
 
+// TODO
 void iniciar_planificacion()
 {
 }
 
+// TODO
 void detener_planificacion()
 {
 }
 
+// TODO
 void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
 
 void ingresar_proceso(char *ruta_ejecutable)
@@ -83,6 +105,12 @@ void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
 {
    io_queue *cola_io = crear_io_queue(nombre_interfaz, fd_conexion);
    conectar_nueva_interfaz(cola_blocked, cola_io, &consumir_io);
+}
+
+static void finalizar_proceso_por_desconexion(void *proceso)
+{
+   t_pcb *pcb = (t_pcb *)proceso;
+   pasar_a_exit(pcb, INVALID_INTERFACE);
 }
 
 static void *consumir_io(void *cola_io)
@@ -99,7 +127,7 @@ static void *consumir_io(void *cola_io)
       // principalmente para EXECUTED,
       // así no afectaría cuando vuelva a la CPU.
       // en otros casos no debería ser relevante
-      vaciar_io_request(pcb->io_request);
+      reset_io_request(pcb);
 
       switch (response)
       {
@@ -112,7 +140,7 @@ static void *consumir_io(void *cola_io)
       case -1: // cuando una interfaz se desconecta
          pasar_a_exit(pcb, INVALID_INTERFACE);
          q_estado *cola = desconectar_interfaz(cola_blocked, io->fd_conexion);
-         // hay q pasar toda la cola a exit
+         mlist_iterate(cola->lista, &finalizar_proceso_por_desconexion);
          destruir_estado(cola);
          return NULL;
       }
@@ -121,6 +149,7 @@ static void *consumir_io(void *cola_io)
    return NULL;
 }
 
+// TODO
 static void *crear_proceso()
 {
    while (1)
@@ -147,10 +176,11 @@ static void *crear_proceso()
 
 static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 {
-   pcb->motivo_finalizacion = motivo;
+   set_motivo_finalizacion(pcb, motivo);
    push_proceso(cola_exit, pcb);
 }
 
+// TODO
 static void *finalizar_proceso()
 {
    while (1)
@@ -165,6 +195,7 @@ static void *finalizar_proceso()
    return NULL;
 }
 
+// TODO
 static void pasar_a_siguiente(t_pcb *pcb)
 {
    switch (pcb->motivo_desalojo)
@@ -174,9 +205,16 @@ static void pasar_a_siguiente(t_pcb *pcb)
       push_proceso(cola_ready, pcb);
       break;
    case IO:
-      if (bloquear_proceso(cola_blocked, pcb))
+      if (bloquear_para_io(cola_blocked, pcb))
          pasar_a_exit(pcb, INVALID_INTERFACE);
       log_motivo_bloqueo(pcb->pid, INTERFAZ, NULL);
+      break;
+   case WAIT:
+      // INCOMPLETO
+      if (bloquear_para_recurso(cola_blocked, pcb))
+         pasar_a_exit(pcb, INVALID_RESOURCE);
+      break;
+   case SIGNAL:
       break;
    case TERMINATED:
       pasar_a_exit(pcb, SUCCESS);
@@ -188,12 +226,15 @@ static void *planificar_por_fifo()
 {
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso(cola_ready);
-      enviar_pcb_cpu(pre_exec); // hasta aca todo bien
+      t_pcb *proceso = pop_proceso(cola_ready);
+      set_estado_pcb(proceso, EXEC);
+      log_cambio_de_estado(proceso->pid, READY, EXEC);
+
+      enviar_pcb_cpu(proceso);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
-      destruir_pcb(pre_exec);
-      pasar_a_siguiente(pos_exec);
+      actualizar_pcb(&proceso, pos_exec);
+      pasar_a_siguiente(proceso);
    }
 
    return NULL;
@@ -222,6 +263,7 @@ static void *planificar_por_rr()
    return NULL;
 }
 
+// TODO
 static void *planificar_por_vrr()
 {
    // usar un temporal aca

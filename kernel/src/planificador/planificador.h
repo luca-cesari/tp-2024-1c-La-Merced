@@ -6,29 +6,28 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <commons/temporal.h>
-#include <mqueue/mqueue.h>
 #include <pcb/pcb.h>
 
 #include "logger/logger.h"
-#include "estados.h"
-#include "blocked.h"
+#include "estado/estado.h"
+#include "blocked/blocked.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 
 /**
  * @brief Inicializa el planificador del kernel.
  *
- * * Crea los estados.
- * * Crea los semaforos necesarios.
- * * Lanza las rutinas de planificacion (crea los hilos).
+ * @note Crea los estados.
+ * @note Crea los semaforos necesarios.
+ * @note Lanza las rutinas de planificacion (crea los hilos).
  */
 void inicializar_planificador();
 
 /**
  * @brief Destruye el planificador del kernel.
  *
- * * Destruye los estados.
- * * Destruye los semaforos creados.
+ * @note Destruye los estados.
+ * @note Destruye los semaforos creados.
  */
 void destruir_planificador();
 
@@ -38,8 +37,11 @@ void destruir_planificador();
 void iniciar_planificacion();
 
 /**
- * @brief Detiene la planificación a largo plazo.
+ * @brief Detiene la planificación de corto y largo plazo.
  *        Impide que se creen nuevos procesos y pase a ready.
+ *
+ * @note El proceso que se encuentra en ejecución NO es desalojado, pero una vez que salga de EXEC se va a pausar el manejo de su motivo de desalojo.
+ * @note Los procesos bloqueados van a pausar su transición a la cola de Ready.
  */
 void detener_planificacion();
 
@@ -53,6 +55,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
 
 /**
  * @brief Función encargada de generar un PCB y encolarlo para ser planificado.
+ *
  * @param ruta_ejecutable Ruta del archivo ejecutable.
  */
 void ingresar_proceso(char *ruta_ejecutable);

@@ -11,7 +11,7 @@
 
 typedef enum
 {
-    SIGNAL,
+    NUMBER,
     MESSAGE,
     PACKET
 } op_code;

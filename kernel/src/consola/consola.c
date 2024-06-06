@@ -50,7 +50,7 @@ void leer_script(char *ruta_script)
 
       ejecutar_comando(operacion, argumento);
 
-      free(linea); // ni idea si hace falta
+      // free(linea); // ni idea si hace falta
       string_array_destroy(vec_comando);
    }
 
