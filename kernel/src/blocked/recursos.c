@@ -39,6 +39,7 @@ static t_recurso *crear_recurso(char *nombre_recurso, u_int32_t instancias)
    t_recurso *recurso = malloc(sizeof(t_recurso));
    recurso->nombre_recurso = nombre_recurso;
    recurso->instancias = instancias;
+   sem_init(&(recurso->sem_instancias), 0, instancias);
 
    return recurso;
 }

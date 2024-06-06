@@ -3,7 +3,6 @@
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 #include "servidor/servidor.h"
-#include "recursos/recursos.h"
 #include "planificador/planificador.h"
 #include "consola/consola.h"
 

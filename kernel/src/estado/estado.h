@@ -20,7 +20,7 @@ void push_proceso(q_estado *estado, t_pcb *pcb);
 void *pop_proceso(q_estado *estado);
 
 /**
- * @brief No tiene en cuenta si adentro del estado había procesos encolados
+ * @brief
  *
  * @param estado
  */
