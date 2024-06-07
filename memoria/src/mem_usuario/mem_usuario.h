@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <commons/collections/list.h>
+#include <commons/bitarray.h>
 
 #include "config/config.h"
 
@@ -32,8 +33,15 @@ void inicializar_memoria_usuario();
  **/
 void inicializar_lista_tablas_de_paginas();
 
+/**
+ * @brief Inicializa el bitmap para saber que frames están ocupados.
+ **/
+void inicializar_bitmap();
+
 u_int32_t get_cantidad_frames();
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
+
+void destruir_memoria_usuario();
 
 #endif // MEM_USUARIO_H

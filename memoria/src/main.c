@@ -12,10 +12,11 @@ int main(void)
     inicializar_memoria_instrucciones();
     inicializar_memoria_usuario();
     inicializar_lista_tablas_de_paginas();
+    inicializar_bitmap();
     iniciar_servidor();
 
     destruir_config();
     destruir_logger();
-
+    destruir_memoria_usuario();
     return EXIT_SUCCESS;
 }
