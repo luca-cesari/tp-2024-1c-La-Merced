@@ -230,12 +230,45 @@ static void pasar_a_siguiente(t_pcb *pcb)
 
 static void manejar_wait(t_pcb *pcb)
 {
-   // TODO
+   respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource);
+
+   switch (respuesta)
+   {
+   case INVALID:
+      pasar_a_exit(pcb, INVALID_RESOURCE);
+      break;
+   case ALL_RETAINED:
+      bloquear_para_recurso(cola_blocked_recursos, pcb);
+      log_motivo_bloqueo(pcb->pid, RECURSO, pcb->resource);
+      break;
+   case ASSIGNED:
+      push_proceso(cola_ready, pcb);
+      break;
+   default: // no debería llegar aca nunca (caso RELEASED)
+      break;
+   }
+
+   // set_recurso_pcb(pcb, ""); // resetea el campo resource
 }
 
 static void manejar_signal(t_pcb *pcb)
 {
-   // TODO
+   respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource);
+
+   switch (respuesta)
+   {
+   case INVALID:
+      pasar_a_exit(pcb, INVALID_RESOURCE);
+      break;
+   case RELEASED:
+      t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
+      push_proceso(cola_ready, proceso);
+      break;
+   default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
+      break;
+   }
+
+   // set_recurso_pcb(pcb, ""); // resetea el campo resource
 }
 
 static void *planificar_por_fifo()
