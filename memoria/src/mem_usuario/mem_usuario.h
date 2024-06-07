@@ -8,25 +8,27 @@
 
 #include "config/config.h"
 
-typedef struct{
+typedef struct
+{
 
     u_int32_t nro_pagina;
     u_int32_t nro_frame;
-    //No pongo ni bit de presencia ni demás porque no hay memoria virtual
-}t_fila_tabla;
+    // No pongo ni bit de presencia ni demás porque no hay memoria virtual
+} t_fila_tabla;
 
-typedef struct{
+typedef struct
+{
 
     u_int32_t pid;
     t_list *tabla_paginas;
 
-}t_proceso_y_tabla;
+} t_proceso_y_tabla;
 
-typedef enum{
-        LIBRE,
-        OCUPADO
+typedef enum
+{
+    LIBRE,
+    OCUPADO
 } t_estado_frame;
-
 
 /**
  * @brief Inicializa la memoria de usuario, es decir el espacio de memoria dado por el archivo de configuracion.
@@ -54,7 +56,15 @@ u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 
-void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
+void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio);
+
+void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
+
+void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
+
+u_int32_t get_frame_libre();
+
+u_int32_t get_cantidad_frames_disponibles();
 
 void destruir_memoria_usuario();
 
