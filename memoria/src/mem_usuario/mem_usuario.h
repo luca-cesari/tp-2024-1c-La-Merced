@@ -57,9 +57,14 @@ u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 
 void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio);
-
+/**
+ * @brief Amplia memoria para un proceso en caso que el RESIZE sea mayor al espacio que ya tiene.
+ **/
 void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
 
+/**
+ * @brief Reduce memoria para un proceso en caso que el RESIZE sea menor al espacio que ya tiene.
+ **/
 void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
 
 u_int32_t get_frame_libre();

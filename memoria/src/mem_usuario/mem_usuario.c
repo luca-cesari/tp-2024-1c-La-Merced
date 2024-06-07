@@ -45,13 +45,6 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
     list_add(lista_tablas, proceso_y_tabla); // Agrego la tabla de paginas asociada a un PID a la lista de tablas
 }
 
-/*Lo que hace la CPU:RESIZE (Tamaño): Solicitará a la Memoria ajustar el tamaño del proceso al tamaño pasado por parámetro.
-
-Al llegar una solicitud de ajuste de tamaño de proceso (resize) se deberá cambiar el tamaño del proceso de acuerdo al nuevo tamaño. Se pueden dar 2 opciones:
-Se deberá ampliar el tamaño del proceso al final del mismo, pudiendo solicitarse múltiples páginas. Es posible que en un punto no se puedan solicitar más marcos ya que la memoria se encuentra llena, por lo que en ese caso se deberá contestar con un error de Out Of Memory.
-Reducción de un proceso
-Se reducirá el mismo desde el final, liberando, en caso de ser necesario, las páginas que ya no sean utilizadas (desde la última hacia la primera).
-*/
 void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
 {
     t_proceso_y_tabla *proceso_y_tabla = list_get(lista_tablas, pid);
