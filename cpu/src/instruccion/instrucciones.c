@@ -3,8 +3,6 @@
 t_dictionary *registros;
 extern t_pcb *pcb;
 
-
-
 void set(char **parametros)
 {
    int valor = atoi(parametros[1]);
@@ -18,6 +16,21 @@ void set(char **parametros)
       u_int8_t *registro = dictionary_get(registros, parametros[0]);
       *registro = valor;
    }
+}
+
+void mov_in(char **parametros)
+{
+
+   u_int32_t *registro_datos = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_direccion = dictionary_get(registros, parametros[1]);
+   // Lee el valor de memoria correspondiente a la Dirección Lógica que se encuentra en el Registro Dirección y lo almacena en el Registro Datos.
+}
+
+void mov_out(char **parametros)
+{
+   u_int32_t *registro_direccion = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_datos = dictionary_get(registros, parametros[1]);
+   // Lee el valor del Registro Datos y lo escribe en la dirección física de memoria obtenida a partir de la Dirección Lógica almacenada en el Registro Dirección.
 }
 
 void sum(char **parametros)
@@ -83,7 +96,6 @@ void exit_instruction(char **parametros)
 {
    pcb->motivo_desalojo = TERMINATED;
 }
-
 
 //////////////// AUXILIARES ////////////////////
 void inicializar_diccionario_registros()

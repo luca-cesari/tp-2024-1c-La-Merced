@@ -23,6 +23,8 @@ void sum(char **parametros);
 void sub(char **parametros);
 void jnz(char **parametros);
 void io_gen_sleep(char **parametros);
+void io_stdin_read(char **parametros)
+void io_stdout_write(char **parametros)
 void exit_instruction(char **parametros);
 
 ///////FUNCINES OBTENER PARAMETROS //
