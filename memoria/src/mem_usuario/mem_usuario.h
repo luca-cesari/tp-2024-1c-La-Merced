@@ -13,14 +13,14 @@ typedef struct{
     u_int32_t nro_pagina;
     u_int32_t nro_frame;
     //No pongo ni bit de presencia ni demás porque no hay memoria virtual
-}t_fila_pagina;
+}t_fila_tabla;
 
 typedef struct{
 
     u_int32_t pid;
-    t_fila_pagina *tabla_paginas;
+    t_list *tabla_paginas;
 
-}t_lista_tablas;
+}t_proceso_y_tabla;
 
 /**
  * @brief Inicializa la memoria de usuario, es decir el espacio de memoria dado por el archivo de configuracion.
@@ -30,8 +30,10 @@ void inicializar_memoria_usuario();
 /**
  * @brief Inicializa la lista de tablas de paginas de los procesos. Cada tabla de página va a estar asociada a un PID, es decir un proceso.
  **/
-void inicializar_lista_tabla_paginas();
+void inicializar_lista_tablas_de_paginas();
 
 u_int32_t get_cantidad_frames();
+
+void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 
 #endif // MEM_USUARIO_H

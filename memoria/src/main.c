@@ -11,7 +11,7 @@ int main(void)
 
     inicializar_memoria_instrucciones();
     inicializar_memoria_usuario();
-    inicializar_lista_tabla_paginas();
+    inicializar_lista_tablas_de_paginas();
     iniciar_servidor();
 
     destruir_config();
