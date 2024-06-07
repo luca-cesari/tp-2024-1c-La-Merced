@@ -43,6 +43,11 @@ void inicializar_lista_tablas_de_paginas();
  **/
 void inicializar_bitmap();
 
+/**
+ * @brief Modifica el estado de un frame en el bitmap(LIBRE / OCUPADO).
+ **/
+void modificar_bitmap(u_int32_t frame, t_estado_frame estado);
+
 u_int32_t get_cantidad_frames();
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);

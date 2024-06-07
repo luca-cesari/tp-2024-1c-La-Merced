@@ -31,6 +31,11 @@ void inicializar_bitmap()
     bitmap = malloc(get_cantidad_frames() * sizeof(t_estado_frame));
 }
 
+void modificar_bitmap(u_int32_t frame, t_estado_frame estado)
+{
+    bitmap[frame] = estado;
+}
+
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
 {
