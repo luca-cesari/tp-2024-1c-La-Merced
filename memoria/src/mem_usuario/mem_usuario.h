@@ -8,25 +8,24 @@
 
 #include "config/config.h"
 
-typedef struct{
-
+typedef struct
+{
     u_int32_t nro_pagina;
     u_int32_t nro_frame;
-    //No pongo ni bit de presencia ni demás porque no hay memoria virtual
-}t_fila_tabla;
+    // No pongo ni bit de presencia ni demás porque no hay memoria virtual
+} t_fila_tabla;
 
-typedef struct{
-
+typedef struct
+{
     u_int32_t pid;
     t_list *tabla_paginas;
+} t_proceso_y_tabla;
 
-}t_proceso_y_tabla;
-
-typedef enum{
-        LIBRE,
-        OCUPADO
+typedef enum
+{
+    LIBRE,
+    OCUPADO
 } t_estado_frame;
-
 
 /**
  * @brief Inicializa la memoria de usuario, es decir el espacio de memoria dado por el archivo de configuracion.
