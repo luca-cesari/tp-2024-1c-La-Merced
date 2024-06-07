@@ -9,8 +9,6 @@
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
 
-#include "estructuras.h"
-
 /// ESTRUCTURAS DECODE ////////
 
 // ver porque los registros pueden ser de 32 o 8 bits => de que tipo son

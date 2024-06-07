@@ -13,7 +13,6 @@
 
 #include "instrucciones.h"
 #include "conexion/memoria.h"
-#include "estructuras.h"
 #include "logger/logger.h"
 #include "interrupcion/interrupcion.h"
 
