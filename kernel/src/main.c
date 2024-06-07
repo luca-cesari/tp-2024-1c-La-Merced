@@ -22,7 +22,6 @@ int main(void)
     if (conectar_con_memoria()) // Conexion con Memoria
         return EXIT_FAILURE;
 
-    inicializar_recursos();
     inicializar_planificador();
 
     iniciar_servidor();
@@ -32,7 +31,6 @@ int main(void)
     liberar_conexion_cpu();
     liberar_conexion_memoria();
 
-    destruir_recursos();
     destruir_planificador();
     destruir_config();
     destruir_logger();

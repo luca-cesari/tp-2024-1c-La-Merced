@@ -41,6 +41,8 @@ void inicializar_planificador()
    cola_blocked_interfaces = crear_estado_blocked();
    cola_blocked_recursos = crear_estado_blocked();
 
+   inicializar_recursos(cola_blocked_recursos);
+
    // ...................................................................
 
    void *(*planificador_corto_plazo)(void *) = NULL;
@@ -84,7 +86,7 @@ void destruir_planificador()
    destruir_estado(cola_ready);
    destruir_estado(cola_exit);
    destruir_estado_blocked(cola_blocked_interfaces, &destruir_io_queue);
-   destruir_estado_blocked(cola_blocked_recursos, &free); // !! no es la funcion correcta
+   destruir_estado_blocked(cola_blocked_recursos, &destruir_resource_queue);
 }
 
 void iniciar_planificacion()
