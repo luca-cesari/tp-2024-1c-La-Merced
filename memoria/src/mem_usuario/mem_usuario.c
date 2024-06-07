@@ -52,6 +52,32 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
    
 }
 
+
+
+void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
+{
+    t_proceso_y_tabla * proceso_y_tabla = list_get(lista_tablas, pid);
+    t_list * tabla_paginas = proceso_y_tabla->tabla_paginas;
+    u_int32_t cantidad_frames = tamanio / get_tamanio_pagina();
+    u_int32_t frames_ocupados = 0;
+    u_int32_t frame = 0;
+    u_int32_t i = 0;
+    while(frames_ocupados < cantidad_frames)
+    {
+        if(bitmap[frame] == LIBRE)
+        {
+            t_fila_tabla * fila_tabla = malloc(sizeof(t_fila_tabla));
+            fila_tabla->nro_pagina = i;
+            fila_tabla->nro_frame = frame;
+            list_add(tabla_paginas, fila_tabla);
+            modificar_bitmap(frame, OCUPADO);
+            frames_ocupados++;
+        }
+        frame++;
+    }
+}
+
+
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);

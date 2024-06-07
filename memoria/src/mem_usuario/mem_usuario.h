@@ -54,6 +54,8 @@ u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 
+void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
+
 void destruir_memoria_usuario();
 
 #endif // MEM_USUARIO_H
