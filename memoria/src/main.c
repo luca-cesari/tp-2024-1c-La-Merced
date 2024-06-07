@@ -2,6 +2,7 @@
 #include "logger/logger.h"
 #include "servidor/servidor.h"
 #include "instrucciones/instrucciones.h"
+#include "mem_usuario/mem_usuario.h"
 
 int main(void)
 {
@@ -9,6 +10,7 @@ int main(void)
     iniciar_logger();
 
     inicializar_memoria_instrucciones();
+    inicializar_memoria_usuario();
     iniciar_servidor();
 
     destruir_config();
