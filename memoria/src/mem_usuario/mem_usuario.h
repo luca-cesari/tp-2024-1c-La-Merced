@@ -50,6 +50,8 @@ void modificar_bitmap(u_int32_t frame, t_estado_frame estado);
 
 u_int32_t get_cantidad_frames();
 
+u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
+
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 
 void destruir_memoria_usuario();

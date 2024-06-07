@@ -19,6 +19,11 @@ u_int32_t get_cantidad_frames()
     return get_tamanio_memoria() / get_tamanio_pagina();
 }
 
+u_int32_t get_numero_de_frame(u_int32_t direccion_fisica) //No se si el tipo de dato de la direccion fisica será este
+{
+    return direccion_fisica / get_tamanio_pagina();
+}
+
 
 void inicializar_lista_tablas_de_paginas() 
 { 
