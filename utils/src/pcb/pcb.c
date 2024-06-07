@@ -11,6 +11,7 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
    pcb->bitarray = malloc(1);
    pcb->psw = bitarray_create_with_mode(pcb->bitarray, 1, LSB_FIRST);
    pcb->io_request = crear_io_request(pcb->pid, "", "", "");
+   pcb->resource = strdup("");
    pcb->executable_path = strdup(ejecutable);
    pcb->motivo_desalojo = -1;
    pcb->motivo_finalizacion = -1;
@@ -46,6 +47,7 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, pcb->io_request->instruction, strlen(pcb->io_request->instruction) + 1);
    agregar_a_paquete(paquete, pcb->io_request->arguments, strlen(pcb->io_request->arguments) + 1);
 
+   agregar_a_paquete(paquete, pcb->resource, strlen(pcb->resource) + 1);
    agregar_a_paquete(paquete, pcb->executable_path, strlen(pcb->executable_path) + 1);
    agregar_a_paquete(paquete, &(pcb->motivo_desalojo), sizeof(motivo_desalojo));
    agregar_a_paquete(paquete, &(pcb->motivo_finalizacion), sizeof(motivo_finalizacion));
@@ -92,10 +94,11 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
                                       strdup((char *)list_get(paquete, 15)),
                                       strdup((char *)list_get(paquete, 16)));
 
-   pcb->executable_path = strdup((char *)list_get(paquete, 17));
-   pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 18);
-   pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 19);
-   pcb->estado = *(state *)list_get(paquete, 20);
+   pcb->resource = strdup((char *)list_get(paquete, 17));
+   pcb->executable_path = strdup((char *)list_get(paquete, 18));
+   pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 19);
+   pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 20);
+   pcb->estado = *(state *)list_get(paquete, 21);
 
    list_destroy(paquete);
    return pcb;
@@ -105,6 +108,12 @@ void actualizar_pcb(t_pcb **pcb, t_pcb *nuevo_pcb)
 {
    destruir_pcb(*pcb);
    *pcb = nuevo_pcb;
+}
+
+void set_recurso_pcb(t_pcb *pcb, char *recurso)
+{
+   free(pcb->resource);
+   pcb->resource = strdup(recurso);
 }
 
 void set_estado_pcb(t_pcb *pcb, state estado)
@@ -141,6 +150,7 @@ void print_pcb(t_pcb *pcb)
    printf("ECX: %d\n", pcb->cpu_registers.ECX);
    printf("EDX: %d\n", pcb->cpu_registers.EDX);
    printf("PSW: %s\n", pcb->psw->bitarray);
+   printf("Recurso: %s\n", pcb->resource);
    printf("Executable Path: %s\n", pcb->executable_path);
    printf("Motivo Desalojo: %d\n", pcb->motivo_desalojo);
    printf("Motivo Finalizacion: %d\n", pcb->motivo_finalizacion);
@@ -156,6 +166,7 @@ void destruir_pcb(t_pcb *pcb)
 {
    bitarray_destroy(pcb->psw);
    destruir_io_request(pcb->io_request);
+   free(pcb->resource);
    free(pcb->executable_path);
    free(pcb);
 }

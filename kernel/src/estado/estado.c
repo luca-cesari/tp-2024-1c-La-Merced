@@ -1,5 +1,7 @@
 #include "estado.h"
 
+static void destruir_proceso(void *);
+
 q_estado *crear_estado(state codigo_estado)
 {
    q_estado *estado = malloc(sizeof(q_estado));
@@ -29,10 +31,16 @@ void *pop_proceso(q_estado *estado)
    return mlist_pop_as_queue(estado->lista);
 }
 
+static void destruir_proceso(void *proceso)
+{
+   t_pcb *pcb = (t_pcb *)proceso;
+   destruir_pcb(pcb);
+}
+
 void destruir_estado(q_estado *estado)
 {
+   mlist_clean(estado->lista, &destruir_proceso);
    mlist_destroy(estado->lista);
    sem_destroy(estado->hay_proceso);
-
    free(estado);
 }
