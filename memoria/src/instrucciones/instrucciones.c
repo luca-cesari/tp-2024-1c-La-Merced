@@ -10,23 +10,25 @@ void inicializar_memoria_instrucciones()
     sem_init(&hay_proceso_en_lista, 0, 0);
 }
 
+
 void cargar_proceso_a_memoria(int32_t pid, char *path)
 {
+    
     t_list *instrucciones = list_create();
 
     instrucciones = leer_instrucciones(path);
-
+    
     t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
     proceso->pid = pid;
     proceso->path = strdup(path);
     proceso->instrucciones = instrucciones;
-
     list_add(lista_procesos, proceso);
     sem_post(&hay_proceso_en_lista);
 }
 
 t_list *leer_instrucciones(char *path)
 {
+    
     FILE *archivo = fopen(path, "r");
     if (archivo == NULL)
     {
@@ -74,6 +76,7 @@ char *proxima_instruccion(t_pcb *pcb)
     t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
 
     char *instrucion = (char *)list_get(proceso->instrucciones, pcb->program_counter);
+    printf("%s", instrucion);
     sem_post(&hay_proceso_en_lista);
     return instrucion;
 }
