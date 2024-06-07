@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <commons/collections/list.h>
-#include <commons/bitarray.h>
 
 #include "config/config.h"
 
@@ -22,6 +21,12 @@ typedef struct{
     t_list *tabla_paginas;
 
 }t_proceso_y_tabla;
+
+typedef enum{
+        LIBRE,
+        OCUPADO
+} t_estado_frame;
+
 
 /**
  * @brief Inicializa la memoria de usuario, es decir el espacio de memoria dado por el archivo de configuracion.
