@@ -29,6 +29,10 @@ void exit_instruction(char **parametros);
 void set_diccionario_registros(t_dictionary *);
 void inicializar_diccionario_registros();
 
+/////////AUX//////
+char *array_a_string(char **array);
+char **eliminar_primer_elemento(char **array);
+
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)

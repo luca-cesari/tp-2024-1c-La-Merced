@@ -67,11 +67,25 @@ void io_gen_sleep(char **parametros)
    pcb->io_request = io_request;
 }
 
+void io_stdin_read(char **parametros)
+{
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", array_a_string(eliminar_primer_elemento(parametros)));
+   pcb->io_request = io_request;
+}
+
+void io_stdout_write(char **parametros)
+{
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", array_a_string(eliminar_primer_elemento(parametros)));
+   pcb->io_request = io_request;
+}
+
 void exit_instruction(char **parametros)
 {
    pcb->motivo_desalojo = TERMINATED;
 }
 
+
+//////////////// AUXILIARES ////////////////////
 void inicializar_diccionario_registros()
 {
    registros = dictionary_create();
@@ -84,4 +98,34 @@ void inicializar_diccionario_registros()
    dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
    dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
    dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
+}
+
+char *array_a_string(char **array)
+{
+   char *string = string_new();
+   int i = 0;
+   while (array[i] != NULL)
+   {
+      string_append(&string, array[i]);
+      i++;
+   }
+   return string;
+}
+
+char **eliminar_primer_elemento(char **array)
+{
+   int tamano = string_array_size(array);
+
+   // Verificar que el array no esté vacío
+   if (tamano > 0)
+   {
+      // Desplazar todos los punteros una posición hacia la izquierda
+      for (int i = 0; i < tamano - 1; i++)
+      {
+         array[i] = array[i + 1];
+      }
+      // Establecer el último puntero a NULL para marcar el final del array
+      array[tamano - 1] = NULL;
+   }
+   return array;
 }

@@ -25,7 +25,7 @@ void execute(void (*instruccion)(char **param), char *char_instruccion)
    aumentar_program_counter();
    instruccion(parametros);
 
-   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], *parametros);
+   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], array_a_string(parametros));
 }
 
 int check_interrupt()
@@ -91,29 +91,6 @@ void inicializar_diccionario_instrucciones()
    dictionary_put(instrucciones, "JNZ", &jnz);
    dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
    dictionary_put(instrucciones, "EXIT", &exit_instruction);
-}
-
-char **eliminar_primer_elemento(char **array)
-{
-   // Calcular el tamaño del array
-   int tamano = 0;
-   while (array[tamano] != NULL)
-   {
-      tamano++;
-   }
-
-   // Verificar que el array no esté vacío
-   if (tamano > 0)
-   {
-      // Desplazar todos los punteros una posición hacia la izquierda
-      for (int i = 0; i < tamano - 1; i++)
-      {
-         array[i] = array[i + 1];
-      }
-      // Establecer el último puntero a NULL para marcar el final del array
-      array[tamano - 1] = NULL;
-   }
-   return array;
 }
 
 void aumentar_program_counter() /// VER SI VA  ACA
