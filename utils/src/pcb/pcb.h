@@ -51,6 +51,7 @@ typedef struct
    char *bitarray;
    t_bitarray *psw;
    t_io_request *io_request;
+   char *resource;
    char *executable_path;
    motivo_desalojo motivo_desalojo;
    motivo_finalizacion motivo_finalizacion;
@@ -62,6 +63,7 @@ t_packet *serializar_pcb(t_pcb *pcb);
 void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
 t_pcb *recibir_pcb(int32_t fd_conexion);
 void actualizar_pcb(t_pcb **pcb, t_pcb *nuevo_pcb);
+void set_recurso_pcb(t_pcb *pcb, char *recurso);
 void set_estado_pcb(t_pcb *pcb, state estado);
 void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo);
 void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo);
