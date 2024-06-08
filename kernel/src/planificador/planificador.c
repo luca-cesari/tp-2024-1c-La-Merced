@@ -306,6 +306,10 @@ static void *planificar_por_rr()
       pthread_cancel(rutina_cronometro);
 
       actualizar_pcb(&proceso, pos_exec);
+
+      // manejar el caso donde el proceso haya
+      // desalojado solo
+
       pasar_a_siguiente(proceso);
    }
 
@@ -316,6 +320,29 @@ static void *planificar_por_vrr()
 {
    // TODO
    // usar un temporal aca
+
+   u_int32_t quantum = get_quantum();
+   q_estado *cola_ready_prioridad = crear_estado(READY);
+
+   while (1)
+   {
+      q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
+
+      t_pcb *proceso = pop_proceso(ready);
+      enviar_pcb_cpu(proceso);
+
+      pthread_t rutina_cronometro;
+      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(quantum));
+      pthread_detach(rutina_cronometro);
+
+      t_pcb *pos_exec = recibir_pcb_cpu();
+      pthread_cancel(rutina_cronometro);
+
+      actualizar_pcb(&proceso, pos_exec);
+      pasar_a_siguiente(proceso);
+   }
+
+   destruir_estado(cola_ready_prioridad);
    return NULL;
 }
 
@@ -324,10 +351,10 @@ static void *cronometrar_quantum(void *milisegundos)
    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
-   u_int32_t segundos = (*(u_int32_t *)milisegundos) / 1000;
-   for (u_int32_t i = 0; i < segundos; ++i)
+   u_int64_t microsegundos = (*(u_int32_t *)milisegundos) * 1000;
+   for (u_int64_t i = 0; i < microsegundos; ++i)
    {
-      sleep(1);
+      usleep(1000);
       pthread_testcancel();
    }
 
