@@ -64,6 +64,7 @@ t_packet *serializar_pcb(t_pcb *pcb);
 void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
 t_pcb *recibir_pcb(int32_t fd_conexion);
 void actualizar_pcb(t_pcb **pcb, t_pcb *nuevo_pcb);
+void set_quantum_pcb(t_pcb *pcb, u_int32_t quantum);
 void set_recurso_pcb(t_pcb *pcb, char *recurso);
 void set_estado_pcb(t_pcb *pcb, state estado);
 void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo);

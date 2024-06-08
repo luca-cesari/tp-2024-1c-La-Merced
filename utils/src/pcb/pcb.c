@@ -113,6 +113,11 @@ void actualizar_pcb(t_pcb **pcb, t_pcb *nuevo_pcb)
    *pcb = nuevo_pcb;
 }
 
+void set_quantum_pcb(t_pcb *pcb, u_int32_t quantum)
+{
+   pcb->quantum = quantum;
+}
+
 void set_recurso_pcb(t_pcb *pcb, char *recurso)
 {
    free(pcb->resource);
