@@ -21,6 +21,7 @@ static void *finalizar_proceso();
 
 static void pasar_a_exit(t_pcb *, motivo_finalizacion);
 static void pasar_a_siguiente(t_pcb *);
+static void pasar_a_ready_segun_prioridad(t_pcb *);
 
 static void manejar_wait(t_pcb *);
 static void manejar_signal(t_pcb *);
@@ -30,8 +31,6 @@ static void *planificar_por_rr();
 static void *planificar_por_vrr();
 
 static void *cronometrar_quantum(void *);
-
-static q_estado *cola_ready_segun_prioridad(t_pcb *);
 
 void inicializar_planificador()
 {
@@ -151,7 +150,7 @@ static void *consumir_io(void *cola_io)
          pasar_a_exit(pcb, INVALID_INTERFACE);
          break;
       case EXECUTED:
-         push_proceso(cola_ready, pcb);
+         pasar_a_ready_segun_prioridad(pcb);
          break;
       case -1: // cuando una interfaz se desconecta
          pasar_a_exit(pcb, INVALID_INTERFACE);
@@ -190,15 +189,9 @@ static void *crear_proceso()
    return NULL;
 }
 
-static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
-{
-   set_motivo_finalizacion(pcb, motivo);
-   push_proceso(cola_exit, pcb);
-}
-
-// TODO
 static void *finalizar_proceso()
 {
+   // TODO
    while (1)
    {
       t_pcb *pcb = pop_proceso(cola_exit);
@@ -211,15 +204,26 @@ static void *finalizar_proceso()
    return NULL;
 }
 
+static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
+{
+   q_estado *ready = proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
+   push_proceso(ready, proceso);
+   // log
+}
+
+static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
+{
+   set_motivo_finalizacion(pcb, motivo);
+   push_proceso(cola_exit, pcb);
+}
+
 static void pasar_a_siguiente(t_pcb *pcb)
 {
-   q_estado *ready = cola_ready_segun_prioridad(pcb);
-
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
       log_fin_de_quantum(pcb->pid);
-      push_proceso(ready, pcb);
+      pasar_a_ready_segun_prioridad(pcb);
       break;
    case IO:
       if (bloquear_para_io(cola_blocked_interfaces, pcb))
@@ -241,7 +245,6 @@ static void pasar_a_siguiente(t_pcb *pcb)
 static void manejar_wait(t_pcb *pcb)
 {
    respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource);
-   q_estado *ready = cola_ready_segun_prioridad(pcb);
 
    switch (respuesta)
    {
@@ -253,7 +256,7 @@ static void manejar_wait(t_pcb *pcb)
       log_motivo_bloqueo(pcb->pid, RECURSO, pcb->resource);
       break;
    case ASSIGNED:
-      push_proceso(ready, pcb);
+      pasar_a_ready_segun_prioridad(pcb);
       break;
    default: // no debería llegar aca nunca (caso RELEASED)
       break;
@@ -265,7 +268,6 @@ static void manejar_wait(t_pcb *pcb)
 static void manejar_signal(t_pcb *pcb)
 {
    respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource);
-   q_estado *ready = cola_ready_segun_prioridad(pcb);
 
    switch (respuesta)
    {
@@ -274,7 +276,7 @@ static void manejar_signal(t_pcb *pcb)
       break;
    case RELEASED:
       t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
-      push_proceso(ready, proceso);
+      pasar_a_ready_segun_prioridad(proceso);
       break;
    default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
       break;
@@ -376,9 +378,4 @@ static void *cronometrar_quantum(void *milisegundos)
 
    enviar_interrupcion();
    return NULL;
-}
-
-static q_estado *cola_ready_segun_prioridad(t_pcb *proceso)
-{
-   return proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
 }
