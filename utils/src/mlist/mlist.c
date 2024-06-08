@@ -9,6 +9,15 @@ t_mutext_list *mlist_create(void)
    return lista_mutex;
 }
 
+int8_t mlist_is_empty(t_mutext_list *lista_mutex)
+{
+   pthread_mutex_lock(&(lista_mutex->mutex));
+   int8_t vacia = list_is_empty(lista_mutex->list);
+   pthread_mutex_unlock(&(lista_mutex->mutex));
+
+   return vacia;
+}
+
 void mlist_add(t_mutext_list *lista_mutex, void *elemento)
 {
    pthread_mutex_lock(&(lista_mutex->mutex));
