@@ -72,7 +72,7 @@ u_int32_t get_cantidad_frames_disponibles(); // AUX
 
 void escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio);
 
-void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio);
+void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio);
 
 u_int32_t obtener_numero_pagina_siguiente(u_int32_t pid, u_int32_t frame);
 

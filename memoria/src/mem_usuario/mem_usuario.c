@@ -178,10 +178,30 @@ u_int32_t obtener_numero_pagina_siguiente(u_int32_t pid, u_int32_t frame)
     return nro_pagina_actual + 1;
 }
 
-/*void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio)
+void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer)
 {
-    memcpy(buffer, memoria_usuario + direccion_fisica, tamanio);
-}*/
+    u_int32_t frame = get_numero_de_frame(direccion_fisica);
+    u_int32_t limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+    u_int32_t tamanio_leido = 0;
+    void *buffer = malloc(tamanio_buffer);
+
+    while ((direccion_fisica < limite_de_frame) && (tamanio_leido < tamanio_buffer))
+    {
+        memcpy(buffer, memoria_usuario + direccion_fisica, 1); // Va copiando byte por byte del buffer a la memoria
+        direccion_fisica++;
+        buffer++;
+    }
+    if (tamanio_leido == tamanio_buffer)
+    {
+        // DEVOLVER BUFFER A CPU
+    }
+    else
+    {
+        // LOGICA PARA SEGUIR LEYENDO
+        u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
+        // LOGICA PARA DEVOLVER A CPU EL NUMERO DE PAGINA SIGUIENTE
+    }
+}
 
 void destruir_memoria_usuario()
 {
