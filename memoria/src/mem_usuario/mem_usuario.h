@@ -8,12 +8,14 @@
 
 #include "config/config.h"
 
+/*Deprecado
 typedef struct
 {
     u_int32_t nro_pagina;
     u_int32_t nro_frame;
     // No pongo ni bit de presencia ni demás porque no hay memoria virtual
 } t_fila_tabla;
+*/
 
 typedef struct
 {

@@ -76,10 +76,11 @@ void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t 
         {
             u_int32_t frame = get_frame_libre();
             modificar_bitmap(frame, OCUPADO);
-            t_fila_tabla *fila_tabla = malloc(sizeof(t_fila_tabla));
-            fila_tabla->nro_pagina = tamanio_actual / get_tamanio_pagina() + i;
-            fila_tabla->nro_frame = frame;
-            list_add(proceso_y_tabla->tabla_paginas, fila_tabla);
+            // t_fila_tabla *fila_tabla = malloc(sizeof(t_fila_tabla));
+            //  fila_tabla->nro_pagina = tamanio_actual / get_tamanio_pagina() + i;
+            // fila_tabla->nro_frame = frame;
+            u_int32_t *nro_frame = malloc(sizeof(u_int32_t));
+            list_add(proceso_y_tabla->tabla_paginas, nro_frame);
         }
     }
 }
@@ -91,10 +92,11 @@ void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t 
 
     for (u_int32_t i = 0; i < cantidad_frames_a_liberar; i++)
     {
-        t_fila_tabla *fila_tabla = list_get(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
-        modificar_bitmap(fila_tabla->nro_frame, LIBRE);
+        // t_fila_tabla *fila_tabla = list_get(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
+        u_int32_t *nro_frame = list_get(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
+        modificar_bitmap(*nro_frame, LIBRE);
         list_remove(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
-        free(fila_tabla);
+        // free(fila_tabla);
     }
 }
 
