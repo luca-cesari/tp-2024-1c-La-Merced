@@ -1,11 +1,13 @@
 #include "planificador.h"
 
 u_int32_t pid_count;
+u_int32_t quantum;
 
 sem_t grado_multiprogramacion;
 
 q_estado *cola_new;
 q_estado *cola_ready;
+q_estado *cola_ready_prioridad;
 q_estado *cola_exit;
 
 q_blocked *cola_blocked_interfaces;
@@ -29,14 +31,18 @@ static void *planificar_por_vrr();
 
 static void *cronometrar_quantum(void *);
 
+static q_estado *cola_ready_segun_prioridad(t_pcb *);
+
 void inicializar_planificador()
 {
    pid_count = 0;
+   quantum = get_quantum();
 
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
 
    cola_new = crear_estado(NEW);
    cola_ready = crear_estado(READY);
+   cola_ready_prioridad = crear_estado(READY);
    cola_exit = crear_estado(EXIT);
    cola_blocked_interfaces = crear_estado_blocked();
    cola_blocked_recursos = crear_estado_blocked();
@@ -84,6 +90,7 @@ void destruir_planificador()
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
+   destruir_estado(cola_ready_prioridad);
    destruir_estado(cola_exit);
    destruir_estado_blocked(cola_blocked_interfaces, &destruir_io_queue);
    destruir_estado_blocked(cola_blocked_recursos, &destruir_resource_queue);
@@ -105,6 +112,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
 void ingresar_proceso(char *ruta_ejecutable)
 {
    t_pcb *pcb = crear_pcb(pid_count++, ruta_ejecutable);
+   set_quantum_pcb(pcb, quantum);
    log_creacion_proceso(pcb->pid);
    push_proceso(cola_new, pcb);
 }
@@ -205,11 +213,13 @@ static void *finalizar_proceso()
 
 static void pasar_a_siguiente(t_pcb *pcb)
 {
+   q_estado *ready = cola_ready_segun_prioridad(pcb);
+
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
       log_fin_de_quantum(pcb->pid);
-      push_proceso(cola_ready, pcb);
+      push_proceso(ready, pcb);
       break;
    case IO:
       if (bloquear_para_io(cola_blocked_interfaces, pcb))
@@ -231,6 +241,7 @@ static void pasar_a_siguiente(t_pcb *pcb)
 static void manejar_wait(t_pcb *pcb)
 {
    respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource);
+   q_estado *ready = cola_ready_segun_prioridad(pcb);
 
    switch (respuesta)
    {
@@ -242,7 +253,7 @@ static void manejar_wait(t_pcb *pcb)
       log_motivo_bloqueo(pcb->pid, RECURSO, pcb->resource);
       break;
    case ASSIGNED:
-      push_proceso(cola_ready, pcb);
+      push_proceso(ready, pcb);
       break;
    default: // no debería llegar aca nunca (caso RELEASED)
       break;
@@ -254,6 +265,7 @@ static void manejar_wait(t_pcb *pcb)
 static void manejar_signal(t_pcb *pcb)
 {
    respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource);
+   q_estado *ready = cola_ready_segun_prioridad(pcb);
 
    switch (respuesta)
    {
@@ -262,7 +274,7 @@ static void manejar_signal(t_pcb *pcb)
       break;
    case RELEASED:
       t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
-      push_proceso(cola_ready, proceso);
+      push_proceso(ready, proceso);
       break;
    default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
       break;
@@ -291,8 +303,6 @@ static void *planificar_por_fifo()
 
 static void *planificar_por_rr()
 {
-   u_int32_t quantum = get_quantum();
-
    while (1)
    {
       t_pcb *proceso = pop_proceso(cola_ready);
@@ -306,10 +316,6 @@ static void *planificar_por_rr()
       pthread_cancel(rutina_cronometro);
 
       actualizar_pcb(&proceso, pos_exec);
-
-      // manejar el caso donde el proceso haya
-      // desalojado solo
-
       pasar_a_siguiente(proceso);
    }
 
@@ -318,31 +324,41 @@ static void *planificar_por_rr()
 
 static void *planificar_por_vrr()
 {
-   // TODO
-   // usar un temporal aca
-
-   u_int32_t quantum = get_quantum();
-   q_estado *cola_ready_prioridad = crear_estado(READY);
+   t_temporal *temporal = NULL;
 
    while (1)
    {
       q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
-
       t_pcb *proceso = pop_proceso(ready);
       enviar_pcb_cpu(proceso);
 
+      temporal = temporal_create();
+
       pthread_t rutina_cronometro;
-      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(quantum));
+      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(proceso->quantum));
       pthread_detach(rutina_cronometro);
 
       t_pcb *pos_exec = recibir_pcb_cpu();
       pthread_cancel(rutina_cronometro);
 
+      temporal_stop(temporal);
+      int64_t transcurrido = temporal_gettime(temporal);
+      // no se si afecta de algo al rendimiento
+      // pero tengo que hacer destroy porque
+      // se crea uno nuevo por cada ciclo del while
+      temporal_destroy(temporal);
+
       actualizar_pcb(&proceso, pos_exec);
+
+      u_int32_t quantum_proceso_nuevo = transcurrido < quantum ? quantum - transcurrido : quantum;
+      set_quantum_pcb(proceso, quantum_proceso_nuevo);
+
+      int8_t prioridad = transcurrido < quantum ? 1 : 0;
+      set_prioridad(proceso, prioridad);
+
       pasar_a_siguiente(proceso);
    }
 
-   destruir_estado(cola_ready_prioridad);
    return NULL;
 }
 
@@ -360,4 +376,9 @@ static void *cronometrar_quantum(void *milisegundos)
 
    enviar_interrupcion();
    return NULL;
+}
+
+static q_estado *cola_ready_segun_prioridad(t_pcb *proceso)
+{
+   return proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
 }
