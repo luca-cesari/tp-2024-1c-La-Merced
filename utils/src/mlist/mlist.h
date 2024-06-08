@@ -22,6 +22,14 @@ t_mutext_list *mlist_create(void);
  * @brief
  *
  * @param lista_mutex
+ * @return `int8_t` : 1 si la lista está vacía, 0 en caso contrario.
+ */
+int8_t mlist_is_empty(t_mutext_list *lista_mutex);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
  * @param elemento
  */
 void mlist_add(t_mutext_list *lista_mutex, void *elemento);

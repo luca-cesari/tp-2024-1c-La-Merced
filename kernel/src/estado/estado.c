@@ -25,16 +25,15 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
    sem_post(estado->hay_proceso);
 }
 
-void *pop_proceso(q_estado *estado)
+t_pcb *pop_proceso(q_estado *estado)
 {
    sem_wait(estado->hay_proceso);
-   return mlist_pop_as_queue(estado->lista);
+   return (t_pcb *)mlist_pop_as_queue(estado->lista);
 }
 
-static void destruir_proceso(void *proceso)
+int8_t hay_proceso(q_estado *estado)
 {
-   t_pcb *pcb = (t_pcb *)proceso;
-   destruir_pcb(pcb);
+   return !mlist_is_empty(estado->lista);
 }
 
 void destruir_estado(q_estado *estado)
@@ -43,4 +42,10 @@ void destruir_estado(q_estado *estado)
    mlist_destroy(estado->lista);
    sem_destroy(estado->hay_proceso);
    free(estado);
+}
+
+static void destruir_proceso(void *proceso)
+{
+   t_pcb *pcb = (t_pcb *)proceso;
+   destruir_pcb(pcb);
 }
