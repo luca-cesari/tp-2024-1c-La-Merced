@@ -6,7 +6,6 @@ t_estado_frame *bitmap;
 
 void inicializar_memoria_usuario()
 {
-
     u_int32_t tamanio_memoria = get_tamanio_memoria();
     memoria_usuario = malloc(tamanio_memoria);
 }

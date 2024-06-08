@@ -10,7 +10,6 @@
 
 typedef struct
 {
-
     u_int32_t nro_pagina;
     u_int32_t nro_frame;
     // No pongo ni bit de presencia ni demás porque no hay memoria virtual
@@ -18,10 +17,8 @@ typedef struct
 
 typedef struct
 {
-
     u_int32_t pid;
     t_list *tabla_paginas;
-
 } t_proceso_y_tabla;
 
 typedef enum
