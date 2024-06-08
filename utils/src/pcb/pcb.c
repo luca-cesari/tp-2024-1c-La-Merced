@@ -16,6 +16,7 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
    pcb->motivo_desalojo = -1;
    pcb->motivo_finalizacion = -1;
    pcb->estado = -1;
+   pcb->priority = 0;
 
    return pcb;
 }
@@ -52,6 +53,7 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->motivo_desalojo), sizeof(motivo_desalojo));
    agregar_a_paquete(paquete, &(pcb->motivo_finalizacion), sizeof(motivo_finalizacion));
    agregar_a_paquete(paquete, &(pcb->estado), sizeof(state));
+   agregar_a_paquete(paquete, &(pcb->priority), sizeof(int8_t));
 
    return paquete;
 }
@@ -99,6 +101,7 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 19);
    pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 20);
    pcb->estado = *(state *)list_get(paquete, 21);
+   pcb->priority = *(int8_t *)list_get(paquete, 22);
 
    list_destroy(paquete);
    return pcb;
@@ -134,6 +137,11 @@ void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo)
 void reset_io_request(t_pcb *pcb)
 {
    vaciar_io_request(pcb->io_request);
+}
+
+void set_prioridad(t_pcb *pcb, int8_t priority)
+{
+   pcb->priority = priority;
 }
 
 void print_pcb(t_pcb *pcb)

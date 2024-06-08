@@ -56,6 +56,7 @@ typedef struct
    motivo_desalojo motivo_desalojo;
    motivo_finalizacion motivo_finalizacion;
    state estado;
+   int8_t priority;
 } t_pcb;
 
 t_pcb *crear_pcb(u_int32_t pid, char *ejecutable);
@@ -68,6 +69,7 @@ void set_estado_pcb(t_pcb *pcb, state estado);
 void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo);
 void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo);
 void reset_io_request(t_pcb *pcb);
+void set_prioridad(t_pcb *pcb, int8_t priority);
 void print_pcb(t_pcb *pcb);
 void destruir_pcb(t_pcb *pcb);
 
