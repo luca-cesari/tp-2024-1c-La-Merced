@@ -70,11 +70,27 @@ void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
 
-    while (1) // igualmente hay q hacer un switch despues de la operacion pedida por cpu
+    while (1) 
     {
-        t_pcb *pcb = recibir_pcb(fd_cpu);
-        char *instruccion = proxima_instruccion(pcb);
-        enviar_mensaje(instruccion, fd_cpu);
+        t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        switch (mem_request->operacion)
+        {
+        case FETCH_INSTRUCCION:
+            printf("FETCH_INSTRUCCION \n");
+            char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
+            enviar_mensaje(instruccion, fd_cpu);
+            break;
+
+        case OBTENER_MARCO:
+            printf("OBTENER_MARCO \n");
+            // ...
+            break;
+
+        default:
+            printf("Error de instruccion \n");
+            // ...
+            break;
+        }
     }
 }
 
