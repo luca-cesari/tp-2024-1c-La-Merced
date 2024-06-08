@@ -49,9 +49,9 @@ void inicializar_bitmap();
  **/
 void modificar_bitmap(u_int32_t frame, t_estado_frame estado);
 
-u_int32_t get_cantidad_frames();
+u_int32_t get_cantidad_frames(); // AUX
 
-u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
+u_int32_t get_numero_de_frame(u_int32_t direccion_fisica); // AUX
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 
@@ -66,9 +66,13 @@ void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t 
  **/
 void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
 
-u_int32_t get_frame_libre();
+u_int32_t get_frame_libre(); // AUX
 
-u_int32_t get_cantidad_frames_disponibles();
+u_int32_t get_cantidad_frames_disponibles(); // AUX
+
+void escribir_memoria_usuario(u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio);
+
+void leer_memoria_usuario(u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio);
 
 void destruir_memoria_usuario();
 

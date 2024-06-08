@@ -125,6 +125,16 @@ u_int32_t get_cantidad_frames_disponibles()
     return cantidad_frames_disponibles;
 }
 
+void escribir_memoria_usuario(u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio)
+{
+    memcpy(memoria_usuario + direccion_fisica, buffer, tamanio);
+}
+
+void leer_memoria_usuario(u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio)
+{
+    memcpy(buffer, memoria_usuario + direccion_fisica, tamanio);
+}
+
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);
