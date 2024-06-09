@@ -63,6 +63,15 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
 void ingresar_proceso(char *ruta_ejecutable);
 
 /**
+ * @brief Función encargada de pasar un proceso a EXIT,
+ *        sin importar en que estado se encuentre.
+ *        Es una interrupción de usuario.
+ *
+ * @param pid PID del proceso a finalizar.
+ */
+void matar_proceso(u_int32_t pid);
+
+/**
  * @brief Conecta una interfaz de entrada/salida a la cola de BLOCKED.
  *
  * @param nombre_interfaz nombre de la interfaz a conectar, único en todo el sistema.

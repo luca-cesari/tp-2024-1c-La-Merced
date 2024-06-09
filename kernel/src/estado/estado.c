@@ -31,6 +31,18 @@ t_pcb *pop_proceso(q_estado *estado)
    return (t_pcb *)mlist_pop_as_queue(estado->lista);
 }
 
+t_pcb *peek_proceso(q_estado *estado)
+{
+   sem_wait(estado->hay_proceso);
+   return (t_pcb *)mlist_peek(estado->lista);
+}
+
+void remover_primer_proceso(q_estado *estado)
+{
+   sem_wait(estado->hay_proceso);
+   mlist_remove(estado->lista, 1);
+}
+
 int8_t hay_proceso(q_estado *estado)
 {
    return !mlist_is_empty(estado->lista);
