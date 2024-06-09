@@ -38,6 +38,8 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->cpu_registers.EBX), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->cpu_registers.ECX), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->cpu_registers.EDX), sizeof(u_int32_t));
+   agregar_a_paquete(paquete, &(pcb->cpu_registers.SI), sizeof(u_int32_t));
+   agregar_a_paquete(paquete, &(pcb->cpu_registers.DI), sizeof(u_int32_t));
 
    agregar_a_paquete(paquete, pcb->psw->bitarray, pcb->psw->size);
    agregar_a_paquete(paquete, &(pcb->psw->size), sizeof(size_t));
@@ -83,18 +85,21 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->cpu_registers.EBX = *(u_int32_t *)list_get(paquete, 8);
    pcb->cpu_registers.ECX = *(u_int32_t *)list_get(paquete, 9);
    pcb->cpu_registers.EDX = *(u_int32_t *)list_get(paquete, 10);
+   pcb->cpu_registers.SI = *(u_int32_t *)list_get(paquete, 11);
+   pcb->cpu_registers.DI = *(u_int32_t *)list_get(paquete, 12);
 
    pcb->bitarray = malloc(1);
-   *(pcb->bitarray) = *(char *)list_get(paquete, 11);
+   *(pcb->bitarray) = *(char *)list_get(paquete, 13);
 
    pcb->psw = bitarray_create_with_mode(pcb->bitarray,
-                                        *(size_t *)list_get(paquete, 12),
-                                        *(bit_numbering_t *)list_get(paquete, 13));
+                                        *(size_t *)list_get(paquete, 14),
+                                        *(bit_numbering_t *)list_get(paquete, 15));
 
    pcb->io_request = crear_io_request(pcb->pid,
-                                      strdup((char *)list_get(paquete, 14)),
-                                      strdup((char *)list_get(paquete, 15)),
-                                      strdup((char *)list_get(paquete, 16)));
+                                      strdup((char *)list_get(paquete, 16)),
+                                      strdup((char *)list_get(paquete, 17)),
+                                      strdup((char *)list_get(paquete, 18)));
+
 
    pcb->resource = strdup((char *)list_get(paquete, 17));
    pcb->executable_path = strdup((char *)list_get(paquete, 18));
@@ -162,6 +167,8 @@ void print_pcb(t_pcb *pcb)
    printf("EBX: %d\n", pcb->cpu_registers.EBX);
    printf("ECX: %d\n", pcb->cpu_registers.ECX);
    printf("EDX: %d\n", pcb->cpu_registers.EDX);
+   printf("ECX: %d\n", pcb->cpu_registers.SI);
+   printf("EDX: %d\n", pcb->cpu_registers.DI);
    printf("PSW: %s\n", pcb->psw->bitarray);
    printf("Recurso: %s\n", pcb->resource);
    printf("Executable Path: %s\n", pcb->executable_path);

@@ -12,6 +12,8 @@
 #include <commons/collections/dictionary.h>
 #include <mem_request/cpu.h>
 
+#include <commons/string.h>
+
 #include "instrucciones.h"
 #include "conexion/memoria.h"
 #include "logger/logger.h"
@@ -29,7 +31,6 @@ void *ciclo_instruccion(t_pcb *pcb_kernel);
 void inicializar_diccionario_instrucciones();
 
 //// FUNCIONES EXECUTE////////
-char **eliminar_primer_elemento(char **array);
 void aumentar_program_counter();
 
 #endif // CICLO_H
