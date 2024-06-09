@@ -88,6 +88,7 @@ void inicializar_planificador()
 void destruir_planificador()
 {
    sem_destroy(&grado_multiprogramacion);
+   destruir_gestor_planificacion();
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);

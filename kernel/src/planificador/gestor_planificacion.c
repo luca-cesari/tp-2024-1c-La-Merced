@@ -6,10 +6,37 @@ estado_planificador estado;
 void inicializar_gestor_planificacion()
 {
    semaforos_planificador = malloc(sizeof(t_gestor_planificacion));
+
+   semaforos_planificador->sem_ejecucion_proceso = malloc(sizeof(sem_t));
    sem_init(semaforos_planificador->sem_ejecucion_proceso, 0, 0);
+
+   semaforos_planificador->sem_creacion_proceso = malloc(sizeof(sem_t));
    sem_init(semaforos_planificador->sem_creacion_proceso, 0, 0);
+
+   semaforos_planificador->sem_manejo_desalojo = malloc(sizeof(sem_t));
    sem_init(semaforos_planificador->sem_manejo_desalojo, 0, 0);
+
+   semaforos_planificador->sem_entrada_ready = malloc(sizeof(sem_t));
    sem_init(semaforos_planificador->sem_entrada_ready, 0, 0);
+
+   estado = DETENIDO;
+}
+
+void destruir_gestor_planificacion()
+{
+   sem_destroy(semaforos_planificador->sem_ejecucion_proceso);
+   free(semaforos_planificador->sem_ejecucion_proceso);
+
+   sem_destroy(semaforos_planificador->sem_creacion_proceso);
+   free(semaforos_planificador->sem_creacion_proceso);
+
+   sem_destroy(semaforos_planificador->sem_manejo_desalojo);
+   free(semaforos_planificador->sem_manejo_desalojo);
+
+   sem_destroy(semaforos_planificador->sem_entrada_ready);
+   free(semaforos_planificador->sem_entrada_ready);
+
+   free(semaforos_planificador);
 }
 
 void habilitar_planificador()

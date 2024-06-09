@@ -27,6 +27,13 @@ typedef struct
 void inicializar_gestor_planificacion(void);
 
 /**
+ * @brief Destruye el gestor de planificación.
+ *
+ * @note Destruye los semáforos.
+ */
+void destruir_gestor_planificacion(void);
+
+/**
  * @brief Habilita la planificación haciendo post
  *        a los semáforos y marca el estado como EJECUTANDO.
  *
