@@ -55,7 +55,8 @@ void escuchar_kernel(int32_t fd_kernel)
 
         case FINALIZAR_PROCESO:
             printf("FINALIZAR_PROCESO \n");
-            // ...
+            // Creo que falta sacar el proceso de la memoria de instrucciones
+            destruir_tabla_de_paginas_para_proceso(mem_request->pid);
             break;
 
         default:
@@ -94,7 +95,7 @@ void escuchar_cpu(int32_t fd_cpu)
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
-           //...
+            //...
             break;
 
         default:
