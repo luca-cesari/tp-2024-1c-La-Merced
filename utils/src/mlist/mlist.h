@@ -96,6 +96,15 @@ void mlist_iterate(t_mutext_list *lista_mutex, void (*closure)(void *));
  * @brief
  *
  * @param lista_mutex
+ * @param criterio
+ * @return `u_int32_t`
+ */
+int32_t mlist_index_of(t_mutext_list *lista_mutex, int32_t (*criterio)(void *));
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
  * @param index
  * @return void*
  */
