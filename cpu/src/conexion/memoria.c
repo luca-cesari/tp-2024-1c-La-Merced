@@ -29,7 +29,12 @@ char *recibir_instruccion()
    return instruccion;
 }
 
-int32_t recibir_marco()
+u_int32_t recibir_marco()
+{
+   return recibir_senial(fd_memoria);
+}
+
+u_int32_t recibir_tamanio_pagina()
 {
    return recibir_senial(fd_memoria);
 }
