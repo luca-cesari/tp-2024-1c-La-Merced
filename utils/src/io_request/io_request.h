@@ -6,7 +6,7 @@
 typedef struct
 {
    u_int32_t pid;
-   char *inteface_name;
+   char *interface_name;
    char *instruction;
    char *arguments; // esta pensado como un solo string con los argumentos separados por espacios (si es que hay mas de uno)
 } t_io_request;

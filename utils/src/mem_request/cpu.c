@@ -13,6 +13,15 @@ t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid,
    case OBTENER_MARCO:
       mem_request->parametros.nro_pag = parametro.nro_pag;
       break;
+   case LEER:
+      mem_request->parametros.param_leer.direccion_fisica = parametro.param_leer.direccion_fisica;
+      mem_request->parametros.param_leer.tamanio_buffer = parametro.param_leer.tamanio_buffer;
+      break;
+   case ESCRIBIR:
+      mem_request->parametros.param_escribir.direccion_fisica = parametro.param_escribir.direccion_fisica;
+      mem_request->parametros.param_escribir.tamanio_buffer = parametro.param_escribir.tamanio_buffer;
+      mem_request->parametros.param_escribir.buffer = parametro.param_escribir.buffer;
+      break;
    default:
       break;
    }
@@ -33,6 +42,15 @@ void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request)
       break;
    case OBTENER_MARCO:
       agregar_a_paquete(paquete, &(mem_request->parametros.nro_pag), sizeof(u_int32_t));
+      break;
+   case LEER:
+      agregar_a_paquete(paquete, &(mem_request->parametros.param_leer.direccion_fisica), sizeof(u_int32_t));
+      agregar_a_paquete(paquete, &(mem_request->parametros.param_leer.tamanio_buffer), sizeof(u_int32_t));
+      break;
+   case ESCRIBIR:
+      agregar_a_paquete(paquete, &(mem_request->parametros.param_escribir.direccion_fisica), sizeof(u_int32_t));
+      agregar_a_paquete(paquete, &(mem_request->parametros.param_escribir.tamanio_buffer), sizeof(u_int32_t));
+      agregar_a_paquete(paquete, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer);
       break;
    default:
       break;
@@ -55,7 +73,16 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
       mem_request->parametros.program_counter = *(int32_t *)list_get(paquete, 2);
       break;
    case OBTENER_MARCO:
-      mem_request->parametros.nro_pag = *(u_int32_t *)list_get(paquete, 3);
+      mem_request->parametros.nro_pag = *(u_int32_t *)list_get(paquete, 2);
+      break;
+   case LEER:
+      mem_request->parametros.param_leer.direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
+      mem_request->parametros.param_leer.tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
+      break;
+   case ESCRIBIR:
+      mem_request->parametros.param_escribir.direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
+      mem_request->parametros.param_escribir.tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
+      mem_request->parametros.param_escribir.buffer = (void *)list_get(paquete, 4);
       break;
    default:
       break;

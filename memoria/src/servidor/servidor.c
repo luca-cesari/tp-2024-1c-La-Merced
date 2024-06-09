@@ -87,6 +87,16 @@ void escuchar_cpu(int32_t fd_cpu)
             enviar_senial(marco, fd_cpu); // ver si es con senial por tema del unsigned
             break;
 
+        case LEER:
+            printf("LEER \n");
+            //...
+            break;
+
+        case ESCRIBIR:
+            printf("ESCRIBIR \n");
+           //...
+            break;
+
         default:
             printf("Error de instruccion \n");
             // ...
