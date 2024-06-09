@@ -13,11 +13,12 @@ q_estado *cola_exit;
 q_blocked *cola_blocked_interfaces;
 q_blocked *cola_blocked_recursos;
 
-static void finalizar_proceso_por_desconexion(void *proceso);
+static void finalizar_proceso_por_desconexion(void *);
 static void *consumir_io(void *);
 
 static void *crear_proceso();
 static void *finalizar_proceso();
+static void liberar_recursos(t_pcb *);
 
 static void pasar_a_exit(t_pcb *, motivo_finalizacion);
 static void pasar_a_siguiente(t_pcb *);
@@ -200,13 +201,39 @@ static void *finalizar_proceso()
    {
       t_pcb *pcb = pop_proceso(cola_exit);
       memoria_finalizar_proceso(pcb->pid);
-
-      // alguna operacion de liberacion de recursos
+      liberar_recursos(pcb);
 
       log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
       destruir_pcb(pcb);
    }
    return NULL;
+}
+
+static void liberar_recursos(t_pcb *proceso)
+{
+   // se asume que la cantidad de recursos es fija,
+   // es decir, la cola de recursos siempre coincide
+   // con los recursos que figuran en la configuración
+   t_list *nombres_recursos = dictionary_keys(get_recursos());
+   t_list_iterator *iterador = list_iterator_create(nombres_recursos);
+
+   // es un asco el doble while,
+   // pero es la solución más corta y rápida por el momento
+
+   while (list_iterator_has_next(iterador))
+   {
+      char *nombre_recurso = list_iterator_next(iterador);
+      while (liberar_recurso(cola_blocked_recursos, proceso->pid, nombre_recurso) == RELEASED)
+      {
+         t_pcb *desbloqueado = desbloquear_para_recurso(cola_blocked_recursos, nombre_recurso);
+         if (proceso == NULL)
+            continue;
+         pasar_a_ready_segun_prioridad(desbloqueado);
+      }
+   }
+
+   list_iterator_destroy(iterador);
+   list_clean_and_destroy_elements(nombres_recursos, &free);
 }
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
