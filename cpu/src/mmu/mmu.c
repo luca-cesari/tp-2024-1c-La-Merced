@@ -1,7 +1,5 @@
 #include "mmu.h"
 
-int tlb_top = 0;
-
 u_int32_t mmu(u_int32_t direccion_logica)
 {
    u_int32_t pid = process_getpid();
@@ -18,7 +16,11 @@ u_int32_t mmu(u_int32_t direccion_logica)
    }
    else
    {
-      // le envia a memoria pid y numero de pag para buscar en la tabla de paginas
+      parametros parametro;
+      parametro.nro_pag = numero_pagina;
+      t_cpu_mem_req *mem_request = crear_cpu_mem_request(OBTENER_MARCO, pid, parametro);
+      enviar_mem_request(mem_request);
+      numero_marco = recibir_marco();
       return ((numero_marco * tamanio_pagina) + desplazamiento);
       cargar_matriz_tlb(pid, numero_pagina, numero_marco);
    }

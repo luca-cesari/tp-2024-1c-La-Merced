@@ -48,7 +48,7 @@ int check_desalojo()
       return 1;
    }
 
-   if (strcmp(pcb->io_request->inteface_name, "")) // es muy asqueroso (fix a futuro)
+   if (strcmp(pcb->io_request->interface_name, "")) // es muy asqueroso (fix a futuro)
    {
       pcb->motivo_desalojo = IO;
       return 1;

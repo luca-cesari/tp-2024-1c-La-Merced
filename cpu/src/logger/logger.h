@@ -16,8 +16,8 @@
 #define IO_GEN_SLEEP "IO_GEN_SLEEP"
 typedef enum
 {
-   LEER,
-   ESCRIBIR
+   LEER1,
+   ESCRIBIR1
 } accion;
 
 void iniciar_logger(void);

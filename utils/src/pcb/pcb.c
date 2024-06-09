@@ -46,7 +46,7 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->psw->mode), sizeof(bit_numbering_t));
 
    // serializar_io_request(pcb->io_request);
-   agregar_a_paquete(paquete, pcb->io_request->inteface_name, strlen(pcb->io_request->inteface_name) + 1);
+   agregar_a_paquete(paquete, pcb->io_request->interface_name, strlen(pcb->io_request->interface_name) + 1);
    agregar_a_paquete(paquete, pcb->io_request->instruction, strlen(pcb->io_request->instruction) + 1);
    agregar_a_paquete(paquete, pcb->io_request->arguments, strlen(pcb->io_request->arguments) + 1);
 

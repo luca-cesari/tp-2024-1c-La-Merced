@@ -29,6 +29,11 @@ char *recibir_instruccion()
    return instruccion;
 }
 
+int32_t recibir_marco()
+{
+   return recibir_senial(fd_memoria);
+}
+
 void liberar_conexion_memoria()
 {
    liberar_conexion(fd_memoria);
