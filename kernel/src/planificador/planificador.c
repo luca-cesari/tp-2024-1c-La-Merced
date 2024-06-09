@@ -1,14 +1,17 @@
 #include "planificador.h"
 
 u_int32_t pid_count;
+u_int32_t quantum;
 
 sem_t grado_multiprogramacion;
 
 q_estado *cola_new;
 q_estado *cola_ready;
+q_estado *cola_ready_prioridad;
 q_estado *cola_exit;
 
-q_blocked *cola_blocked;
+q_blocked *cola_blocked_interfaces;
+q_blocked *cola_blocked_recursos;
 
 static void finalizar_proceso_por_desconexion(void *proceso);
 static void *consumir_io(void *);
@@ -19,22 +22,32 @@ static void *finalizar_proceso();
 static void pasar_a_exit(t_pcb *, motivo_finalizacion);
 static void pasar_a_siguiente(t_pcb *);
 
+static void manejar_wait(t_pcb *);
+static void manejar_signal(t_pcb *);
+
 static void *planificar_por_fifo();
 static void *planificar_por_rr();
 static void *planificar_por_vrr();
 
 static void *cronometrar_quantum(void *);
 
+static q_estado *cola_ready_segun_prioridad(t_pcb *);
+
 void inicializar_planificador()
 {
    pid_count = 0;
+   quantum = get_quantum();
 
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
 
    cola_new = crear_estado(NEW);
    cola_ready = crear_estado(READY);
+   cola_ready_prioridad = crear_estado(READY);
    cola_exit = crear_estado(EXIT);
-   cola_blocked = crear_estado_blocked();
+   cola_blocked_interfaces = crear_estado_blocked();
+   cola_blocked_recursos = crear_estado_blocked();
+
+   inicializar_recursos(cola_blocked_recursos);
 
    // ...................................................................
 
@@ -77,18 +90,20 @@ void destruir_planificador()
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
+   destruir_estado(cola_ready_prioridad);
    destruir_estado(cola_exit);
-   destruir_estado_blocked(cola_blocked);
+   destruir_estado_blocked(cola_blocked_interfaces, &destruir_io_queue);
+   destruir_estado_blocked(cola_blocked_recursos, &destruir_resource_queue);
 }
 
-// TODO
 void iniciar_planificacion()
 {
+   // TODO
 }
 
-// TODO
 void detener_planificacion()
 {
+   // TODO
 }
 
 // TODO
@@ -97,6 +112,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
 void ingresar_proceso(char *ruta_ejecutable)
 {
    t_pcb *pcb = crear_pcb(pid_count++, ruta_ejecutable);
+   set_quantum_pcb(pcb, quantum);
    log_creacion_proceso(pcb->pid);
    push_proceso(cola_new, pcb);
 }
@@ -104,7 +120,7 @@ void ingresar_proceso(char *ruta_ejecutable)
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
 {
    io_queue *cola_io = crear_io_queue(nombre_interfaz, fd_conexion);
-   conectar_nueva_interfaz(cola_blocked, cola_io, &consumir_io);
+   conectar_nueva_interfaz(cola_blocked_interfaces, cola_io, &consumir_io);
 }
 
 static void finalizar_proceso_por_desconexion(void *proceso)
@@ -115,13 +131,13 @@ static void finalizar_proceso_por_desconexion(void *proceso)
 
 static void *consumir_io(void *cola_io)
 {
-   io_queue *io = (io_queue *)cola_io;
+   io_queue *interfaz = (io_queue *)cola_io;
 
    while (1)
    {
-      t_pcb *pcb = pop_proceso(io->cola);
-      enviar_io_request(io->fd_conexion, pcb->io_request);
-      int32_t response = recibir_senial(io->fd_conexion);
+      t_pcb *pcb = pop_proceso(interfaz->cola_procesos);
+      enviar_io_request(interfaz->fd_conexion, pcb->io_request);
+      int32_t response = recibir_senial(interfaz->fd_conexion);
 
       // se resetea el campo io_req
       // principalmente para EXECUTED,
@@ -139,7 +155,7 @@ static void *consumir_io(void *cola_io)
          break;
       case -1: // cuando una interfaz se desconecta
          pasar_a_exit(pcb, INVALID_INTERFACE);
-         q_estado *cola = desconectar_interfaz(cola_blocked, io->fd_conexion);
+         q_estado *cola = desconectar_interfaz(cola_blocked_interfaces, interfaz->fd_conexion);
          mlist_iterate(cola->lista, &finalizar_proceso_por_desconexion);
          destruir_estado(cola);
          return NULL;
@@ -195,31 +211,76 @@ static void *finalizar_proceso()
    return NULL;
 }
 
-// TODO
 static void pasar_a_siguiente(t_pcb *pcb)
 {
+   q_estado *ready = cola_ready_segun_prioridad(pcb);
+
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
       log_fin_de_quantum(pcb->pid);
-      push_proceso(cola_ready, pcb);
+      push_proceso(ready, pcb);
       break;
    case IO:
-      if (bloquear_para_io(cola_blocked, pcb))
+      if (bloquear_para_io(cola_blocked_interfaces, pcb))
          pasar_a_exit(pcb, INVALID_INTERFACE);
       log_motivo_bloqueo(pcb->pid, INTERFAZ, NULL);
       break;
    case WAIT:
-      // INCOMPLETO
-      if (bloquear_para_recurso(cola_blocked, pcb))
-         pasar_a_exit(pcb, INVALID_RESOURCE);
+      manejar_wait(pcb);
       break;
    case SIGNAL:
+      manejar_signal(pcb);
       break;
    case TERMINATED:
       pasar_a_exit(pcb, SUCCESS);
       break;
    }
+}
+
+static void manejar_wait(t_pcb *pcb)
+{
+   respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource);
+   q_estado *ready = cola_ready_segun_prioridad(pcb);
+
+   switch (respuesta)
+   {
+   case INVALID:
+      pasar_a_exit(pcb, INVALID_RESOURCE);
+      break;
+   case ALL_RETAINED:
+      bloquear_para_recurso(cola_blocked_recursos, pcb);
+      log_motivo_bloqueo(pcb->pid, RECURSO, pcb->resource);
+      break;
+   case ASSIGNED:
+      push_proceso(ready, pcb);
+      break;
+   default: // no debería llegar aca nunca (caso RELEASED)
+      break;
+   }
+
+   // set_recurso_pcb(pcb, ""); // resetea el campo resource
+}
+
+static void manejar_signal(t_pcb *pcb)
+{
+   respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource);
+   q_estado *ready = cola_ready_segun_prioridad(pcb);
+
+   switch (respuesta)
+   {
+   case INVALID:
+      pasar_a_exit(pcb, INVALID_RESOURCE);
+      break;
+   case RELEASED:
+      t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
+      push_proceso(ready, proceso);
+      break;
+   default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
+      break;
+   }
+
+   // set_recurso_pcb(pcb, ""); // resetea el campo resource
 }
 
 static void *planificar_por_fifo()
@@ -242,12 +303,10 @@ static void *planificar_por_fifo()
 
 static void *planificar_por_rr()
 {
-   u_int32_t quantum = get_quantum();
-
    while (1)
    {
-      t_pcb *pre_exec = pop_proceso(cola_ready);
-      enviar_pcb_cpu(pre_exec);
+      t_pcb *proceso = pop_proceso(cola_ready);
+      enviar_pcb_cpu(proceso);
 
       pthread_t rutina_cronometro;
       pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(quantum));
@@ -256,17 +315,50 @@ static void *planificar_por_rr()
       t_pcb *pos_exec = recibir_pcb_cpu();
       pthread_cancel(rutina_cronometro);
 
-      destruir_pcb(pre_exec);
-      pasar_a_siguiente(pos_exec);
+      actualizar_pcb(&proceso, pos_exec);
+      pasar_a_siguiente(proceso);
    }
 
    return NULL;
 }
 
-// TODO
 static void *planificar_por_vrr()
 {
-   // usar un temporal aca
+   t_temporal *temporal = NULL;
+
+   while (1)
+   {
+      q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
+      t_pcb *proceso = pop_proceso(ready);
+      enviar_pcb_cpu(proceso);
+
+      temporal = temporal_create();
+
+      pthread_t rutina_cronometro;
+      pthread_create(&rutina_cronometro, NULL, &cronometrar_quantum, &(proceso->quantum));
+      pthread_detach(rutina_cronometro);
+
+      t_pcb *pos_exec = recibir_pcb_cpu();
+      pthread_cancel(rutina_cronometro);
+
+      temporal_stop(temporal);
+      int64_t transcurrido = temporal_gettime(temporal);
+      // no se si afecta de algo al rendimiento
+      // pero tengo que hacer destroy porque
+      // se crea uno nuevo por cada ciclo del while
+      temporal_destroy(temporal);
+
+      actualizar_pcb(&proceso, pos_exec);
+
+      u_int32_t quantum_proceso_nuevo = transcurrido < quantum ? quantum - transcurrido : quantum;
+      set_quantum_pcb(proceso, quantum_proceso_nuevo);
+
+      int8_t prioridad = transcurrido < quantum ? 1 : 0;
+      set_prioridad(proceso, prioridad);
+
+      pasar_a_siguiente(proceso);
+   }
+
    return NULL;
 }
 
@@ -275,13 +367,18 @@ static void *cronometrar_quantum(void *milisegundos)
    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
-   u_int32_t segundos = (*(u_int32_t *)milisegundos) / 1000;
-   for (u_int32_t i = 0; i < segundos; ++i)
+   u_int64_t microsegundos = (*(u_int32_t *)milisegundos) * 1000;
+   for (u_int64_t i = 0; i < microsegundos; ++i)
    {
-      sleep(1);
+      usleep(1000);
       pthread_testcancel();
    }
 
    enviar_interrupcion();
    return NULL;
+}
+
+static q_estado *cola_ready_segun_prioridad(t_pcb *proceso)
+{
+   return proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
 }

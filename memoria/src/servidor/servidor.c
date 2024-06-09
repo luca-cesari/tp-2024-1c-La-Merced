@@ -50,6 +50,7 @@ void escuchar_kernel(int32_t fd_kernel)
         case INICIAR_PROCESO:
             printf("INICIAR_PROCESO \n");
             cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
+            crear_tabla_de_paginas_para_proceso(mem_request->pid);
             break;
 
         case FINALIZAR_PROCESO:
@@ -69,11 +70,28 @@ void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
 
-    while (1) // igualmente hay q hacer un switch despues de la operacion pedida por cpu
+    while (1)
     {
-        t_pcb *pcb = recibir_pcb(fd_cpu);
-        char *instruccion = proxima_instruccion(pcb);
-        enviar_mensaje(instruccion, fd_cpu);
+        t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        switch (mem_request->operacion)
+        {
+        case FETCH_INSTRUCCION:
+            printf("FETCH_INSTRUCCION \n");
+            char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
+            enviar_mensaje(instruccion, fd_cpu);
+            break;
+
+        case OBTENER_MARCO:
+            printf("OBTENER_MARCO \n");
+            u_int32_t marco = obtener_marco(mem_request->pid, mem_request->parametros.nro_pag);
+            enviar_senial(marco, fd_cpu); // ver si es con senial por tema del unsigned
+            break;
+
+        default:
+            printf("Error de instruccion \n");
+            // ...
+            break;
+        }
     }
 }
 

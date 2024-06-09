@@ -15,12 +15,43 @@ typedef struct
    state cod_estado;
 } q_estado;
 
+/**
+ * @brief Crea una cola de procesos para el estado dado.
+ *
+ * @param coigo_estado
+ * @return `q_estado*`
+ */
 q_estado *crear_estado(state coigo_estado);
-void push_proceso(q_estado *estado, t_pcb *pcb);
-void *pop_proceso(q_estado *estado);
 
 /**
- * @brief No tiene en cuenta si adentro del estado había procesos encolados
+ * @brief Encola un proceso en el estado dado.
+ *
+ * @param estado
+ * @param pcb
+ */
+void push_proceso(q_estado *estado, t_pcb *pcb);
+
+/**
+ * @brief Desencola un proceso del estado dado.
+ *        El puntero retornado nunca será NULL.
+ *
+ * @param estado
+ * @return `t_pcb*`
+ */
+t_pcb *pop_proceso(q_estado *estado);
+
+/**
+ * @brief Indica si hay algún proceso encolado en el estado dado.
+ *
+ * @param estado
+ * @return `int8_t`
+ */
+int8_t hay_proceso(q_estado *estado);
+
+/**
+ * @brief Destruye un estado.
+ *        Limpia la cola de procesos y libera la memoria,
+ *        si había algún proceso encolado, lo destruye.
  *
  * @param estado
  */

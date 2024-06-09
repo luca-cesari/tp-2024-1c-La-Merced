@@ -5,10 +5,12 @@
 #include <pthread.h>
 #include <sockets/sockets.h>
 #include <mem_request/kernel.h>
+#include <mem_request/cpu.h>
 
 #include "config/config.h"
 #include "protocol/protocol.h"
 #include "instrucciones/instrucciones.h"
+#include "mem_usuario/mem_usuario.h"
 
 /**
  * @brief Inicia el servidor Memoria. La función no es bloqueante,

@@ -13,7 +13,7 @@ typedef struct
     int32_t pid;
     char *path;
     t_list *instrucciones;
-    // sem_t 
+    // sem_t
 } t_proceso_instrucciones;
 
 /**
@@ -38,6 +38,6 @@ void cargar_proceso_a_memoria(int32_t pid, char *path);
  */
 t_list *leer_instrucciones(char *path);
 void eliminar_proceso(t_pcb *pcb);
-char *proxima_instruccion(t_pcb *pcb);
+char *proxima_instruccion(u_int32_t pid, int32_t program_counter);
 
 #endif // INSTRUCCIONES_H

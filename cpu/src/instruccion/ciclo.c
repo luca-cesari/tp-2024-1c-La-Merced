@@ -5,7 +5,10 @@ t_pcb *pcb;
 
 char *fetch()
 {
-   enviar_pcb_memoria(pcb);
+   parametros parametro;
+   parametro.program_counter = pcb->program_counter;
+   t_cpu_mem_req *mem_request = crear_cpu_mem_request(FETCH_INSTRUCCION, pcb->pid, parametro);
+   enviar_mem_request(mem_request);
    char *instruccion = recibir_instruccion();
    log_fetch_instruccion(pcb->pid, pcb->program_counter);
 

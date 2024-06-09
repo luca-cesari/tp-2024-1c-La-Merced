@@ -10,7 +10,8 @@
 
 #include "logger/logger.h"
 #include "estado/estado.h"
-#include "blocked/blocked.h"
+#include "blocked/interfaces.h"
+#include "blocked/recursos.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 
