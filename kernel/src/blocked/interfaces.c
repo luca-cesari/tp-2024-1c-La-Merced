@@ -32,7 +32,7 @@ int32_t bloquear_para_io(q_blocked *estado, t_pcb *pcb)
    int _es_interfaz_buscada(void *elemento)
    {
       io_queue *io = (io_queue *)elemento;
-      return strcmp(io->nombre_interfaz, pcb->io_request->inteface_name) == 0;
+      return strcmp(io->nombre_interfaz, pcb->io_request->interface_name) == 0;
    };
 
    io_queue *io_encontrado = mlist_find(estado->lista_colas, (void *)_es_interfaz_buscada);

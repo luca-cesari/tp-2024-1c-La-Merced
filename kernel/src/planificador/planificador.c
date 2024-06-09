@@ -48,6 +48,8 @@ void inicializar_planificador()
 
    inicializar_recursos(cola_blocked_recursos);
 
+   inicializar_gestor_planificacion();
+
    // ...................................................................
 
    void *(*planificador_corto_plazo)(void *) = NULL;
@@ -97,16 +99,18 @@ void destruir_planificador()
 
 void iniciar_planificacion()
 {
-   // TODO
+   habilitar_planificador();
 }
 
 void detener_planificacion()
 {
-   // TODO
+   deshabilitar_planificador();
 }
 
-// TODO
-void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
+void modificar_grado_multiprogramacion(u_int32_t nuevo_grado)
+{
+   // TODO
+}
 
 void ingresar_proceso(char *ruta_ejecutable)
 {
@@ -169,19 +173,15 @@ static void *crear_proceso()
 {
    while (1)
    {
+      puede_crear_proceso();
       t_pcb *pcb = pop_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
       if (memoria_iniciar_proceso(pcb->pid, pcb->executable_path))
       {
-         // no deberia ser "out of memory",
-         // pero no hay otro tipo de error
-         pasar_a_exit(pcb, OUT_OF_MEMORY);
+         pasar_a_exit(pcb, -1); // no hay motivo de error por no poder iniciar un proceso
          continue;
       }
-
-      // ver si puede planificar o no,
-      // o sea, si esta en pausa o no la planificacion
       sem_wait(&grado_multiprogramacion);
       push_proceso(cola_ready, pcb);
    }
@@ -206,6 +206,8 @@ static void *finalizar_proceso()
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
 {
+   puede_entrar_a_ready();
+
    q_estado *ready = proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
    push_proceso(ready, proceso);
    // log
@@ -219,6 +221,8 @@ static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 
 static void pasar_a_siguiente(t_pcb *pcb)
 {
+   puede_manejar_desalojo();
+
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
@@ -228,7 +232,7 @@ static void pasar_a_siguiente(t_pcb *pcb)
    case IO:
       if (bloquear_para_io(cola_blocked_interfaces, pcb))
          pasar_a_exit(pcb, INVALID_INTERFACE);
-      log_motivo_bloqueo(pcb->pid, INTERFAZ, NULL);
+      log_motivo_bloqueo(pcb->pid, INTERFAZ, pcb->io_request->interface_name);
       break;
    case WAIT:
       manejar_wait(pcb);
@@ -289,6 +293,8 @@ static void *planificar_por_fifo()
 {
    while (1)
    {
+      puede_ejecutar_proceso();
+
       t_pcb *proceso = pop_proceso(cola_ready);
       set_estado_pcb(proceso, EXEC);
       log_cambio_de_estado(proceso->pid, READY, EXEC);
@@ -307,6 +313,8 @@ static void *planificar_por_rr()
 {
    while (1)
    {
+      puede_ejecutar_proceso();
+
       t_pcb *proceso = pop_proceso(cola_ready);
       enviar_pcb_cpu(proceso);
 
@@ -330,6 +338,8 @@ static void *planificar_por_vrr()
 
    while (1)
    {
+      puede_ejecutar_proceso();
+
       q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
       t_pcb *proceso = pop_proceso(ready);
       enviar_pcb_cpu(proceso);
