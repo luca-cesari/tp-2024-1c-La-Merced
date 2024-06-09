@@ -26,8 +26,16 @@ void enviar_kernel_mem_request(int32_t fd_memoria, t_kernel_mem_req *mem_request
    crear_buffer(paquete);
    agregar_a_paquete(paquete, &(mem_request->operacion), sizeof(t_kernel_mem_req));
    agregar_a_paquete(paquete, &(mem_request->pid), sizeof(u_int32_t));
-   agregar_a_paquete(paquete, mem_request->parametros.path, strlen(mem_request->parametros.path) + 1);
-
+   switch (mem_request->operacion)
+   {
+   case INICIAR_PROCESO:
+      agregar_a_paquete(paquete, mem_request->parametros.path, strlen(mem_request->parametros.path) + 1);
+      break;
+   case FINALIZAR_PROCESO:
+      break;
+   default:
+      break;
+   }
    enviar_paquete(paquete, fd_memoria);
    eliminar_paquete(paquete);
 }

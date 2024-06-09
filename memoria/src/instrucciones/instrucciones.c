@@ -66,16 +66,16 @@ void eliminar_proceso(t_pcb *pcb)
     free(proceso);
 }
 
-char *proxima_instruccion(t_pcb *pcb)
+char *proxima_instruccion(u_int32_t pid,int32_t program_counter)
 {
     sem_wait(&hay_proceso_en_lista);
     int es_proceso_buscado(void *elemento)
     {
-        return ((t_proceso_instrucciones *)elemento)->pid == pcb->pid;
+        return ((t_proceso_instrucciones *)elemento)->pid == pid;
     };
     t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
 
-    char *instrucion = (char *)list_get(proceso->instrucciones, pcb->program_counter);
+    char *instrucion = (char *)list_get(proceso->instrucciones, program_counter);
     printf("%s", instrucion);
     sem_post(&hay_proceso_en_lista);
     return instrucion;
