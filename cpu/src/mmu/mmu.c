@@ -1,7 +1,5 @@
 #include "mmu.h"
 
-int tlb_top = 0;
-
 u_int32_t mmu(u_int32_t direccion_logica)
 {
    u_int32_t pid = process_getpid();
