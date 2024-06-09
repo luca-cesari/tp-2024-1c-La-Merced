@@ -121,6 +121,11 @@ void ingresar_proceso(char *ruta_ejecutable)
    push_proceso(cola_new, pcb);
 }
 
+void matar_proceso(u_int32_t pid)
+{
+   // TODO
+}
+
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
 {
    io_queue *cola_io = crear_io_queue(nombre_interfaz, fd_conexion);
@@ -169,7 +174,6 @@ static void *consumir_io(void *cola_io)
    return NULL;
 }
 
-// TODO
 static void *crear_proceso()
 {
    while (1)
@@ -192,15 +196,15 @@ static void *crear_proceso()
 
 static void *finalizar_proceso()
 {
-   // TODO
    while (1)
    {
       t_pcb *pcb = pop_proceso(cola_exit);
-      if (memoria_finalizar_proceso(pcb->pid))
-      {
-         log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
-         destruir_pcb(pcb);
-      }
+      memoria_finalizar_proceso(pcb->pid);
+
+      // alguna operacion de liberacion de recursos
+
+      log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
+      destruir_pcb(pcb);
    }
    return NULL;
 }
@@ -218,6 +222,7 @@ static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 {
    set_motivo_finalizacion(pcb, motivo);
    push_proceso(cola_exit, pcb);
+   sem_post(&grado_multiprogramacion);
 }
 
 static void pasar_a_siguiente(t_pcb *pcb)
@@ -249,7 +254,7 @@ static void pasar_a_siguiente(t_pcb *pcb)
 
 static void manejar_wait(t_pcb *pcb)
 {
-   respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource);
+   respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->pid, pcb->resource);
 
    switch (respuesta)
    {
@@ -272,7 +277,7 @@ static void manejar_wait(t_pcb *pcb)
 
 static void manejar_signal(t_pcb *pcb)
 {
-   respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource);
+   respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->pid, pcb->resource);
 
    switch (respuesta)
    {
@@ -281,7 +286,8 @@ static void manejar_signal(t_pcb *pcb)
       break;
    case RELEASED:
       t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
-      pasar_a_ready_segun_prioridad(proceso);
+      if (proceso != NULL)
+         pasar_a_ready_segun_prioridad(proceso);
       break;
    default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
       break;

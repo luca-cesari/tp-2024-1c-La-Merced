@@ -41,6 +41,22 @@ void push_proceso(q_estado *estado, t_pcb *pcb);
 t_pcb *pop_proceso(q_estado *estado);
 
 /**
+ * @brief Devuelve el primer proceso encolado en el estado dado.
+ *        El puntero retornado nunca será NULL.
+ *
+ * @param estado
+ * @return `t_pcb*`
+ */
+t_pcb *peek_proceso(q_estado *estado);
+
+/**
+ * @brief Remueve el primer proceso encolado en el estado dado.
+ *
+ * @param estado
+ */
+void remover_primer_proceso(q_estado *estado);
+
+/**
  * @brief Indica si hay algún proceso encolado en el estado dado.
  *
  * @param estado
