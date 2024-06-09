@@ -12,6 +12,7 @@
 #include "estado/estado.h"
 #include "blocked/interfaces.h"
 #include "blocked/recursos.h"
+#include "gestor_planificacion.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 

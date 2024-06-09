@@ -73,15 +73,15 @@ static char *state_to_string(state estado)
    }
 }
 
-void log_motivo_bloqueo(u_int32_t pid, motivo_bloqueo motivo, char *recurso)
+void log_motivo_bloqueo(u_int32_t pid, motivo_bloqueo motivo, char *nombre)
 {
    switch (motivo)
    {
    case INTERFAZ:
-      log_info(kernel_logger, "PID: %d - Bloqueado por: INTERFAZ", pid);
+      log_info(kernel_logger, "PID: %d - Bloqueado por Interfaz: %s", pid, nombre);
       return;
    case RECURSO:
-      log_info(kernel_logger, "PID: %d - Bloqueado por: %s", pid, recurso);
+      log_info(kernel_logger, "PID: %d - Bloqueado por Recurso: %s", pid, nombre);
       return;
    default:
       return;

@@ -21,6 +21,7 @@ static void *finalizar_proceso();
 
 static void pasar_a_exit(t_pcb *, motivo_finalizacion);
 static void pasar_a_siguiente(t_pcb *);
+static void pasar_a_ready_segun_prioridad(t_pcb *);
 
 static void manejar_wait(t_pcb *);
 static void manejar_signal(t_pcb *);
@@ -30,8 +31,6 @@ static void *planificar_por_rr();
 static void *planificar_por_vrr();
 
 static void *cronometrar_quantum(void *);
-
-static q_estado *cola_ready_segun_prioridad(t_pcb *);
 
 void inicializar_planificador()
 {
@@ -48,6 +47,8 @@ void inicializar_planificador()
    cola_blocked_recursos = crear_estado_blocked();
 
    inicializar_recursos(cola_blocked_recursos);
+
+   inicializar_gestor_planificacion();
 
    // ...................................................................
 
@@ -87,6 +88,7 @@ void inicializar_planificador()
 void destruir_planificador()
 {
    sem_destroy(&grado_multiprogramacion);
+   destruir_gestor_planificacion();
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
@@ -98,16 +100,18 @@ void destruir_planificador()
 
 void iniciar_planificacion()
 {
-   // TODO
+   habilitar_planificador();
 }
 
 void detener_planificacion()
 {
-   // TODO
+   deshabilitar_planificador();
 }
 
-// TODO
-void modificar_grado_multiprogramacion(u_int32_t nuevo_grado) {}
+void modificar_grado_multiprogramacion(u_int32_t nuevo_grado)
+{
+   // TODO
+}
 
 void ingresar_proceso(char *ruta_ejecutable)
 {
@@ -151,7 +155,7 @@ static void *consumir_io(void *cola_io)
          pasar_a_exit(pcb, INVALID_INTERFACE);
          break;
       case EXECUTED:
-         push_proceso(cola_ready, pcb);
+         pasar_a_ready_segun_prioridad(pcb);
          break;
       case -1: // cuando una interfaz se desconecta
          pasar_a_exit(pcb, INVALID_INTERFACE);
@@ -170,19 +174,15 @@ static void *crear_proceso()
 {
    while (1)
    {
+      puede_crear_proceso();
       t_pcb *pcb = pop_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
       if (memoria_iniciar_proceso(pcb->pid, pcb->executable_path))
       {
-         // no deberia ser "out of memory",
-         // pero no hay otro tipo de error
-         pasar_a_exit(pcb, OUT_OF_MEMORY);
+         pasar_a_exit(pcb, -1); // no hay motivo de error por no poder iniciar un proceso
          continue;
       }
-
-      // ver si puede planificar o no,
-      // o sea, si esta en pausa o no la planificacion
       sem_wait(&grado_multiprogramacion);
       push_proceso(cola_ready, pcb);
    }
@@ -190,15 +190,9 @@ static void *crear_proceso()
    return NULL;
 }
 
-static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
-{
-   set_motivo_finalizacion(pcb, motivo);
-   push_proceso(cola_exit, pcb);
-}
-
-// TODO
 static void *finalizar_proceso()
 {
+   // TODO
    while (1)
    {
       t_pcb *pcb = pop_proceso(cola_exit);
@@ -211,20 +205,35 @@ static void *finalizar_proceso()
    return NULL;
 }
 
+static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
+{
+   puede_entrar_a_ready();
+
+   q_estado *ready = proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
+   push_proceso(ready, proceso);
+   // log
+}
+
+static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
+{
+   set_motivo_finalizacion(pcb, motivo);
+   push_proceso(cola_exit, pcb);
+}
+
 static void pasar_a_siguiente(t_pcb *pcb)
 {
-   q_estado *ready = cola_ready_segun_prioridad(pcb);
+   puede_manejar_desalojo();
 
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
       log_fin_de_quantum(pcb->pid);
-      push_proceso(ready, pcb);
+      pasar_a_ready_segun_prioridad(pcb);
       break;
    case IO:
       if (bloquear_para_io(cola_blocked_interfaces, pcb))
          pasar_a_exit(pcb, INVALID_INTERFACE);
-      log_motivo_bloqueo(pcb->pid, INTERFAZ, NULL);
+      log_motivo_bloqueo(pcb->pid, INTERFAZ, pcb->io_request->interface_name);
       break;
    case WAIT:
       manejar_wait(pcb);
@@ -241,7 +250,6 @@ static void pasar_a_siguiente(t_pcb *pcb)
 static void manejar_wait(t_pcb *pcb)
 {
    respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource);
-   q_estado *ready = cola_ready_segun_prioridad(pcb);
 
    switch (respuesta)
    {
@@ -253,7 +261,7 @@ static void manejar_wait(t_pcb *pcb)
       log_motivo_bloqueo(pcb->pid, RECURSO, pcb->resource);
       break;
    case ASSIGNED:
-      push_proceso(ready, pcb);
+      pasar_a_ready_segun_prioridad(pcb);
       break;
    default: // no debería llegar aca nunca (caso RELEASED)
       break;
@@ -265,7 +273,6 @@ static void manejar_wait(t_pcb *pcb)
 static void manejar_signal(t_pcb *pcb)
 {
    respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource);
-   q_estado *ready = cola_ready_segun_prioridad(pcb);
 
    switch (respuesta)
    {
@@ -274,7 +281,7 @@ static void manejar_signal(t_pcb *pcb)
       break;
    case RELEASED:
       t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
-      push_proceso(ready, proceso);
+      pasar_a_ready_segun_prioridad(proceso);
       break;
    default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
       break;
@@ -287,6 +294,8 @@ static void *planificar_por_fifo()
 {
    while (1)
    {
+      puede_ejecutar_proceso();
+
       t_pcb *proceso = pop_proceso(cola_ready);
       set_estado_pcb(proceso, EXEC);
       log_cambio_de_estado(proceso->pid, READY, EXEC);
@@ -305,6 +314,8 @@ static void *planificar_por_rr()
 {
    while (1)
    {
+      puede_ejecutar_proceso();
+
       t_pcb *proceso = pop_proceso(cola_ready);
       enviar_pcb_cpu(proceso);
 
@@ -328,6 +339,8 @@ static void *planificar_por_vrr()
 
    while (1)
    {
+      puede_ejecutar_proceso();
+
       q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
       t_pcb *proceso = pop_proceso(ready);
       enviar_pcb_cpu(proceso);
@@ -376,9 +389,4 @@ static void *cronometrar_quantum(void *milisegundos)
 
    enviar_interrupcion();
    return NULL;
-}
-
-static q_estado *cola_ready_segun_prioridad(t_pcb *proceso)
-{
-   return proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
 }

@@ -62,21 +62,21 @@ void ejecutar_comando(char *operacion, char *argumento)
 {
    if (strcmp(operacion, INICIAR_PLANIFICACION) == 0)
    {
-      printf("Iniciar planificacion \n");
+      printf("Iniciar Planificacion \n");
       iniciar_planificacion();
       return;
    }
 
    if (strcmp(operacion, DETENER_PLANIFICACION) == 0)
    {
-      printf("Detener planificacion \n");
+      printf("Detener Planificacion \n");
       detener_planificacion();
       return;
    }
 
    if (strcmp(operacion, PROCESO_ESTADO) == 0)
    {
-      printf("Estado de proceso \n");
+      printf("Estado de Proceso \n");
       return;
    }
 
@@ -86,24 +86,24 @@ void ejecutar_comando(char *operacion, char *argumento)
 
    if (strcmp(operacion, EJECUTAR_SCRIPT) == 0)
    {
-      printf("Ejecutar script \n");
-      printf("Path del script: %s \n", argumento);
+      printf("Ejecutar Script \n");
+      printf("Path del Script: %s \n", argumento);
       leer_script(argumento);
       return;
    }
 
    if (strcmp(operacion, INICIAR_PROCESO) == 0)
    {
-      printf("Iniciar proceso \n");
-      printf("Path del ejecutable: %s \n", argumento);
+      printf("Iniciar Proceso \n");
+      printf("Path del Ejecutable: %s \n", argumento);
       ingresar_proceso(argumento);
       return;
    }
 
    if (strcmp(operacion, FINALIZAR_PROCESO) == 0)
    {
-      printf("Finalizar proceso \n");
-      printf("PID del proceso: %s \n", argumento);
+      printf("Finalizar Proceso \n");
+      printf("PID del Proceso: %s \n", argumento);
       // finalizar_proceso(atoi(argumento));
       return;
    }
