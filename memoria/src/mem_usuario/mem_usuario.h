@@ -78,6 +78,8 @@ u_int32_t obtener_numero_pagina_siguiente(u_int32_t pid, u_int32_t frame);
 
 void destruir_memoria_usuario();
 
+t_proceso_y_tabla *obtener_tabla_segun_proceso(u_int32_t pid);
+
 u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag);
 
 #endif // MEM_USUARIO_H

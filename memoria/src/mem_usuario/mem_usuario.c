@@ -46,7 +46,8 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
 
 void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
 {
-    t_proceso_y_tabla *proceso_y_tabla = list_get(lista_tablas, pid);
+
+    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
     u_int32_t tamanio_actual = list_size(proceso_y_tabla->tabla_paginas) * get_tamanio_pagina();
     u_int32_t tamanio_nuevo = tamanio;
 
@@ -76,9 +77,6 @@ void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t 
         {
             u_int32_t frame = get_frame_libre();
             modificar_bitmap(frame, OCUPADO);
-            // t_fila_tabla *fila_tabla = malloc(sizeof(t_fila_tabla));
-            //  fila_tabla->nro_pagina = tamanio_actual / get_tamanio_pagina() + i;
-            // fila_tabla->nro_frame = frame;
             u_int32_t *nro_frame = malloc(sizeof(u_int32_t));
             list_add(proceso_y_tabla->tabla_paginas, nro_frame);
         }
@@ -92,11 +90,9 @@ void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t 
 
     for (u_int32_t i = 0; i < cantidad_frames_a_liberar; i++)
     {
-        // t_fila_tabla *fila_tabla = list_get(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
         u_int32_t *nro_frame = list_get(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
         modificar_bitmap(*nro_frame, LIBRE);
         list_remove(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
-        // free(fila_tabla);
     }
 }
 
@@ -151,14 +147,14 @@ void escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, void *b
     else
     {
         // LOGICA PARA SEGUIR ESCRIBIENDO
-        u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
+        // u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
         // LOGICA PARA DEVOLVER A CPU EL NUMERO DE PAGINA SIGUIENTE
     }
 }
 
 u_int32_t obtener_numero_pagina_siguiente(u_int32_t pid, u_int32_t frame)
 {
-    t_proceso_y_tabla *proceso_y_tabla = list_get(lista_tablas, pid);
+    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
     u_int32_t nro_pagina_actual;
 
     t_list_iterator *iterador = list_iterator_create(proceso_y_tabla->tabla_paginas);
@@ -198,7 +194,7 @@ void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t t
     else
     {
         // LOGICA PARA SEGUIR LEYENDO
-        u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
+        // u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
         // LOGICA PARA DEVOLVER A CPU EL NUMERO DE PAGINA SIGUIENTE
     }
 }
@@ -209,14 +205,20 @@ void destruir_memoria_usuario()
     free(bitmap);
 }
 
-u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
+t_proceso_y_tabla *obtener_tabla_segun_proceso(u_int32_t pid)
 {
     int es_tabla_buscada(void *elemento)
     {
         t_proceso_y_tabla *tabla = (t_proceso_y_tabla *)elemento;
         return tabla->pid == pid;
     };
-    t_proceso_y_tabla *proceso_tabla = list_find(lista_tablas, (void *)es_tabla_buscada);
+    return list_find(lista_tablas, (void *)es_tabla_buscada);
+}
+
+u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
+{
+
+    t_proceso_y_tabla *proceso_tabla = obtener_tabla_segun_proceso(pid);
     u_int32_t *valor = (u_int32_t *)list_get(proceso_tabla->tabla_paginas, nro_pag);
     if (valor == NULL)
     {
