@@ -41,9 +41,9 @@ void log_escritura_lectura_memoria(u_int32_t pid, accion accion, u_int32_t direc
 {
    switch (accion)
    {
-   case LEER:
+   case LEER1:
       log_info(cpu_logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", pid, direccion_fisica, valor);
-   case ESCRIBIR:
+   case ESCRIBIR1:
       log_info(cpu_logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", pid, direccion_fisica, valor);
       return;
    default:
