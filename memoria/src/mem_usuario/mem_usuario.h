@@ -72,4 +72,6 @@ u_int32_t get_cantidad_frames_disponibles();
 
 void destruir_memoria_usuario();
 
+u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag);
+
 #endif // MEM_USUARIO_H

@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
+#include <mem_request/cpu.h>
 
 #include "instrucciones.h"
 #include "conexion/memoria.h"

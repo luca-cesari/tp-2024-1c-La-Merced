@@ -70,7 +70,7 @@ void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
 
-    while (1) 
+    while (1)
     {
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
         switch (mem_request->operacion)
@@ -83,7 +83,8 @@ void escuchar_cpu(int32_t fd_cpu)
 
         case OBTENER_MARCO:
             printf("OBTENER_MARCO \n");
-            // ...
+            u_int32_t marco = obtener_marco(mem_request->pid, mem_request->parametros.nro_pag);
+            enviar_senial(marco, fd_cpu); // ver si es con senial por tema del unsigned
             break;
 
         default:

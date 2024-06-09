@@ -9,18 +9,20 @@ typedef enum
    OBTENER_MARCO,
 } cpu_req_operation;
 
+typedef union
+{
+   int32_t program_counter; // Presente solo para FETCH_INSTRUCCION
+   u_int32_t nro_pag;       // Presente solo para OBTENER_MARCO
+} parametros;
 typedef struct
 {
    cpu_req_operation operacion;
    u_int32_t pid;
-   union
-   {
-      int32_t program_counter; // Presente solo para FETCH_INSTRUCCION
-      u_int32_t nro_pag;       // Presente solo para OBTENER_MARCO
-   } parametros;
+   parametros parametros;
+
 } t_cpu_mem_req;
 
-t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, int32_t program_counter, u_int32_t pid, u_int32_t nro_pag);
+t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid, parametros parametro);
 void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request);
 t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu);
 void destruir_cpu_mem_request(t_cpu_mem_req *mem_request);

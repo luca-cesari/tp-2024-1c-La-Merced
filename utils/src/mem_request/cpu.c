@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, int32_t program_counter, u_int32_t pid, u_int32_t nro_pag)
+t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid, parametros parametro)
 {
    t_cpu_mem_req *mem_request = malloc(sizeof(t_cpu_mem_req));
    mem_request->operacion = operacion;
@@ -8,10 +8,10 @@ t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, int32_t progra
    switch (operacion)
    {
    case FETCH_INSTRUCCION:
-      mem_request->parametros.program_counter = program_counter;
+      mem_request->parametros.program_counter = parametro.program_counter;
       break;
    case OBTENER_MARCO:
-      mem_request->parametros.nro_pag = nro_pag;
+      mem_request->parametros.nro_pag = parametro.nro_pag;
       break;
    default:
       break;

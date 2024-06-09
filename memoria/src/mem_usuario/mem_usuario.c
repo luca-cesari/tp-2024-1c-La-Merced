@@ -130,3 +130,20 @@ void destruir_memoria_usuario()
     free(memoria_usuario);
     free(bitmap);
 }
+
+u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
+{
+    int es_tabla_buscada(void *elemento)
+    {
+        t_proceso_y_tabla *tabla = (t_proceso_y_tabla *)elemento;
+        return tabla->pid == pid;
+    };
+    t_proceso_y_tabla *proceso_tabla = list_find(lista_tablas, (void *)es_tabla_buscada);
+    u_int32_t *valor = (u_int32_t *)list_get(proceso_tabla->tabla_paginas, nro_pag);
+    if (valor == NULL)
+    {
+        // ES NECESARIO SIGNO DE PREGUNTA
+        printf("No tiene marco asignado");
+    }
+    return *valor;
+}
