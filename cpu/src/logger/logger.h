@@ -16,19 +16,18 @@
 #define IO_GEN_SLEEP "IO_GEN_SLEEP"
 typedef enum
 {
-   LEER1,
-   ESCRIBIR1
+   READ,
+   WRITE
 } accion;
 
 void iniciar_logger(void);
 void destruir_logger(void);
 
-void log_fetch_instruccion(u_int32_t , u_int32_t );
-void log_instruccion_ejecutada(u_int32_t pid, char* instruccion, char* parametros);
-void log_tlb_hit(u_int32_t , int );
-void log_tlb_miss(u_int32_t , int ); //ver si se abstrae con el hit
-void log_obtener_marco(u_int32_t , int , int );
-void log_escritura_lectura_memoria(u_int32_t , accion , u_int32_t , char* ); // ver si la implementaicon de leer esbribir queda asi
-
+void log_fetch_instruccion(u_int32_t, u_int32_t);
+void log_instruccion_ejecutada(u_int32_t pid, char *instruccion, char *parametros);
+void log_tlb_hit(u_int32_t, int);
+void log_tlb_miss(u_int32_t, int); // ver si se abstrae con el hit
+void log_obtener_marco(u_int32_t, int, int);
+void log_escritura_lectura_memoria(u_int32_t, accion, u_int32_t, char *); // ver si la implementaicon de leer esbribir queda asi
 
 #endif // KERNEL_LOGGER_H
