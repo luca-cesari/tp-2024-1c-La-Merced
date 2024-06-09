@@ -44,6 +44,23 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
     list_add(lista_tablas, proceso_y_tabla); // Agrego la tabla de paginas asociada a un PID a la lista de tablas
 }
 
+void destruir_tabla_de_paginas_para_proceso(u_int32_t pid)
+{
+    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
+
+    t_list_iterator *iterador = list_iterator_create(proceso_y_tabla->tabla_paginas);
+    while (list_iterator_has_next(iterador))
+    {
+        u_int32_t *nro_frame = (u_int32_t *)list_iterator_next(iterador);
+        modificar_bitmap(*nro_frame, LIBRE);
+    }
+
+    list_destroy_and_destroy_elements(proceso_y_tabla->tabla_paginas, free);
+
+    list_iterator_destroy(iterador);
+    free(proceso_y_tabla);
+}
+
 void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
 {
 
