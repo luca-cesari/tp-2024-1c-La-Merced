@@ -345,15 +345,23 @@ static void *planificar_por_fifo()
       puede_ejecutar_proceso();
 
       t_pcb *proceso = pop_proceso(cola_ready);
-      set_estado_pcb(proceso, EXEC);
-      log_cambio_de_estado(proceso->pid, READY, EXEC);
+      push_proceso(cola_exec, proceso);
 
+      proceso = peek_proceso(cola_exec);
       enviar_pcb_cpu(proceso);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
+      // revisar función, capaz no hay que asignar todo
+      // se tendría que evitar modificar el estado del proceso
+      // si durante la ejecución se interrumpe por usuario, se
+      // seteará el motivo de desalojo y el estado; por lo que
+      // no se tenría que sobreescribir esos campos.
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
-      pasar_a_siguiente(proceso);
+
+      proceso = remove_proceso(cola_exec, proceso->pid);
+      if (proceso != NULL)
+         pasar_a_siguiente(proceso);
    }
 
    return NULL;
@@ -366,6 +374,9 @@ static void *planificar_por_rr()
       puede_ejecutar_proceso();
 
       t_pcb *proceso = pop_proceso(cola_ready);
+      push_proceso(cola_exec, proceso);
+
+      proceso = peek_proceso(cola_exec);
       enviar_pcb_cpu(proceso);
 
       pthread_t rutina_cronometro;
@@ -377,7 +388,10 @@ static void *planificar_por_rr()
 
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
-      pasar_a_siguiente(proceso);
+
+      proceso = remove_proceso(cola_exec, proceso->pid);
+      if (proceso != NULL)
+         pasar_a_siguiente(proceso);
    }
 
    return NULL;
@@ -393,6 +407,9 @@ static void *planificar_por_vrr()
 
       q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
       t_pcb *proceso = pop_proceso(ready);
+      push_proceso(cola_exec, proceso);
+
+      proceso = peek_proceso(cola_exec);
       enviar_pcb_cpu(proceso);
 
       temporal = temporal_create();
@@ -420,7 +437,9 @@ static void *planificar_por_vrr()
       int8_t prioridad = transcurrido < quantum ? 1 : 0;
       set_prioridad(proceso, prioridad);
 
-      pasar_a_siguiente(proceso);
+      proceso = remove_proceso(cola_exec, proceso->pid);
+      if (proceso != NULL)
+         pasar_a_siguiente(proceso);
    }
 
    return NULL;
