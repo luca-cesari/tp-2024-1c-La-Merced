@@ -17,9 +17,9 @@ int8_t conectar_con_memoria()
    return 0;
 }
 
-void enviar_pcb_memoria(t_pcb *pcb)
+void enviar_mem_request(t_cpu_mem_req *mem_request)
 {
-   enviar_pcb(fd_memoria, pcb);
+   enviar_cpu_mem_request(fd_memoria, mem_request);
 }
 
 char *recibir_instruccion()
@@ -27,6 +27,16 @@ char *recibir_instruccion()
    char *instruccion = recibir_mensaje(fd_memoria);
 
    return instruccion;
+}
+
+u_int32_t recibir_marco()
+{
+   return recibir_senial(fd_memoria);
+}
+
+u_int32_t recibir_tamanio_pagina()
+{
+   return recibir_senial(fd_memoria);
 }
 
 void liberar_conexion_memoria()

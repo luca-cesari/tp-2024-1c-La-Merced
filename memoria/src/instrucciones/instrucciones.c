@@ -1,111 +1,82 @@
 #include "instrucciones.h"
 
 t_list *lista_procesos;
+// sem_t hay_proceso_en_lista;
 
 void inicializar_memoria_instrucciones()
 {
     /*Inicializo la lista de procesos*/
     lista_procesos = list_create();
+    // sem_init(&hay_proceso_en_lista, 0, 0);
 }
 
-/*Para cargar un proceso a memoria tengo que agregarlo a la lista de procesos,
-esto implica que debo añadir a la lista el pid, path y una lista de instrucciones*/
 
 void cargar_proceso_a_memoria(int32_t pid, char *path)
 {
-    /*Para obtener la lista de instrucciones primero debo usar el path para
-    leer las instrucciones que hay en un archivo de pseudocodigo*/
+    
     t_list *instrucciones = list_create();
-    printf("%s", path);
+
     instrucciones = leer_instrucciones(path);
-    /*Una vez que tengo la lista de instrucciones, puedo crear un proceso de instrucciones
-    y añadirlo a la lista de procesos*/
+    
     t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
     proceso->pid = pid;
     proceso->path = strdup(path);
     proceso->instrucciones = instrucciones;
     list_add(lista_procesos, proceso);
+    // sem_post(&hay_proceso_en_lista);
 }
 
 t_list *leer_instrucciones(char *path)
 {
-    /*Un ejemplo de las instrucciones que pueden venir en el archivo son las siguientes:
-    SET AX 1
-    SET BX 1
-    SET PC 5
-    SUM AX BX
-    Simplemente tengo que guardarlas como strings en la lista de instrucciones a medida
-    que las voy leyendo. Cada instruccion es una linea nueva. La CPU luego se encargará de interpretar
-    estos strings*/
+    
     FILE *archivo = fopen(path, "r");
     if (archivo == NULL)
     {
         perror("Error al abrir el archivo");
         return NULL;
     }
+
     char *linea = NULL;
     size_t len = 0;
     ssize_t read;
     t_list *instrucciones = list_create();
 
-    int32_t numero_instruccion = 1; // inicializo el numero en 1
-
     while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        t_instruccion *instruccion = malloc(sizeof(t_instruccion));
-        instruccion->num_instruccion = numero_instruccion;
-        instruccion->instruccion = strdup(linea);
-        list_add(instrucciones, instruccion);
-        numero_instruccion++;
+        list_add(instrucciones, strdup(linea));
     }
-    fclose(archivo);
+
     free(linea);
+    fclose(archivo);
     return instrucciones;
 }
 
 void eliminar_proceso(t_pcb *pcb)
 {
-    // busco el proceso en la lista
-    for (int i = 0; i < list_size(lista_procesos); i++)
+    sem_wait(&hay_proceso_en_lista);
+    int es_proceso_buscado(void *elemento)
     {
-        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
-        if (proceso->pid == pcb->pid)
-        {
-            free(proceso->path);
-            for (int j = 0; j < list_size(proceso->instrucciones); j++)
-            {
-                char *instruccion = list_get(proceso->instrucciones, j);
-                free(instruccion);
-            }
-            list_destroy(proceso->instrucciones);
-            list_remove(lista_procesos, i);
-            free(proceso);
-            break;
-        }
-    }
+        return ((t_proceso_instrucciones *)elemento)->pid == pcb->pid;
+    };
+    t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
+
+    list_remove_element(lista_procesos, proceso);
+    free(proceso->path);
+    list_destroy_and_destroy_elements(proceso->instrucciones, free);
+    free(proceso);
 }
 
-char *proxima_instruccion(t_pcb *pcb)
+char *proxima_instruccion(u_int32_t pid,int32_t program_counter)
 {
-    for (int i = 0; i < list_size(lista_procesos); i++)
+    // sem_wait(&hay_proceso_en_lista);
+    int es_proceso_buscado(void *elemento)
     {
-        // busca el proceso en la lista de procesos por pid
-        t_proceso_instrucciones *proceso = list_get(lista_procesos, i);
-        if (proceso->pid == pcb->pid)
-        {
+        return ((t_proceso_instrucciones *)elemento)->pid == pid;
+    };
+    t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
 
-            // busco la instruccion con el pc
-            for (int j = 0; j < list_size(proceso->instrucciones); j++)
-            {
-
-                t_instruccion *instruccion = list_get(proceso->instrucciones, j);
-
-                if (instruccion->num_instruccion == pcb->program_counter)
-                {
-                    return instruccion->instruccion;
-                }
-            }
-        }
-    }
-    return NULL;
+    char *instrucion = (char *)list_get(proceso->instrucciones, program_counter);
+    printf("%s", instrucion);
+    sem_post(&hay_proceso_en_lista);
+    return instrucion;
 }

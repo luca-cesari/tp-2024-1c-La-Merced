@@ -32,15 +32,17 @@ void leer_script(char *ruta_script)
 {
    FILE *script;
    char *linea = NULL;
+   size_t len = 0;
+   ssize_t read;
 
    script = fopen(ruta_script, "r");
    if (script == NULL)
    {
-      printf("No se pudo abrir el script \n");
+      perror("Error al abrir el script");
       return;
    }
 
-   while (getline(&linea, NULL, script) != -1)
+   while ((read = getline(&linea, &len, script)) != -1)
    {
       char **vec_comando = string_split(linea, " ");
       char *operacion = vec_comando[0];
@@ -48,7 +50,7 @@ void leer_script(char *ruta_script)
 
       ejecutar_comando(operacion, argumento);
 
-      free(linea); // ni idea si hace falta
+      // free(linea); // ni idea si hace falta
       string_array_destroy(vec_comando);
    }
 
@@ -60,21 +62,21 @@ void ejecutar_comando(char *operacion, char *argumento)
 {
    if (strcmp(operacion, INICIAR_PLANIFICACION) == 0)
    {
-      printf("Iniciar planificacion \n");
+      printf("Iniciar Planificacion \n");
       iniciar_planificacion();
       return;
    }
 
    if (strcmp(operacion, DETENER_PLANIFICACION) == 0)
    {
-      printf("Detener planificacion \n");
+      printf("Detener Planificacion \n");
       detener_planificacion();
       return;
    }
 
    if (strcmp(operacion, PROCESO_ESTADO) == 0)
    {
-      printf("Estado de proceso \n");
+      printf("Estado de Proceso \n");
       return;
    }
 
@@ -84,24 +86,24 @@ void ejecutar_comando(char *operacion, char *argumento)
 
    if (strcmp(operacion, EJECUTAR_SCRIPT) == 0)
    {
-      printf("Ejecutar script \n");
-      printf("Path del script: %s \n", argumento);
+      printf("Ejecutar Script \n");
+      printf("Path del Script: %s \n", argumento);
       leer_script(argumento);
       return;
    }
 
    if (strcmp(operacion, INICIAR_PROCESO) == 0)
    {
-      printf("Iniciar proceso \n");
-      printf("Path del ejecutable: %s \n", argumento);
-      ingresar_proceso(argumento);
+      printf("Iniciar Proceso \n");
+      printf("Path del Ejecutable: %s \n", argumento);
+      crear_proceso(argumento);
       return;
    }
 
    if (strcmp(operacion, FINALIZAR_PROCESO) == 0)
    {
-      printf("Finalizar proceso \n");
-      printf("PID del proceso: %s \n", argumento);
+      printf("Finalizar Proceso \n");
+      printf("PID del Proceso: %s \n", argumento);
       // finalizar_proceso(atoi(argumento));
       return;
    }

@@ -1,26 +1,16 @@
 #include "servidor.h"
 
+static void retardo_respuesta(void);
+
 void iniciar_servidor()
 {
-
     char *puerto_escucha = get_puerto_escucha();
+    int32_t fd_escucha = crear_servidor(puerto_escucha);
 
-    int32_t *fd_escucha = malloc(sizeof(int32_t));
-    *fd_escucha = crear_servidor(puerto_escucha);
-
-    pthread_t hilo_escucha;
-    pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, fd_escucha);
-    pthread_join(hilo_escucha, NULL); // Esto lo cambie a join para que el hilo sea bloqueante
-}
-
-void *escuchar_conexiones(void *fd_escucha)
-{
     while (1)
     {
-        esperar_cliente(*((int32_t *)fd_escucha), &atender_cliente);
+        esperar_cliente(fd_escucha, &atender_cliente);
     }
-
-    return NULL;
 }
 
 void *atender_cliente(void *fd_ptr)
@@ -53,35 +43,84 @@ void escuchar_kernel(int32_t fd_kernel)
 {
     printf("Kernel conectado \n");
 
-    t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
-
-    switch (mem_request->tipo)
+    while (1)
     {
-    case INICIAR_PROCESO:
-        printf("INICIAR_PROCESO \n");
-        cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
-        break;
+        t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
 
-    case FINALIZAR_PROCESO:
-        printf("FINALIZAR_PROCESO \n");
-        break;
+        // Dado que es indistinto el momento en que se aplica el retardo,
+        // lo aplico antes de procesar la solicitud
+        retardo_respuesta();
+        switch (mem_request->operacion)
+        {
+        case INICIAR_PROCESO:
+            printf("INICIAR_PROCESO \n");
+            cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
+            crear_tabla_de_paginas_para_proceso(mem_request->pid);
+            break;
 
-    default:
-        printf("Error de instruccion \n");
-        break;
+        case FINALIZAR_PROCESO:
+            printf("FINALIZAR_PROCESO \n");
+            // Creo que falta sacar el proceso de la memoria de instrucciones
+            destruir_tabla_de_paginas_para_proceso(mem_request->pid);
+            break;
+
+        default:
+            printf("Error de instruccion \n");
+            // ...
+            break;
+        }
     }
 }
 
 void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
-    recibir_mensaje(fd_cpu);
 
-    recibir_mensaje(fd_cpu); // block
+    while (1)
+    {
+        t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        retardo_respuesta();
+        switch (mem_request->operacion)
+        {
+        case FETCH_INSTRUCCION:
+            printf("FETCH_INSTRUCCION \n");
+            char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
+            u_int32_t tamanio_pagina = get_tamanio_pagina();
+            enviar_senial(tamanio_pagina, fd_cpu);
+            enviar_mensaje(instruccion, fd_cpu);
+            break;
+
+        case OBTENER_MARCO:
+            printf("OBTENER_MARCO \n");
+            u_int32_t marco = obtener_marco(mem_request->pid, mem_request->parametros.nro_pag);
+            enviar_senial(marco, fd_cpu); // ver si es con senial por tema del unsigned
+            break;
+
+        case LEER:
+            printf("LEER \n");
+            //...
+            break;
+
+        case ESCRIBIR:
+            printf("ESCRIBIR \n");
+            //...
+            break;
+
+        default:
+            printf("Error de instruccion \n");
+            // ...
+            break;
+        }
+    }
 }
 
 void escuchar_interfaz_es(int32_t fd_es)
 {
     printf("Interfaz E/S conectada \n");
     recibir_mensaje(fd_es);
+}
+
+static void retardo_respuesta()
+{
+    usleep(get_retardo() * 1000);
 }

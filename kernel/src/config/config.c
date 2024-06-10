@@ -1,7 +1,6 @@
 #include "config.h"
 
 t_config *kernel_config;
-t_dictionary *recursos;
 
 void iniciar_config(void)
 {
@@ -66,7 +65,8 @@ t_dictionary *get_recursos(void)
    {
       u_int32_t *valor_instancia = malloc(sizeof(u_int32_t));
       *valor_instancia = atoi(instancias[i]);
-      dictionary_put(recursos, nombres[i], valor_instancia);
+
+      dictionary_put(recursos, strdup(nombres[i]), valor_instancia);
    }
 
    return recursos;
@@ -79,8 +79,5 @@ u_int32_t get_grado_multiprogramacion(void)
 
 void destruir_config(void)
 {
-   if (recursos != NULL)
-      dictionary_destroy(recursos);
-
    config_destroy(kernel_config);
 }

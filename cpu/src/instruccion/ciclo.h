@@ -10,30 +10,26 @@
 #include <errno.h>
 #include <limits.h>
 #include <commons/collections/dictionary.h>
+#include <mem_request/cpu.h>
 
 #include "instrucciones.h"
 #include "conexion/memoria.h"
-#include "estructuras.h"
 #include "logger/logger.h"
 #include "interrupcion/interrupcion.h"
 
 char *fetch();
-void (*decode(char *char_instruccion))(Parametros);
-void execute(void (*instruccion)(Parametros), char *char_instruccion);
+void (*decode(char *char_instruccion))(char **array);
+void execute(void (*instruccion)(char **array), char *char_instruccion);
 int check_interrupt();
 int check_desalojo();
 void *ciclo_instruccion(t_pcb *pcb_kernel);
 
 /// FUNCIONES DECODE ////////////
 
-char **instruccion_parametros(char *char_instruccion);
-int es_numero(char *parametro);
-int char_a_numero(char *parametro);
-Parametros obtener_parametros(char **parametros);
-Parametro buscar_operando(char *parametro);
-void set_diccionario_instrucciones(t_dictionary *);
-void set_diccionario_registros(t_dictionary *);
+void inicializar_diccionario_instrucciones();
+
+//// FUNCIONES EXECUTE////////
+char **eliminar_primer_elemento(char **array);
 void aumentar_program_counter();
-void inicializar_diccionarios_inst_reg();
 
 #endif // CICLO_H

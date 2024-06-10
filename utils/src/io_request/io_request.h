@@ -6,7 +6,7 @@
 typedef struct
 {
    u_int32_t pid;
-   char *inteface_name;
+   char *interface_name;
    char *instruction;
    char *arguments; // esta pensado como un solo string con los argumentos separados por espacios (si es que hay mas de uno)
 } t_io_request;
@@ -20,6 +20,7 @@ typedef enum
 
 t_io_request *crear_io_request(u_int32_t pid, char *nombre_interfaz, char *instruccion, char *argumentos);
 t_packet *serializar_io_request(t_io_request *io_request);
+void vaciar_io_request(t_io_request *io_request);
 void print_io_request(t_io_request *io_request);
 void destruir_io_request(t_io_request *io_request);
 

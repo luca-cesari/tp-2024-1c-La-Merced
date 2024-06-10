@@ -112,7 +112,7 @@ t_list *recibir_paquete(int32_t fd_conexion)
 
    buffer = recibir_buffer(&buffer_size, fd_conexion);
 
-   printf("tamanio buffer %d\n", buffer_size);
+   // printf("tamanio buffer %d\n", buffer_size);
 
    while (offset < buffer_size)
    {
@@ -130,7 +130,7 @@ t_list *recibir_paquete(int32_t fd_conexion)
 
 void enviar_senial(int32_t signal, int32_t fd_conexion)
 {
-   op_code code = SIGNAL;
+   op_code code = NUMBER;
    void *buffer = malloc(sizeof(int32_t) * 2);
 
    memcpy(buffer, &code, sizeof(int32_t));
@@ -142,8 +142,8 @@ void enviar_senial(int32_t signal, int32_t fd_conexion)
 
 int32_t recibir_senial(int32_t fd_conexion)
 {
-   if (recibir_operacion(fd_conexion) != SIGNAL)
-      return -5;
+   if (recibir_operacion(fd_conexion) != NUMBER)
+      return -1;
 
    int32_t signal;
    recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
