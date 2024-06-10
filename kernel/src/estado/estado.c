@@ -34,7 +34,9 @@ t_pcb *pop_proceso(q_estado *estado)
 t_pcb *peek_proceso(q_estado *estado)
 {
    sem_wait(estado->hay_proceso);
-   return (t_pcb *)mlist_peek(estado->lista);
+   t_pcb *peeked = (t_pcb *)mlist_peek(estado->lista);
+   sem_post(estado->hay_proceso);
+   return peeked;
 }
 
 void remover_primer_proceso(q_estado *estado)

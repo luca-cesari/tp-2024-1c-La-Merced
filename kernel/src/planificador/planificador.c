@@ -8,6 +8,7 @@ sem_t grado_multiprogramacion;
 q_estado *cola_new;
 q_estado *cola_ready;
 q_estado *cola_ready_prioridad;
+q_estado *cola_exec;
 q_estado *cola_exit;
 
 q_blocked *cola_blocked_interfaces;
@@ -43,6 +44,7 @@ void inicializar_planificador()
    cola_new = crear_estado(NEW);
    cola_ready = crear_estado(READY);
    cola_ready_prioridad = crear_estado(READY);
+   cola_exec = crear_estado(EXEC);
    cola_exit = crear_estado(EXIT);
    cola_blocked_interfaces = crear_estado_blocked();
    cola_blocked_recursos = crear_estado_blocked();
@@ -94,6 +96,7 @@ void destruir_planificador()
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
    destruir_estado(cola_ready_prioridad);
+   destruir_estado(cola_exec);
    destruir_estado(cola_exit);
    destruir_estado_blocked(cola_blocked_interfaces, &destruir_io_queue);
    destruir_estado_blocked(cola_blocked_recursos, &destruir_resource_queue);
