@@ -27,12 +27,11 @@ int8_t memoria_iniciar_proceso(u_int32_t pid, char *path)
    enviar_kernel_mem_request(fd_memoria, mem_request);
    pthread_mutex_unlock(&mutex_memoria);
 
-   // pthread_mutex_lock(&mutex_memoria);
-   // int32_t respuesta = recibir_senial(fd_memoria);
-   // pthread_mutex_unlock(&mutex_memoria);
+   pthread_mutex_lock(&mutex_memoria);
+   int32_t respuesta = recibir_senial(fd_memoria);
+   pthread_mutex_unlock(&mutex_memoria);
 
-   // return respuesta;
-   return 0;
+   return respuesta;
 }
 
 void memoria_finalizar_proceso(u_int32_t pid)
