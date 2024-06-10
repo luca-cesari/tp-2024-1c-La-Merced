@@ -26,7 +26,7 @@ void crear_instrucciones()
     dictionary_put(instruccion_funcion, "IO_GEN_SLEEP", &gen_sleep);
 }
 
-void gen_sleep(char *cant_unidad_trabajo)
+void gen_sleep(char *)
 {
     u_int32_t tiempo_en_ms = get_tiempo_unidad_trabajo();
 
