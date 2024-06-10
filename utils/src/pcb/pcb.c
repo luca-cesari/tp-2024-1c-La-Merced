@@ -45,8 +45,6 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->cpu_registers.EBX), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->cpu_registers.ECX), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->cpu_registers.EDX), sizeof(u_int32_t));
-   agregar_a_paquete(paquete, &(pcb->cpu_registers.SI), sizeof(u_int32_t));
-   agregar_a_paquete(paquete, &(pcb->cpu_registers.DI), sizeof(u_int32_t));
 
    agregar_a_paquete(paquete, pcb->executable, strlen(pcb->executable) + 1);
    agregar_a_paquete(paquete, pcb->resource, strlen(pcb->resource) + 1);
@@ -94,9 +92,9 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
 
 
    pcb->io_request = crear_io_request(pcb->pid,
-                                      strdup((char *)list_get(paquete, 16)),
-                                      strdup((char *)list_get(paquete, 17)),
-                                      strdup((char *)list_get(paquete, 18)));
+                                      strdup((char *)list_get(paquete, 14)),
+                                      strdup((char *)list_get(paquete, 15)),
+                                      strdup((char *)list_get(paquete, 16)));
 
 
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 17);
