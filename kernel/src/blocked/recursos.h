@@ -102,4 +102,20 @@ void bloquear_para_recurso(q_blocked *estado, t_pcb *pcb);
  */
 t_pcb *desbloquear_para_recurso(q_blocked *estado, char *nombre_recurso);
 
+/**
+ * @brief Bloquea todas las colas de recursos para que no puedan ser operadas.
+ *        No se puede consumir ni liberar recursos.
+ *
+ * @param estado
+ */
+void bloquear_colas_de_recursos(q_blocked *estado);
+
+/**
+ * @brief Desbloquea todas las colas de recursos para que puedan ser operadas.
+ *        Se puede consumir y liberar recursos.
+ *
+ * @param estado
+ */
+void desbloquear_colas_de_recursos(q_blocked *estado);
+
 #endif // RECURSOS_H

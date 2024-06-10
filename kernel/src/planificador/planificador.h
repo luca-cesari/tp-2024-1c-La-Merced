@@ -12,7 +12,6 @@
 #include "estado/estado.h"
 #include "blocked/interfaces.h"
 #include "blocked/recursos.h"
-#include "gestor_planificacion.h"
 #include "conexion/cpu.h"
 #include "conexion/memoria.h"
 
@@ -60,7 +59,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado);
  *
  * @param ruta_ejecutable Ruta del archivo ejecutable.
  */
-void ingresar_proceso(char *ruta_ejecutable);
+void crear_proceso(char *ruta_ejecutable);
 
 /**
  * @brief Función encargada de pasar un proceso a EXIT,

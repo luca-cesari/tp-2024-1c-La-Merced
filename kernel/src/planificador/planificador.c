@@ -17,7 +17,7 @@ q_blocked *cola_blocked_recursos;
 static void finalizar_proceso_por_desconexion(void *);
 static void *consumir_io(void *);
 
-static void *crear_proceso();
+static void *admitir_proceso();
 static void *finalizar_proceso();
 static void liberar_recursos(t_pcb *);
 
@@ -51,8 +51,6 @@ void inicializar_planificador()
 
    inicializar_recursos(cola_blocked_recursos);
 
-   inicializar_gestor_planificacion();
-
    // ...................................................................
 
    void *(*planificador_corto_plazo)(void *) = NULL;
@@ -73,9 +71,9 @@ void inicializar_planificador()
       return;
    }
 
-   pthread_t rutina_crear_proceso;
-   pthread_create(&rutina_crear_proceso, NULL, &crear_proceso, NULL);
-   pthread_detach(rutina_crear_proceso);
+   pthread_t rutina_admitir_proceso;
+   pthread_create(&rutina_admitir_proceso, NULL, &admitir_proceso, NULL);
+   pthread_detach(rutina_admitir_proceso);
 
    pthread_t rutina_planificacion_corto_plazo;
    pthread_create(&rutina_planificacion_corto_plazo, NULL, planificador_corto_plazo, NULL);
@@ -84,14 +82,11 @@ void inicializar_planificador()
    pthread_t rutina_finalizar_proceso;
    pthread_create(&rutina_finalizar_proceso, NULL, &finalizar_proceso, NULL);
    pthread_detach(rutina_finalizar_proceso);
-
-   iniciar_planificacion();
 }
 
 void destruir_planificador()
 {
    sem_destroy(&grado_multiprogramacion);
-   destruir_gestor_planificacion();
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
@@ -104,12 +99,20 @@ void destruir_planificador()
 
 void iniciar_planificacion()
 {
-   habilitar_planificador();
+   bloquear_estado(cola_exec);
+   bloquear_estado(cola_ready_prioridad);
+   bloquear_estado(cola_ready);
+   bloquear_colas_io(cola_blocked_interfaces);
+   bloquear_colas_de_recursos(cola_blocked_recursos);
 }
 
 void detener_planificacion()
 {
-   deshabilitar_planificador();
+   desbloquear_colas_de_recursos(cola_blocked_recursos);
+   desbloquear_colas_io(cola_blocked_interfaces);
+   desbloquear_estado(cola_ready);
+   desbloquear_estado(cola_ready_prioridad);
+   desbloquear_estado(cola_exec);
 }
 
 void modificar_grado_multiprogramacion(u_int32_t nuevo_grado)
@@ -117,7 +120,7 @@ void modificar_grado_multiprogramacion(u_int32_t nuevo_grado)
    // TODO
 }
 
-void ingresar_proceso(char *ruta_ejecutable)
+void crear_proceso(char *ruta_ejecutable)
 {
    t_pcb *pcb = crear_pcb(pid_count++, ruta_ejecutable);
    set_quantum_pcb(pcb, quantum);
@@ -183,11 +186,10 @@ static void *consumir_io(void *cola_io)
    return NULL;
 }
 
-static void *crear_proceso()
+static void *admitir_proceso()
 {
    while (1)
    {
-      puede_crear_proceso();
       t_pcb *pcb = peek_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
@@ -253,8 +255,6 @@ static void liberar_recursos(t_pcb *proceso)
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
 {
-   puede_entrar_a_ready();
-
    q_estado *ready = proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
    push_proceso(ready, proceso);
    // log
@@ -269,8 +269,6 @@ static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 
 static void pasar_a_siguiente(t_pcb *pcb)
 {
-   puede_manejar_desalojo();
-
    switch (pcb->motivo_desalojo)
    {
    case QUANTUM:
@@ -342,8 +340,6 @@ static void *planificar_por_fifo()
 {
    while (1)
    {
-      puede_ejecutar_proceso();
-
       t_pcb *proceso = pop_proceso(cola_ready);
       push_proceso(cola_exec, proceso);
 
@@ -371,8 +367,6 @@ static void *planificar_por_rr()
 {
    while (1)
    {
-      puede_ejecutar_proceso();
-
       t_pcb *proceso = pop_proceso(cola_ready);
       push_proceso(cola_exec, proceso);
 
@@ -403,8 +397,6 @@ static void *planificar_por_vrr()
 
    while (1)
    {
-      puede_ejecutar_proceso();
-
       q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
       t_pcb *proceso = pop_proceso(ready);
       push_proceso(cola_exec, proceso);
