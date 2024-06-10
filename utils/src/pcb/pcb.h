@@ -36,12 +36,6 @@ typedef enum
    OUT_OF_MEMORY
 } motivo_finalizacion;
 
-typedef enum
-{
-   INTERFAZ,
-   RECURSO
-} motivo_bloqueo;
-
 typedef struct
 {
    u_int32_t pid;

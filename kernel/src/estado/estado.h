@@ -64,6 +64,17 @@ t_pcb *peek_proceso(q_estado *estado);
 t_pcb *remove_proceso(q_estado *estado, u_int32_t pid);
 
 /**
+ * @brief Dvueleve una lista de PIDs de los procesos encolados en el estado dado.
+ *
+ * @param estado
+ * @return `t_list*`
+ *
+ * @note Los elementos de la lista son `u_int32_t*`.
+ * @note Liberar la lista con `list_destroy_and_destroy_elements(lista, &free)`.
+ */
+t_list *get_pids(q_estado *estado);
+
+/**
  * @brief Indica si hay algún proceso encolado en el estado dado.
  *
  * @param estado

@@ -58,6 +58,21 @@ t_pcb *remove_proceso(q_estado *estado, u_int32_t pid)
    return (t_pcb *)mlist_remove_by_condition(estado->lista, &_es_proceso);
 }
 
+t_list *get_pids(q_estado *estado)
+{
+   t_list *pids = list_create();
+   void _agregar_pid_a_lista(void *ptr_pcb)
+   {
+      t_pcb *pcb = (t_pcb *)ptr_pcb;
+      u_int32_t *pid = malloc(sizeof(u_int32_t));
+      *pid = pcb->pid;
+      list_add(pids, pid);
+   };
+
+   mlist_iterate(estado->lista, &_agregar_pid_a_lista);
+   return pids;
+}
+
 int8_t hay_proceso(q_estado *estado)
 {
    return !mlist_is_empty(estado->lista);
