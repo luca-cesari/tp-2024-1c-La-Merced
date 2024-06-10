@@ -34,13 +34,21 @@ t_pcb *pop_proceso(q_estado *estado)
 t_pcb *peek_proceso(q_estado *estado)
 {
    sem_wait(estado->hay_proceso);
-   return (t_pcb *)mlist_peek(estado->lista);
+   t_pcb *peeked = (t_pcb *)mlist_peek(estado->lista);
+   sem_post(estado->hay_proceso);
+   return peeked;
 }
 
-void remover_primer_proceso(q_estado *estado)
+t_pcb *remove_proceso(q_estado *estado, u_int32_t pid)
 {
+   int32_t _es_proceso(void *pcb)
+   {
+      t_pcb *proceso = (t_pcb *)pcb;
+      return proceso->pid == pid;
+   };
+
    sem_wait(estado->hay_proceso);
-   mlist_remove(estado->lista, 1);
+   return (t_pcb *)mlist_remove_by_condition(estado->lista, &_es_proceso);
 }
 
 int8_t hay_proceso(q_estado *estado)

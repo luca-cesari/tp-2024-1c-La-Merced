@@ -35,7 +35,7 @@ void *serializar_paquete(t_packet *paquete, int32_t tamanio_paquete);
 void enviar_paquete(t_packet *paquete, int32_t fd_conexion);
 void eliminar_paquete(t_packet *paquete);
 
-int32_t recibir_operacion(int fd_conexion);
+int32_t recibir_operacion(int32_t fd_conexion);
 void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion);
 t_list *recibir_paquete(int32_t fd_conexion);
 

@@ -143,7 +143,7 @@ void enviar_senial(int32_t signal, int32_t fd_conexion)
 int32_t recibir_senial(int32_t fd_conexion)
 {
    if (recibir_operacion(fd_conexion) != NUMBER)
-      return -5;
+      return -1;
 
    int32_t signal;
    recv(fd_conexion, &signal, sizeof(int32_t), MSG_WAITALL);
