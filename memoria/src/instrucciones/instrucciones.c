@@ -1,13 +1,13 @@
 #include "instrucciones.h"
 
 t_list *lista_procesos;
-sem_t hay_proceso_en_lista;
+// sem_t hay_proceso_en_lista;
 
 void inicializar_memoria_instrucciones()
 {
     /*Inicializo la lista de procesos*/
     lista_procesos = list_create();
-    sem_init(&hay_proceso_en_lista, 0, 0);
+    // sem_init(&hay_proceso_en_lista, 0, 0);
 }
 
 
@@ -23,7 +23,7 @@ void cargar_proceso_a_memoria(int32_t pid, char *path)
     proceso->path = strdup(path);
     proceso->instrucciones = instrucciones;
     list_add(lista_procesos, proceso);
-    sem_post(&hay_proceso_en_lista);
+    // sem_post(&hay_proceso_en_lista);
 }
 
 t_list *leer_instrucciones(char *path)
@@ -68,7 +68,7 @@ void eliminar_proceso(t_pcb *pcb)
 
 char *proxima_instruccion(u_int32_t pid,int32_t program_counter)
 {
-    sem_wait(&hay_proceso_en_lista);
+    // sem_wait(&hay_proceso_en_lista);
     int es_proceso_buscado(void *elemento)
     {
         return ((t_proceso_instrucciones *)elemento)->pid == pid;
