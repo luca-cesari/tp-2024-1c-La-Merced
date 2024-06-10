@@ -50,11 +50,15 @@ t_pcb *pop_proceso(q_estado *estado);
 t_pcb *peek_proceso(q_estado *estado);
 
 /**
- * @brief Remueve el primer proceso encolado en el estado dado.
+ * @brief
  *
  * @param estado
+ * @param pid
+ * @return `t_pcb*`
+ *
+ * @note Si el proceso no existe, retorna NULL.
  */
-void remover_primer_proceso(q_estado *estado);
+t_pcb *remove_proceso(q_estado *estado, u_int32_t pid);
 
 /**
  * @brief Indica si hay algún proceso encolado en el estado dado.
