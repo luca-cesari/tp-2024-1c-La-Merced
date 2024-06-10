@@ -85,6 +85,8 @@ void escuchar_cpu(int32_t fd_cpu)
         case FETCH_INSTRUCCION:
             printf("FETCH_INSTRUCCION \n");
             char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
+            u_int32_t tamanio_pagina = get_tamanio_pagina();
+            enviar_senial(tamanio_pagina, fd_cpu);
             enviar_mensaje(instruccion, fd_cpu);
             break;
 
