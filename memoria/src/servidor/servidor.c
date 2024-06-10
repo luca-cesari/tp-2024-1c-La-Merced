@@ -1,5 +1,7 @@
 #include "servidor.h"
 
+static void retardo_respuesta(void);
+
 void iniciar_servidor()
 {
     char *puerto_escucha = get_puerto_escucha();
@@ -45,6 +47,9 @@ void escuchar_kernel(int32_t fd_kernel)
     {
         t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
 
+        // Dado que es indistinto el momento en que se aplica el retardo,
+        // lo aplico antes de procesar la solicitud
+        retardo_respuesta();
         switch (mem_request->operacion)
         {
         case INICIAR_PROCESO:
@@ -74,6 +79,7 @@ void escuchar_cpu(int32_t fd_cpu)
     while (1)
     {
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        retardo_respuesta();
         switch (mem_request->operacion)
         {
         case FETCH_INSTRUCCION:
@@ -110,4 +116,9 @@ void escuchar_interfaz_es(int32_t fd_es)
 {
     printf("Interfaz E/S conectada \n");
     recibir_mensaje(fd_es);
+}
+
+static void retardo_respuesta()
+{
+    usleep(get_retardo() * 1000);
 }
