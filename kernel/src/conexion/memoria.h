@@ -23,7 +23,7 @@ int8_t conectar_con_memoria();
  * @param u_int32_t : pid del proceso a iniciar
  * @param char * : path del archivo a ejecutar
  *
- * @return `int8_t` : 0 si fue exitosa, -1 si hubo un error
+ * @return `int8_t` : 0 si fue exitosa, 1 si hubo un error
  */
 int8_t memoria_iniciar_proceso(u_int32_t, char *);
 
