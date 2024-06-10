@@ -2,6 +2,8 @@
 
 static resource_queue *crear_recurso(char *nombre_recurso, u_int32_t instancias);
 static resource_queue *buscar_recurso(q_blocked *estado, char *nombre_recurso);
+static void _bloquear_recurso(void *ptr_recurso);
+static void _desbloquear_recurso(void *ptr_recurso);
 static int32_t index_of_pid(resource_queue *estado, u_int32_t pid);
 
 void inicializar_recursos(q_blocked *cola_recursos)
@@ -101,6 +103,16 @@ t_pcb *desbloquear_para_recurso(q_blocked *estado, char *nombre_recurso)
    return pcb;
 }
 
+void bloquear_colas_de_recursos(q_blocked *estado)
+{
+   mlist_iterate(estado->lista_colas, &_bloquear_recurso);
+}
+
+void desbloquear_colas_de_recursos(q_blocked *estado)
+{
+   mlist_iterate(estado->lista_colas, &_desbloquear_recurso);
+}
+
 static resource_queue *crear_recurso(char *nombre_recurso, u_int32_t instancias)
 {
    resource_queue *recurso = malloc(sizeof(resource_queue));
@@ -123,6 +135,18 @@ static resource_queue *buscar_recurso(q_blocked *estado, char *nombre_recurso)
 
    return mlist_find(estado->lista_colas, &_es_buscado);
 }
+
+void _bloquear_recurso(void *ptr_recurso)
+{
+   resource_queue *recurso = (resource_queue *)ptr_recurso;
+   bloquear_estado(recurso->cola_procesos);
+};
+
+void _desbloquear_recurso(void *ptr_recurso)
+{
+   resource_queue *recurso = (resource_queue *)ptr_recurso;
+   desbloquear_estado(recurso->cola_procesos);
+};
 
 static int32_t index_of_pid(resource_queue *estado, u_int32_t pid)
 {

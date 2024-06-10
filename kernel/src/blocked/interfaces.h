@@ -59,4 +59,18 @@ int32_t bloquear_para_io(q_blocked *estado, t_pcb *pcb);
  */
 q_estado *desconectar_interfaz(q_blocked *estado, int32_t fd_conexion);
 
+/**
+ * @brief 
+ * 
+ * @param estado 
+ */
+void bloquear_colas_io(q_blocked *estado);
+
+/**
+ * @brief 
+ * 
+ * @param estado 
+ */
+void desbloquear_colas_io(q_blocked *estado);
+
 #endif // BLOCKED_IO_QUEUE_H

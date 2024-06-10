@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <semaphore.h>
 #include <pcb/pcb.h>
+#include <pgate/pgate.h>
 #include <mlist/mlist.h>
 
 #include "logger/logger.h"
@@ -13,6 +14,8 @@ typedef struct
    t_mutext_list *lista;
    sem_t *hay_proceso;
    state cod_estado;
+   pgate_t *gate_entrada;
+   pgate_t *gate_salida;
 } q_estado;
 
 /**
@@ -67,6 +70,21 @@ t_pcb *remove_proceso(q_estado *estado, u_int32_t pid);
  * @return `int8_t`
  */
 int8_t hay_proceso(q_estado *estado);
+
+/**
+ * @brief Bloquea el estado.
+ *        Se utiliza para evitar cualquier operación sobre ésta.
+ *
+ * @param estado
+ */
+void bloquear_estado(q_estado *estado);
+
+/**
+ * @brief Desbloquea el estado.
+ *
+ * @param estado
+ */
+void desbloquear_estado(q_estado *estado);
 
 /**
  * @brief Destruye un estado.

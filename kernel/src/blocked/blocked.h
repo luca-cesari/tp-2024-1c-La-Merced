@@ -9,7 +9,6 @@ typedef struct
 } q_blocked;
 
 q_blocked *crear_estado_blocked(void);
-
 void destruir_estado_blocked(q_blocked *estado, void (*destructor)(void *));
 
 #endif // BLOCKED_H
