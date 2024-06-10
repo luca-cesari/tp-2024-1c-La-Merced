@@ -1,5 +1,7 @@
 #include "servidor.h"
 
+static void retardo_respuesta(void);
+
 void iniciar_servidor()
 {
     char *puerto_escucha = get_puerto_escucha();
@@ -45,17 +47,24 @@ void escuchar_kernel(int32_t fd_kernel)
     {
         t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
 
+        // Dado que es indistinto el momento en que se aplica el retardo,
+        // lo aplico antes de procesar la solicitud
+        retardo_respuesta();
         switch (mem_request->operacion)
         {
         case INICIAR_PROCESO:
             printf("INICIAR_PROCESO \n");
             cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
             crear_tabla_de_paginas_para_proceso(mem_request->pid);
+
+            // Siempre envía resultado exitoso, podría haber error??
+            enviar_senial(0, fd_kernel);
             break;
 
         case FINALIZAR_PROCESO:
             printf("FINALIZAR_PROCESO \n");
-            // ...
+            // Creo que falta sacar el proceso de la memoria de instrucciones
+            destruir_tabla_de_paginas_para_proceso(mem_request->pid);
             break;
 
         default:
@@ -73,11 +82,14 @@ void escuchar_cpu(int32_t fd_cpu)
     while (1)
     {
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        retardo_respuesta();
         switch (mem_request->operacion)
         {
         case FETCH_INSTRUCCION:
             printf("FETCH_INSTRUCCION \n");
             char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
+            u_int32_t tamanio_pagina = get_tamanio_pagina();
+            enviar_senial(tamanio_pagina, fd_cpu);
             enviar_mensaje(instruccion, fd_cpu);
             break;
 
@@ -94,7 +106,7 @@ void escuchar_cpu(int32_t fd_cpu)
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
-           //...
+            //...
             break;
 
         default:
@@ -109,4 +121,9 @@ void escuchar_interfaz_es(int32_t fd_es)
 {
     printf("Interfaz E/S conectada \n");
     recibir_mensaje(fd_es);
+}
+
+static void retardo_respuesta()
+{
+    usleep(get_retardo_respuesta() * 1000);
 }

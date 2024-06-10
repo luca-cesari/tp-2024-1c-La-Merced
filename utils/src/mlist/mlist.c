@@ -79,6 +79,27 @@ void mlist_iterate(t_mutext_list *lista_mutex, void (*closure)(void *))
    pthread_mutex_unlock(&(lista_mutex->mutex));
 }
 
+int32_t mlist_index_of(t_mutext_list *lista_mutex, int32_t (*criterio)(void *))
+{
+   int32_t index = -1;
+
+   pthread_mutex_lock(&(lista_mutex->mutex));
+   t_list_iterator *iterator = list_iterator_create(lista_mutex->list);
+   while (list_iterator_has_next(iterator))
+   {
+      void *elemento = list_iterator_next(iterator);
+      if (!criterio(elemento))
+         continue;
+
+      index = list_iterator_index(iterator);
+      break;
+   }
+   list_iterator_destroy(iterator);
+   pthread_mutex_unlock(&(lista_mutex->mutex));
+
+   return index;
+}
+
 void *mlist_remove(t_mutext_list *lista_mutex, u_int32_t index)
 {
    pthread_mutex_lock(&(lista_mutex->mutex));

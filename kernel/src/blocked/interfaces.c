@@ -1,5 +1,8 @@
 #include "interfaces.h"
 
+static void _bloquear_interfaz(void *ptr_interfaz);
+static void _desbloquear_interfaz(void *ptr_interfaz);
+
 io_queue *crear_io_queue(char *nombre_interfaz, int32_t fd_conexion)
 {
    io_queue *io = malloc(sizeof(io_queue));
@@ -59,4 +62,26 @@ q_estado *desconectar_interfaz(q_blocked *estado, int32_t fd_conexion)
    free(io_encontrado);
 
    return procesos;
+}
+
+void bloquear_colas_io(q_blocked *estado)
+{
+   mlist_iterate(estado->lista_colas, &_bloquear_interfaz);
+}
+
+void desbloquear_colas_io(q_blocked *estado)
+{
+   mlist_iterate(estado->lista_colas, &_desbloquear_interfaz);
+}
+
+static void _bloquear_interfaz(void *ptr_interfaz)
+{
+   io_queue *interfaz = (io_queue *)ptr_interfaz;
+   bloquear_estado(interfaz->cola_procesos);
+}
+
+static void _desbloquear_interfaz(void *ptr_interfaz)
+{
+   io_queue *interfaz = (io_queue *)ptr_interfaz;
+   desbloquear_estado(interfaz->cola_procesos);
 }
