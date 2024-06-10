@@ -93,8 +93,24 @@ void log_fin_de_quantum(u_int32_t pid)
    log_info(kernel_logger, "PID: %d - Desalojado por fin de Quantum", pid);
 }
 
-void log_ingreso_a_ready(void)
+void log_ingreso_a_ready(t_list *lista_pid, tipo_cola_ready tipo)
 {
-   // ...
-   log_info(kernel_logger, "Cola Ready <COLA>: [<LISTA DE PIDS>]");
+   char *pids_str = string_new();
+
+   string_append(&pids_str, "[ ");
+   void _agregar_pid_a_string(void *ptr_pid)
+   {
+      u_int32_t pid = *(u_int32_t *)ptr_pid;
+      string_append(&pids_str, string_itoa(pid));
+      string_append(&pids_str, " ");
+   };
+   list_iterate(lista_pid, &_agregar_pid_a_string);
+   string_append(&pids_str, "]");
+
+   char *tipo_cola_str = tipo == PRIORIDAD ? "Ready Prioridad" : "Ready";
+
+   log_info(kernel_logger, "Cola %s: %s", tipo_cola_str, pids_str);
+
+   list_destroy_and_destroy_elements(lista_pid, &free);
+   free(pids_str);
 }

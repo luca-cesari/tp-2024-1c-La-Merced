@@ -205,8 +205,10 @@ static void *admitir_proceso()
       // durante la espera de la memoria.
       // véase matar_proceso()
       pcb = remove_proceso(cola_new, pcb->pid);
-      if (pcb != NULL)
-         push_proceso(cola_ready, pcb);
+      if (pcb == NULL)
+         continue;
+      push_proceso(cola_ready, pcb);
+      log_ingreso_a_ready(get_pids(cola_ready), NORMAL);
    }
 
    return NULL;
@@ -223,6 +225,7 @@ static void *finalizar_proceso()
       log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
       destruir_pcb(pcb);
    }
+
    return NULL;
 }
 
@@ -257,7 +260,10 @@ static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
 {
    q_estado *ready = proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
    push_proceso(ready, proceso);
-   // log
+
+   // el valor de proceso->priority coincide con el tipo_cola_ready
+   // 0 implica cola ready normal, 1 implica cola ready prioridad
+   log_ingreso_a_ready(get_pids(ready), proceso->priority);
 }
 
 static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
