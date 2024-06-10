@@ -90,10 +90,12 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->executable = strdup((char *)list_get(paquete, 12));
    pcb->resource = strdup((char *)list_get(paquete, 13));
 
+
    pcb->io_request = crear_io_request(pcb->pid,
                                       strdup((char *)list_get(paquete, 14)),
                                       strdup((char *)list_get(paquete, 15)),
                                       strdup((char *)list_get(paquete, 16)));
+
 
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 17);
    pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 18);

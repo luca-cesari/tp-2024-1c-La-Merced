@@ -12,7 +12,8 @@ t_registers crear_registros()
    registros.EBX = 0;
    registros.ECX = 0;
    registros.EBX = 0;
-
+   registros.SI = 0;
+   registros.DI = 0;
    return registros;
 }
 
