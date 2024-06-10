@@ -56,6 +56,9 @@ void escuchar_kernel(int32_t fd_kernel)
             printf("INICIAR_PROCESO \n");
             cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
             crear_tabla_de_paginas_para_proceso(mem_request->pid);
+
+            // Siempre envía resultado exitoso, podría haber error??
+            enviar_senial(0, fd_kernel);
             break;
 
         case FINALIZAR_PROCESO:
@@ -122,5 +125,5 @@ void escuchar_interfaz_es(int32_t fd_es)
 
 static void retardo_respuesta()
 {
-    usleep(get_retardo() * 1000);
+    usleep(get_retardo_respuesta() * 1000);
 }
