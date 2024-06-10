@@ -22,6 +22,7 @@ void close_gate(pgate_t *pgate)
       return;
 
    sem_wait(pgate->semaphore);
+   pgate->state = CLOSED;
 }
 
 void open_gate(pgate_t *pgate)
@@ -30,6 +31,7 @@ void open_gate(pgate_t *pgate)
       return;
 
    sem_post(pgate->semaphore);
+   pgate->state = OPEN;
 }
 
 void pgate_destroy(pgate_t *pgate)
