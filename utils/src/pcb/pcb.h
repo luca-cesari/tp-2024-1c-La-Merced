@@ -47,31 +47,32 @@ typedef struct
    u_int32_t pid;
    int32_t program_counter;
    u_int32_t quantum;
+   int8_t priority;
    t_registers cpu_registers;
-   char *bitarray;
-   t_bitarray *psw;
+   char *executable;
    t_io_request *io_request;
    char *resource;
-   char *executable_path;
    motivo_desalojo motivo_desalojo;
    motivo_finalizacion motivo_finalizacion;
    state estado;
-   int8_t priority;
 } t_pcb;
 
 t_pcb *crear_pcb(u_int32_t pid, char *ejecutable);
+void destruir_pcb(t_pcb *pcb);
+
 t_packet *serializar_pcb(t_pcb *pcb);
 void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
 t_pcb *recibir_pcb(int32_t fd_conexion);
-void actualizar_pcb(t_pcb **pcb, t_pcb *nuevo_pcb);
+
+void actualizar_pcb(t_pcb *pcb, t_pcb *nuevo_pcb);
 void set_quantum_pcb(t_pcb *pcb, u_int32_t quantum);
 void set_recurso_pcb(t_pcb *pcb, char *recurso);
 void set_estado_pcb(t_pcb *pcb, state estado);
 void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo);
 void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo);
-void reset_io_request(t_pcb *pcb);
-void set_prioridad(t_pcb *pcb, int8_t priority);
+void set_io_request(t_pcb *pcb, t_io_request *io_request);
+void set_prioridad(t_pcb *pcb, int8_t prioridad);
+
 void print_pcb(t_pcb *pcb);
-void destruir_pcb(t_pcb *pcb);
 
 #endif // UTILS_PCB_H

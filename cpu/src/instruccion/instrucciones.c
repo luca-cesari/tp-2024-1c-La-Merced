@@ -64,7 +64,7 @@ void jnz(char **parametros)
 void io_gen_sleep(char **parametros)
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_GEN_SLEEP", parametros[1]);
-   pcb->io_request = io_request;
+   set_io_request(pcb, io_request);
 }
 
 void exit_instruction(char **parametros)
