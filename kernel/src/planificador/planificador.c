@@ -153,7 +153,8 @@ static void *consumir_io(void *cola_io)
       // principalmente para EXECUTED,
       // así no afectaría cuando vuelva a la CPU.
       // en otros casos no debería ser relevante
-      reset_io_request(pcb);
+      t_io_request *empty_io_req = crear_io_request(pcb->pid, "", "", "");
+      set_io_request(pcb, empty_io_req);
 
       switch (response)
       {
@@ -183,7 +184,7 @@ static void *crear_proceso()
       t_pcb *pcb = pop_proceso(cola_new);
 
       // ver si es la unica operacion que se hace antes de encolar a ready
-      if (memoria_iniciar_proceso(pcb->pid, pcb->executable_path))
+      if (memoria_iniciar_proceso(pcb->pid, pcb->executable))
       {
          pasar_a_exit(pcb, -1); // no hay motivo de error por no poder iniciar un proceso
          continue;
@@ -336,7 +337,8 @@ static void *planificar_por_fifo()
       enviar_pcb_cpu(proceso);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
-      actualizar_pcb(&proceso, pos_exec);
+      actualizar_pcb(proceso, pos_exec);
+      destruir_pcb(pos_exec);
       pasar_a_siguiente(proceso);
    }
 
@@ -359,7 +361,8 @@ static void *planificar_por_rr()
       t_pcb *pos_exec = recibir_pcb_cpu();
       pthread_cancel(rutina_cronometro);
 
-      actualizar_pcb(&proceso, pos_exec);
+      actualizar_pcb(proceso, pos_exec);
+      destruir_pcb(pos_exec);
       pasar_a_siguiente(proceso);
    }
 
@@ -394,7 +397,8 @@ static void *planificar_por_vrr()
       // se crea uno nuevo por cada ciclo del while
       temporal_destroy(temporal);
 
-      actualizar_pcb(&proceso, pos_exec);
+      actualizar_pcb(proceso, pos_exec);
+      destruir_pcb(pos_exec);
 
       u_int32_t quantum_proceso_nuevo = transcurrido < quantum ? quantum - transcurrido : quantum;
       set_quantum_pcb(proceso, quantum_proceso_nuevo);
