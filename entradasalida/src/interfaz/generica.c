@@ -26,10 +26,10 @@ void crear_instrucciones()
     dictionary_put(instruccion_funcion, "IO_GEN_SLEEP", &gen_sleep);
 }
 
-void gen_sleep(char *)
+void gen_sleep(char *cant_unidad_trabajo)
 {
     u_int32_t tiempo_en_ms = get_tiempo_unidad_trabajo();
 
-    u_int32_t timepo_a_bloquear = atoi(cant_unidad_trabajo) * tiempo_en_ms;
-    sleep(timepo_a_bloquear / 1000);
+    u_int32_t tiempo_a_bloquear = atoi(cant_unidad_trabajo) * tiempo_en_ms;
+    sleep(tiempo_a_bloquear / 1000);
 }
