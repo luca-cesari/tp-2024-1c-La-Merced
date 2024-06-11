@@ -45,6 +45,8 @@ t_packet *serializar_pcb(t_pcb *pcb)
    agregar_a_paquete(paquete, &(pcb->cpu_registers.EBX), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->cpu_registers.ECX), sizeof(u_int32_t));
    agregar_a_paquete(paquete, &(pcb->cpu_registers.EDX), sizeof(u_int32_t));
+   agregar_a_paquete(paquete, &(pcb->cpu_registers.SI), sizeof(u_int32_t));
+   agregar_a_paquete(paquete, &(pcb->cpu_registers.DI), sizeof(u_int32_t));
 
    agregar_a_paquete(paquete, pcb->executable, strlen(pcb->executable) + 1);
    agregar_a_paquete(paquete, pcb->resource, strlen(pcb->resource) + 1);
@@ -86,20 +88,20 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->cpu_registers.EBX = *(u_int32_t *)list_get(paquete, 9);
    pcb->cpu_registers.ECX = *(u_int32_t *)list_get(paquete, 10);
    pcb->cpu_registers.EDX = *(u_int32_t *)list_get(paquete, 11);
+   pcb->cpu_registers.SI = *(u_int32_t *)list_get(paquete, 12);
+   pcb->cpu_registers.DI = *(u_int32_t *)list_get(paquete, 13);
 
-   pcb->executable = strdup((char *)list_get(paquete, 12));
-   pcb->resource = strdup((char *)list_get(paquete, 13));
-
+   pcb->executable = strdup((char *)list_get(paquete, 14));
+   pcb->resource = strdup((char *)list_get(paquete, 15));
 
    pcb->io_request = crear_io_request(pcb->pid,
-                                      strdup((char *)list_get(paquete, 14)),
-                                      strdup((char *)list_get(paquete, 15)),
-                                      strdup((char *)list_get(paquete, 16)));
+                                      strdup((char *)list_get(paquete, 16)),
+                                      strdup((char *)list_get(paquete, 17)),
+                                      strdup((char *)list_get(paquete, 18)));
 
-
-   pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 17);
-   pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 18);
-   pcb->estado = *(state *)list_get(paquete, 19);
+   pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 19);
+   pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 20);
+   pcb->estado = *(state *)list_get(paquete, 21);
 
    list_destroy(paquete);
    return pcb;
@@ -178,6 +180,8 @@ void print_pcb(t_pcb *pcb)
    printf("EBX: %d\n", pcb->cpu_registers.EBX);
    printf("ECX: %d\n", pcb->cpu_registers.ECX);
    printf("EDX: %d\n", pcb->cpu_registers.EDX);
+   printf("ECX: %d\n", pcb->cpu_registers.SI);
+   printf("EDX: %d\n", pcb->cpu_registers.DI);
 
    printf("Recurso: %s\n", pcb->resource);
    printf("Executable Path: %s\n", pcb->executable);
