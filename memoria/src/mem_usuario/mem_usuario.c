@@ -2,141 +2,98 @@
 
 void *memoria_usuario;
 t_list *lista_tablas;
-t_estado_frame *bitmap;
+
+static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
+static t_proceso_tabla *obtener_tabla_segun_proceso(u_int32_t pid);
 
 void inicializar_memoria_usuario()
 {
-    u_int32_t tamanio_memoria = get_tamanio_memoria();
-    memoria_usuario = malloc(tamanio_memoria);
-}
-
-u_int32_t get_cantidad_frames()
-{
-    return get_tamanio_memoria() / get_tamanio_pagina();
-}
-
-u_int32_t get_numero_de_frame(u_int32_t direccion_fisica) // No se si el tipo de dato de la direccion fisica será este
-{
-    return direccion_fisica / get_tamanio_pagina();
-}
-
-void inicializar_lista_tablas_de_paginas()
-{
+    memoria_usuario = malloc(get_tamanio_memoria());
     lista_tablas = list_create();
-}
-
-void inicializar_bitmap()
-{
-    bitmap = malloc(get_cantidad_frames() * sizeof(t_estado_frame));
-}
-
-void modificar_bitmap(u_int32_t frame, t_estado_frame estado)
-{
-    bitmap[frame] = estado;
+    inicializar_bitmap_estados();
 }
 
 void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
 {
-    t_proceso_y_tabla *proceso_y_tabla = malloc(sizeof(t_proceso_y_tabla));
-    t_list *tabla_paginas = list_create();
-    proceso_y_tabla->pid = pid;
-    proceso_y_tabla->tabla_paginas = tabla_paginas;
-    list_add(lista_tablas, proceso_y_tabla); // Agrego la tabla de paginas asociada a un PID a la lista de tablas
+    t_proceso_tabla *tabla_paginas = malloc(sizeof(t_proceso_tabla));
+    tabla_paginas->pid = pid;
+    tabla_paginas->lista_frames = list_create();
+    list_add(lista_tablas, tabla_paginas);
 }
 
 void destruir_tabla_de_paginas_para_proceso(u_int32_t pid)
 {
-    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
+    t_proceso_tabla *tabla_paginas = obtener_tabla_segun_proceso(pid);
 
-    t_list_iterator *iterador = list_iterator_create(proceso_y_tabla->tabla_paginas);
+    t_list_iterator *iterador = list_iterator_create(tabla_paginas->lista_frames);
     while (list_iterator_has_next(iterador))
     {
         u_int32_t *nro_frame = (u_int32_t *)list_iterator_next(iterador);
-        modificar_bitmap(*nro_frame, LIBRE);
+        set_estado_frame(*nro_frame, LIBRE);
     }
 
-    list_destroy_and_destroy_elements(proceso_y_tabla->tabla_paginas, free);
+    list_destroy_and_destroy_elements(tabla_paginas->lista_frames, &free);
 
     list_iterator_destroy(iterador);
-    free(proceso_y_tabla);
+    free(tabla_paginas);
 }
 
-void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
+int8_t ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
 {
 
-    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
-    u_int32_t tamanio_actual = list_size(proceso_y_tabla->tabla_paginas) * get_tamanio_pagina();
+    t_proceso_tabla *tabla_paginas = obtener_tabla_segun_proceso(pid);
+    u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t tamanio_nuevo = tamanio;
 
     if (tamanio_nuevo > tamanio_actual)
     {
-        ampliar_memoria_para_proceso(proceso_y_tabla, tamanio_nuevo);
+        return ampliar_memoria_para_proceso(tabla_paginas, tamanio_nuevo);
     }
     else
     {
-        reducir_memoria_para_proceso(proceso_y_tabla, tamanio_nuevo);
+        return reducir_memoria_para_proceso(tabla_paginas, tamanio_nuevo);
     }
 }
 
-void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo)
+int8_t ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
 {
-    u_int32_t tamanio_actual = list_size(proceso_y_tabla->tabla_paginas) * get_tamanio_pagina();
+    u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina();
     u_int32_t cantidad_frames_disponibles = get_cantidad_frames_disponibles();
 
     if (cantidad_frames_necesarios > cantidad_frames_disponibles)
     {
         // ERROR OUT OF MEMORY
+        return -1;
     }
-    else
+
+    for (u_int32_t i = 0; i < cantidad_frames_necesarios; i++)
     {
-        for (u_int32_t i = 0; i < cantidad_frames_necesarios; i++)
-        {
-            u_int32_t frame = get_frame_libre();
-            modificar_bitmap(frame, OCUPADO);
-            u_int32_t *nro_frame = malloc(sizeof(u_int32_t));
-            list_add(proceso_y_tabla->tabla_paginas, nro_frame);
-        }
+        u_int32_t frame = get_frame_libre();
+        set_estado_frame(frame, OCUPADO);
+        u_int32_t *nro_frame = malloc(sizeof(u_int32_t));
+        *nro_frame = frame;
+        list_add(tabla_paginas->lista_frames, nro_frame);
     }
+
+    return 0;
 }
 
-void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo)
+int8_t reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
 {
-    u_int32_t tamanio_actual = list_size(proceso_y_tabla->tabla_paginas) * get_tamanio_pagina();
+    u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t cantidad_frames_a_liberar = tamanio_actual / get_tamanio_pagina() - tamanio_nuevo / get_tamanio_pagina();
 
     for (u_int32_t i = 0; i < cantidad_frames_a_liberar; i++)
     {
-        u_int32_t *nro_frame = list_get(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
-        modificar_bitmap(*nro_frame, LIBRE);
-        list_remove(proceso_y_tabla->tabla_paginas, list_size(proceso_y_tabla->tabla_paginas) - 1);
+        u_int32_t *nro_frame = list_get(tabla_paginas->lista_frames, list_size(tabla_paginas->lista_frames) - 1);
+        set_estado_frame(*nro_frame, LIBRE);
+        list_remove(tabla_paginas->lista_frames, list_size(tabla_paginas->lista_frames) - 1);
     }
+
+    return 0;
 }
 
-u_int32_t get_frame_libre()
-{
-    for (u_int32_t i = 0; i < get_cantidad_frames(); i++)
-    {
-        if (bitmap[i] == LIBRE)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-u_int32_t get_cantidad_frames_disponibles()
-{
-    u_int32_t cantidad_frames_disponibles = 0;
-    for (u_int32_t i = 0; i < get_cantidad_frames(); i++)
-    {
-        if (bitmap[i] == LIBRE)
-        {
-            cantidad_frames_disponibles++;
-        }
-    }
-    return cantidad_frames_disponibles;
-}
 /*
 Acceso a espacio de usuario
 Esta petición puede venir tanto de la CPU como de un Módulo de Interfaz de I/O, es importante tener en cuenta que las peticiones pueden ocupar más de una página.
@@ -149,6 +106,7 @@ void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
+
     u_int32_t frame;
     u_int32_t limite_de_frame;
     u_int32_t tamanio_guardado = 0;
@@ -222,11 +180,11 @@ void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t 
     }
 }
 
-t_proceso_y_tabla *obtener_tabla_segun_proceso(u_int32_t pid)
+static t_proceso_tabla *obtener_tabla_segun_proceso(u_int32_t pid)
 {
     int es_tabla_buscada(void *elemento)
     {
-        t_proceso_y_tabla *tabla = (t_proceso_y_tabla *)elemento;
+        t_proceso_tabla *tabla = (t_proceso_tabla *)elemento;
         return tabla->pid == pid;
     };
     return list_find(lista_tablas, (void *)es_tabla_buscada);
@@ -234,9 +192,8 @@ t_proceso_y_tabla *obtener_tabla_segun_proceso(u_int32_t pid)
 
 u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
 {
-
-    t_proceso_y_tabla *proceso_tabla = obtener_tabla_segun_proceso(pid);
-    u_int32_t *valor = (u_int32_t *)list_get(proceso_tabla->tabla_paginas, nro_pag);
+    t_proceso_tabla *proceso_tabla = obtener_tabla_segun_proceso(pid);
+    u_int32_t *valor = (u_int32_t *)list_get(proceso_tabla->lista_frames, nro_pag);
     if (valor == NULL)
     {
         // ES NECESARIO SIGNO DE PREGUNTA
@@ -248,5 +205,10 @@ u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);
-    free(bitmap);
+    destruir_bitmap_estados();
+}
+
+static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)
+{
+    return direccion_fisica / get_tamanio_pagina();
 }
