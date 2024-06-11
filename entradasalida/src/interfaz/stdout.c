@@ -3,12 +3,11 @@
 void inicializar_interfaz_stdout()
 {
 
-
     while (1)
     {
         t_io_request *peticion_io = esperar_instruccion();
 
-          if (strcmp(peticion_io->instruction, "IO_STDOUT_WRITE")!=0)
+        if (strcmp(peticion_io->instruction, "IO_STDOUT_WRITE") != 0)
             enviar_respuesta(INVALID_INSTRUCTION);
 
         io_stdout_write(peticion_io->arguments);

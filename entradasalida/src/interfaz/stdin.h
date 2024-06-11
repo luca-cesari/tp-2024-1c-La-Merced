@@ -12,7 +12,6 @@
 #include "conexion/kernel.h"
 #include "consola/consola.h"
 
-
 void iniciar_rutina_interfaz_stdin(void);
 void io_stdin_read(char *);
 

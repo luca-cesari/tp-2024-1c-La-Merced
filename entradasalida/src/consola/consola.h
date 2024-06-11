@@ -6,6 +6,6 @@
 #include <readline/readline.h>
 #include <commons/string.h>
 
-char* iniciar_consola();
+char *iniciar_consola();
 
 #endif // CONSOLA_H

@@ -8,7 +8,6 @@
 #include <sockets/sockets.h>
 #include "config/config.h"
 
-
 void inicializar_interfaz_dialfs(void);
 
 #endif // DIALFS_H

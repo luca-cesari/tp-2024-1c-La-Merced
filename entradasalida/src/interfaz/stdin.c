@@ -22,5 +22,5 @@ void io_stdin_read(char *argumentos)
     int tamanio_valor = atoi(parametros[0]);
     char *valor_consola = iniciar_consola(tamanio_valor);
 
-    //mem request
+    // mem request
 }

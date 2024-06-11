@@ -11,7 +11,6 @@
 #include "logger/logger.h"
 #include "conexion/kernel.h"
 
-
 void inicializar_interfaz_stdout(void);
 void io_stdout_write(char *parametros);
 

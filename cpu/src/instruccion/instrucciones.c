@@ -82,6 +82,13 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
+   char *tamanio_valor = "1";
+   if (string_starts_with(parametros[1], "E"))
+   {
+      tamanio_valor = "4";
+   }
+   // obtener direcciones fisicas con mmu
+   // concatenar direcciones fisicas con el 4 o 1 y enviarlo como parametros, con el numero adelante
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", array_a_string(eliminar_primer_elemento(parametros)));
    pcb->io_request = io_request;
 }
