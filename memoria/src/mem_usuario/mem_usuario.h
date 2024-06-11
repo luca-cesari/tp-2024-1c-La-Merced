@@ -7,6 +7,7 @@
 #include <commons/collections/list.h>
 
 #include "config/config.h"
+#include "protocol/protocol.h"
 
 /*Deprecado
 typedef struct
