@@ -6,8 +6,12 @@
 #include <string.h>
 #include <pcb/pcb.h>
 #include <io_request/io_request.h>
+#include <mem_request/cpu.h>
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
+
+#include "mmu/mmu.h"
+#include "conexion/memoria.h"
 
 /// ESTRUCTURAS DECODE ////////
 

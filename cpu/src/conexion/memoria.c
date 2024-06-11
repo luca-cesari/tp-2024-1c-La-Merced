@@ -29,6 +29,11 @@ char *recibir_instruccion()
    return instruccion;
 }
 
+u_int32_t recibir_valor()
+{
+   return recibir_senial(fd_memoria);
+}
+
 u_int32_t recibir_marco()
 {
    return recibir_senial(fd_memoria);
