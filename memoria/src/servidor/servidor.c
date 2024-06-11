@@ -109,6 +109,11 @@ void escuchar_cpu(int32_t fd_cpu)
             escribir_memoria_usuario(mem_request->pid, mem_request->parametros.param_escribir.direccion_fisica, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
             break;
 
+        case RESIZE:
+            printf("RESIZE \n");
+            ajustar_memoria_para_proceso(mem_request->pid, mem_request->parametros.tamanio_nuevo);
+            break;
+
         default:
             printf("Error de instruccion \n");
             // ...

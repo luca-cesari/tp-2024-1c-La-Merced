@@ -22,6 +22,9 @@ t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid,
       mem_request->parametros.param_escribir.tamanio_buffer = parametro.param_escribir.tamanio_buffer;
       mem_request->parametros.param_escribir.buffer = parametro.param_escribir.buffer;
       break;
+   case RESIZE:
+      mem_request->parametros.tamanio_nuevo = parametro.tamanio_nuevo;
+      break;
    default:
       break;
    }
@@ -51,6 +54,9 @@ void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request)
       agregar_a_paquete(paquete, &(mem_request->parametros.param_escribir.direccion_fisica), sizeof(u_int32_t));
       agregar_a_paquete(paquete, &(mem_request->parametros.param_escribir.tamanio_buffer), sizeof(u_int32_t));
       agregar_a_paquete(paquete, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer);
+      break;
+   case RESIZE:
+      agregar_a_paquete(paquete, &(mem_request->parametros.tamanio_nuevo), sizeof(u_int32_t));
       break;
    default:
       break;
@@ -83,6 +89,9 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
       mem_request->parametros.param_escribir.direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
       mem_request->parametros.param_escribir.tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
       mem_request->parametros.param_escribir.buffer = (void *)list_get(paquete, 4);
+      break;
+   case RESIZE:
+      mem_request->parametros.tamanio_nuevo = *(u_int32_t *)list_get(paquete, 2);
       break;
    default:
       break;
