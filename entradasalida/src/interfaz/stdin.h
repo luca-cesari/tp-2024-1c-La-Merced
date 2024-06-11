@@ -10,6 +10,7 @@
 #include "config/config.h"
 #include "logger/logger.h"
 #include "conexion/kernel.h"
+#include "consola/consola.h"
 
 
 void iniciar_rutina_interfaz_stdin(void);
