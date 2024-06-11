@@ -82,7 +82,9 @@ void escuchar_cpu(int32_t fd_cpu)
     while (1)
     {
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        t_list *direcciones_fisicas;
         retardo_respuesta();
+
         switch (mem_request->operacion)
         {
         case FETCH_INSTRUCCION:
@@ -101,14 +103,14 @@ void escuchar_cpu(int32_t fd_cpu)
 
         case LEER:
             printf("LEER \n");
-            // CORREGIR ESTO PARA RECIBIR LISTA DE DIRECCIONES FISICAS
-            leer_memoria_usuario(mem_request->pid, mem_request->parametros.param_leer.direccion_fisica, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
+            leer_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
             break;
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
-            // CORREGIR ESTO PARA RECIBIR LISTA DE DIRECCIONES FISICAS
-            escribir_memoria_usuario(mem_request->pid, mem_request->parametros.param_escribir.direccion_fisica, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
+            escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
             break;
 
         default:
