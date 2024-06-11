@@ -145,44 +145,68 @@ Ante un pedido de lectura, devolver el valor que se encuentra a partir de la dir
 Ante un pedido de escritura, escribir lo indicado a partir de la dirección física pedida. En caso satisfactorio se responderá un mensaje de ‘OK’.
 */
 
-void escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
+void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
 {
-    u_int32_t frame = get_numero_de_frame(direccion_fisica);
-    u_int32_t limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+    /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
+    ya que antes se obtuvieron los marcos correspondientes*/
+    u_int32_t frame;
+    u_int32_t limite_de_frame;
     u_int32_t tamanio_guardado = 0;
+    u_int32_t *direccion_fisica_a_recorrer;
+    int i = 0;
 
-    while ((direccion_fisica < limite_de_frame) && (tamanio_guardado < tamanio_buffer))
+    while (tamanio_guardado <= tamanio_buffer)
     {
-        memcpy(memoria_usuario + direccion_fisica, buffer, 1); // Va copiando byte por byte del buffer a la memoria
-        direccion_fisica++;
-        buffer++;
+
+        direccion_fisica_a_recorrer = list_get(direcciones_fisicas, i);
+        frame = get_numero_de_frame(*direccion_fisica_a_recorrer);
+        limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+
+        while ((*direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_guardado <= tamanio_buffer))
+        {
+            memcpy(memoria_usuario + (*direccion_fisica_a_recorrer), buffer, 1); // Va copiando byte por byte del buffer a la memoria
+            (*direccion_fisica_a_recorrer)++;
+            buffer++;
+            tamanio_guardado++;
+        }
+        i++;
     }
     if (tamanio_guardado == tamanio_buffer)
     {
-        // RESPONDER OK A CPU O INTERFAZ DE I/O
         enviar_mensaje("OK", fd);
     }
     else
     {
-        // LOGICA PARA SEGUIR ESCRIBIENDO
-        // u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
-        // LOGICA PARA DEVOLVER A CPU EL NUMERO DE PAGINA SIGUIENTE
+        // ERROR
     }
 }
 
-void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer, int32_t fd)
+void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer, int32_t fd)
 {
-    u_int32_t frame = get_numero_de_frame(direccion_fisica);
-    u_int32_t limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+    /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
+    ya que antes se obtuvieron los marcos correspondientes*/
+    u_int32_t *direccion_fisica_a_recorrer;
+    u_int32_t frame;
+    u_int32_t limite_de_frame;
     u_int32_t tamanio_leido = 0;
     void *buffer = malloc(tamanio_buffer);
 
-    while ((direccion_fisica < limite_de_frame) && (tamanio_leido < tamanio_buffer))
+    while (tamanio_leido <= tamanio_buffer)
     {
-        memcpy(buffer, memoria_usuario + direccion_fisica, 1); // Va copiando byte por byte del buffer a la memoria
-        direccion_fisica++;
-        buffer++;
+
+        direccion_fisica_a_recorrer = list_get(direcciones_fisicas, 0);
+        frame = get_numero_de_frame(*direccion_fisica_a_recorrer);
+        limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+
+        while ((*direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido <= tamanio_buffer))
+        {
+            memcpy(buffer, memoria_usuario + (*direccion_fisica_a_recorrer), 1); // Va copiando byte por byte del buffer a la memoria
+            (*direccion_fisica_a_recorrer)++;
+            buffer++;
+            tamanio_leido++;
+        }
     }
+
     if (tamanio_leido == tamanio_buffer)
     {
         // DEVOLVER BUFFER A CPU (la cpu se debe encargar de castearlo ya que puede ser un int32 o int8) O STRING A INTERFAZ DE I/O
@@ -194,9 +218,7 @@ void leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t t
     }
     else
     {
-        // LOGICA PARA SEGUIR LEYENDO
-        // u_int32_t nro_pag_sig = obtener_numero_pagina_siguiente(pid, frame);
-        // LOGICA PARA DEVOLVER A CPU EL NUMERO DE PAGINA SIGUIENTE
+        // ERROR
     }
 }
 
@@ -221,28 +243,6 @@ u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
         printf("No tiene marco asignado");
     }
     return *valor;
-}
-
-u_int32_t obtener_numero_pagina_siguiente(u_int32_t pid, u_int32_t frame)
-{
-    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
-    u_int32_t nro_pagina_actual;
-
-    t_list_iterator *iterador = list_iterator_create(proceso_y_tabla->tabla_paginas);
-
-    while (list_iterator_has_next(iterador))
-    {
-        u_int32_t *nro_frame = (u_int32_t *)list_iterator_next(iterador);
-        if (*nro_frame == frame)
-        {
-            nro_pagina_actual = list_iterator_index(iterador);
-            break;
-        }
-    }
-
-    list_iterator_destroy(iterador);
-
-    return nro_pagina_actual + 1;
 }
 
 void destruir_memoria_usuario()

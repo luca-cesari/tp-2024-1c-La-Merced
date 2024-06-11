@@ -14,13 +14,13 @@ typedef enum
 
 typedef struct
 {
-   u_int32_t direccion_fisica;
+   char *direcciones_fisicas;
    u_int32_t tamanio_buffer;
 } param_leer;
 
 typedef struct
 {
-   u_int32_t direccion_fisica;
+   char *direcciones_fisicas;
    u_int32_t tamanio_buffer;
    void *buffer;
 } param_escribir;
@@ -46,5 +46,7 @@ t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid,
 void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request);
 t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu);
 void destruir_cpu_mem_request(t_cpu_mem_req *mem_request);
+
+t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas);
 
 #endif // UTILS_MEM_REQUEST_CPU_H
