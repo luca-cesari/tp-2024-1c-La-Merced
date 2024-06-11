@@ -4,11 +4,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <commons/string.h>
-#include <commons/collections/dictionary.h>
+#include <string.h>
 #include <sockets/sockets.h>
+
 #include "config/config.h"
+#include "logger/logger.h"
+#include "conexion/kernel.h"
 
 
 void inicializar_interfaz_stdout(void);
+void io_stdout_write(char *parametros);
 
 #endif // STDOUT_H

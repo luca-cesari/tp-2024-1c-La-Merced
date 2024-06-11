@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <commons/string.h>
-#include <commons/collections/dictionary.h>
+#include <string.h>
 #include <sockets/sockets.h>
 
 #include "config/config.h"
@@ -13,7 +13,6 @@
 
 
 void iniciar_rutina_interfaz_stdin(void);
-void inicializar_instrucciones(void);
 void io_stdin_read(char *);
 
 #endif // STDIN_H
