@@ -101,11 +101,13 @@ void escuchar_cpu(int32_t fd_cpu)
 
         case LEER:
             printf("LEER \n");
+            // CORREGIR ESTO PARA RECIBIR LISTA DE DIRECCIONES FISICAS
             leer_memoria_usuario(mem_request->pid, mem_request->parametros.param_leer.direccion_fisica, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
             break;
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
+            // CORREGIR ESTO PARA RECIBIR LISTA DE DIRECCIONES FISICAS
             escribir_memoria_usuario(mem_request->pid, mem_request->parametros.param_escribir.direccion_fisica, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
             break;
 

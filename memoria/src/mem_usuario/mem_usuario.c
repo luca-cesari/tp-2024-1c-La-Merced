@@ -245,28 +245,6 @@ u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
     return *valor;
 }
 
-u_int32_t obtener_numero_pagina_siguiente(u_int32_t pid, u_int32_t frame)
-{
-    t_proceso_y_tabla *proceso_y_tabla = obtener_tabla_segun_proceso(pid);
-    u_int32_t nro_pagina_actual;
-
-    t_list_iterator *iterador = list_iterator_create(proceso_y_tabla->tabla_paginas);
-
-    while (list_iterator_has_next(iterador))
-    {
-        u_int32_t *nro_frame = (u_int32_t *)list_iterator_next(iterador);
-        if (*nro_frame == frame)
-        {
-            nro_pagina_actual = list_iterator_index(iterador);
-            break;
-        }
-    }
-
-    list_iterator_destroy(iterador);
-
-    return nro_pagina_actual + 1;
-}
-
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);
