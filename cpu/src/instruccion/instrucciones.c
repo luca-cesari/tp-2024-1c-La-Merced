@@ -82,6 +82,12 @@ void resize(char **parametros_char)
    enviar_mem_request(mem_request);
 }
 
+void copy_string(char **parametros)
+{
+   // Toma del string apuntado por el registro SI y copia la cantidad de bytes indicadas en el parámetro tamaño
+   // a la posición de memoria apuntada por el registro DI.
+}
+
 void io_gen_sleep(char **parametros)
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_GEN_SLEEP", parametros[1]);
