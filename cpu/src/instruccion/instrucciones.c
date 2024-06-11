@@ -128,16 +128,24 @@ char **eliminar_primer_elemento(char **array)
 {
    int tamano = string_array_size(array);
 
+   char **nuevo_array = malloc(sizeof(char *) * (tamano - 1));
+
    // Verificar que el array no esté vacío
-   if (tamano > 0)
+
+   for (int i = 0; i < tamano - 1; i++)
    {
-      // Desplazar todos los punteros una posición hacia la izquierda
-      for (int i = 0; i < tamano - 1; i++)
-      {
-         array[i] = array[i + 1];
-      }
-      // Establecer el último puntero a NULL para marcar el final del array
-      array[tamano - 1] = NULL;
+      nuevo_array[i] = strdup(array[i + 1]);
    }
-   return array;
+
+   // if (tamano > 0)
+   // {
+   //    // Desplazar todos los punteros una posición hacia la izquierda
+   //    for (int i = 0; i < tamano - 1; i++)
+   //    {
+   //       array[i] = array[i + 1];
+   //    }
+   //    // Establecer el último puntero a NULL para marcar el final del array
+   //    array[tamano - 1] = NULL;
+   // }
+   return nuevo_array;
 }
