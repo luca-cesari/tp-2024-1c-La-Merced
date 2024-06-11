@@ -8,20 +8,17 @@
 #include <io_request/io_request.h>
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
+#include <mem_request/cpu.h>
+
+#include "conexion/memoria.h"
 
 /// ESTRUCTURAS DECODE ////////
-
-// ver porque los registros pueden ser de 32 o 8 bits => de que tipo son
-// void *set(char *registro, char *valor);
-// void *sum(char *registro_destino, char *registro_origen);
-// void *sub(char *registro_destino, char *registro_origen);
-// void *jnz(char *registro, char *instruccion);
-// void *io_gen_sleep(char *interfaz, char *unidades_trabajo);
 
 void set(char **parametros);
 void sum(char **parametros);
 void sub(char **parametros);
 void jnz(char **parametros);
+void resize(char **parametros);
 void io_gen_sleep(char **parametros);
 void io_stdin_read(char **parametros);
 void io_stdout_write(char **parametros);
