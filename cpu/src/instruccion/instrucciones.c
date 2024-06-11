@@ -82,10 +82,10 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
-   char *tamanio_valor = "1";
+   char *tamanio_valor = "255";
    if (string_starts_with(parametros[1], "E"))
    {
-      tamanio_valor = "4";
+      tamanio_valor = "4294967295";
    }
    // obtener direcciones fisicas con mmu
    // concatenar direcciones fisicas con el 4 o 1 y enviarlo como parametros, con el numero adelante
