@@ -149,20 +149,38 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
-   char *tamanio_valor = "255";
-   if (string_starts_with(parametros[1], "E"))
-   {
-      tamanio_valor = "4294967295";
-   }
+   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_tamanio = dictionary_get(registros, parametros[1]);
+   char *tamanio_valor = string_itoa(*registro_tamanio);
    // obtener direcciones fisicas con mmu
+   char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
+   char *tamanio_direcciones = string_new();
+
    // concatenar direcciones fisicas con el 4 o 1 y enviarlo como parametros, con el numero adelante
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", array_a_string(eliminar_primer_elemento(parametros)));
+   string_append(&tamanio_direcciones, tamanio_valor);
+   string_append(&tamanio_direcciones, " ");
+   string_append(&tamanio_direcciones, direcciones_fisicas);
+
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", tamanio_direcciones);
    pcb->io_request = io_request;
 }
 
 void io_stdout_write(char **parametros)
 {
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", array_a_string(eliminar_primer_elemento(parametros)));
+   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_tamanio = dictionary_get(registros, parametros[1]);
+   char *tamanio_valor = string_itoa(*registro_tamanio);
+
+   // obtener direcciones fisicas con mmu
+   char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
+   char *tamanio_direcciones = string_new();
+
+   // concatenar tamanio con direcciones fisicas
+   string_append(&tamanio_direcciones, tamanio_valor);
+   string_append(&tamanio_direcciones, " ");
+   string_append(&tamanio_direcciones, direcciones_fisicas);
+
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", tamanio_direcciones);
    pcb->io_request = io_request;
 }
 
