@@ -19,6 +19,15 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
    return pcb;
 }
 
+t_proceso *crear_estructura_proceso(u_int32_t pid, t_pcb *pcb)
+{
+   t_proceso *proceso = malloc(sizeof(t_proceso));
+
+   proceso->pid = pid;
+   proceso->pcb = pcb;
+   return proceso;
+}
+
 void destruir_pcb(t_pcb *pcb)
 {
    free(pcb->executable);
