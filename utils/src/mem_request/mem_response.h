@@ -1,0 +1,10 @@
+#ifndef UTILS_MEM_REQUEST_RESPONSE_H
+#define UTILS_MEM_REQUEST_RESPONSE_H
+
+typedef enum
+{
+   OPERATION_SUCCEED,
+   OPERATION_FAILED,
+} t_mem_response;
+
+#endif // UTILS_MEM_REQUEST_RESPONSE_H

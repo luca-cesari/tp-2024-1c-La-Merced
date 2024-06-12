@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <protocol/protocol.h>
+#include "mem_response.h"
+
 typedef enum
 {
    LEER_IO,
