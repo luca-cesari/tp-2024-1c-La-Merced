@@ -1,9 +1,6 @@
 #include "estado_frame.h"
 
 t_estado_frame *bitmap;
-
-// es la cantidad de elementos (frames) que tiene el array
-// no es la cantidad de bytes que ocupa
 u_int32_t frames_totales;
 u_int32_t frames_libres;
 
