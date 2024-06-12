@@ -23,9 +23,12 @@ void mov_in(char **parametros_recibidos)
    u_int32_t tamanio_pagina = 32; // lo tengo que traer desde la memoria, se debería hacer en el handshake
    u_int32_t tamanio_registro;
    u_int32_t *registro_datos = dictionary_get(registros, parametros_recibidos[0]);
-   u_int32_t *registro_direccion = dictionary_get(registros, parametros_recibidos[1]);
+   u_int32_t *direccion_logica = dictionary_get(registros, parametros_recibidos[1]);
+   u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
+   t_cpu_mem_req *mem_request;
+   parametros parametros_leer;
 
-   if (string_starts_with(parametros_recibidos[0], "E"))
+   if (string_starts_with(registro_datos, "E"))
    {
       tamanio_registro = 4;
    }
@@ -34,23 +37,19 @@ void mov_in(char **parametros_recibidos)
       tamanio_registro = 1;
    }
 
-   u_int32_t direccion_logica = *registro_direccion;
-   u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
    u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
-   char *direcciones_fisicas = malloc(100); // Ver cuantas direcciones se podrían llegar a necesitar
+   char *direcciones_fisicas = malloc(100); // Ver cuantas direcciones se podrían llegar a necesitar. Cada dir fisica calculo que puede escribirse como muy largo "XXX.XXX.XXX"
 
    char *direccion_fisica_actual_str = string_itoa(mmu(direccion_logica));
    direcciones_fisicas = direccion_fisica_actual_str;
 
-   for (u_int32_t pagina = pagina_inicial + 1; pagina <= pagina_final; pagina++)
+   for (u_int32_t pagina = pagina_inicial + 1; pagina <= pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
    {
       direccion_fisica_actual_str = string_itoa(mmu(direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
       string_append(&direcciones_fisicas, " ");
       string_append(&direcciones_fisicas, direccion_fisica_actual_str);
    }
 
-   t_cpu_mem_req *mem_request;
-   parametros parametros_leer;
    parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
    parametros_leer.param_leer.tamanio_buffer = tamanio_registro;
 
