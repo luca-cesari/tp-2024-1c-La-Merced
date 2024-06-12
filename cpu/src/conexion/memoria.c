@@ -1,6 +1,7 @@
 #include "memoria.h"
 
 int32_t fd_memoria;
+u_int32_t tamanio_pagina;
 
 int8_t conectar_con_memoria()
 {
@@ -13,6 +14,8 @@ int8_t conectar_con_memoria()
       liberar_conexion(fd_memoria);
       return -1;
    }
+
+   tamanio_pagina = recibir_senial(fd_memoria);
 
    return 0;
 }
@@ -29,14 +32,26 @@ char *recibir_instruccion()
    return instruccion;
 }
 
+char *recibir_confirmacion()
+{
+   char *instruccion = recibir_mensaje(fd_memoria);
+
+   return instruccion;
+}
+
+u_int32_t recibir_valor()
+{
+   return recibir_senial(fd_memoria);
+}
+
 u_int32_t recibir_marco()
 {
    return recibir_senial(fd_memoria);
 }
 
-u_int32_t recibir_tamanio_pagina()
+u_int32_t get_tamanio_pagina()
 {
-   return recibir_senial(fd_memoria);
+   return tamanio_pagina;
 }
 
 void liberar_conexion_memoria()
