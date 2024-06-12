@@ -38,7 +38,7 @@ void inicializar_diccionario_registros();
 /////////AUX//////
 char *array_a_string(char **array);
 char **eliminar_primer_elemento(char **array);
-
+char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro, u_int32_t tamanio_pagina);
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)

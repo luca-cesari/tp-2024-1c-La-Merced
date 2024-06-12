@@ -24,11 +24,12 @@ void mov_in(char **parametros_recibidos)
    u_int32_t tamanio_registro;
    u_int32_t *registro_datos = dictionary_get(registros, parametros_recibidos[0]);
    u_int32_t *direccion_logica = dictionary_get(registros, parametros_recibidos[1]);
-   u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
+
    t_cpu_mem_req *mem_request;
    parametros parametros_leer;
+   char *direcciones_fisicas;
 
-   if (string_starts_with(registro_datos, "E"))
+   if (string_starts_with(parametros_recibidos[0], "E"))
    {
       tamanio_registro = 4;
    }
@@ -37,6 +38,21 @@ void mov_in(char **parametros_recibidos)
       tamanio_registro = 1;
    }
 
+   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro, tamanio_pagina);
+
+   parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
+   parametros_leer.param_leer.tamanio_buffer = tamanio_registro;
+
+   mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
+
+   enviar_mem_request(mem_request);
+
+   *registro_datos = recibir_valor();
+}
+
+char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro, u_int32_t tamanio_pagina)
+{
+   u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
    u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
    char *direcciones_fisicas = malloc(100); // Ver cuantas direcciones se podrían llegar a necesitar. Cada dir fisica calculo que puede escribirse como muy largo "XXX.XXX.XXX"
 
@@ -50,12 +66,7 @@ void mov_in(char **parametros_recibidos)
       string_append(&direcciones_fisicas, direccion_fisica_actual_str);
    }
 
-   parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
-   parametros_leer.param_leer.tamanio_buffer = tamanio_registro;
-
-   mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
-   enviar_mem_request(mem_request);
-   *registro_datos = recibir_valor();
+   return direcciones_fisicas;
 }
 
 void mov_out(char **parametros)
