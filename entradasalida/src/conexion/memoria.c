@@ -17,6 +17,11 @@ int8_t conectar_con_memoria()
    return 0;
 }
 
+void enviar_mem_request(t_io_mem_req *mem_request)
+{
+   enviar_io_mem_request(fd_memoria, mem_request);
+}
+
 void liberar_conexion_memoria()
 {
    liberar_conexion(fd_memoria);
