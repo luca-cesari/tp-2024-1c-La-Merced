@@ -2,85 +2,59 @@
 #define MEM_USUARIO_H
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <commons/collections/list.h>
+#include <protocol/protocol.h>
 
 #include "config/config.h"
-#include "protocol/protocol.h"
-
-/*Deprecado
-typedef struct
-{
-    u_int32_t nro_pagina;
-    u_int32_t nro_frame;
-    // No pongo ni bit de presencia ni demás porque no hay memoria virtual
-} t_fila_tabla;
-*/
-
-typedef struct
-{
-    u_int32_t pid;
-    t_list *tabla_paginas;
-} t_proceso_y_tabla;
-
-typedef enum
-{
-    LIBRE,
-    OCUPADO
-} t_estado_frame;
+#include "estado_frame/estado_frame.h"
+#include "tabla_paginas/tabla_paginas.h"
 
 /**
- * @brief Inicializa la memoria de usuario, es decir el espacio de memoria dado por el archivo de configuracion.
- **/
-void inicializar_memoria_usuario();
+ * @brief Función constructor de la memoria de usuario.
+ *        Inicializa la memoria de usuario con el espacio
+ *        especificado por el archivo de configuración.
+ */
+void inicializar_memoria_usuario(void);
 
 /**
- * @brief Inicializa la lista de tablas de paginas de los procesos. Cada tabla de página va a estar asociada a un PID, es decir un proceso.
- **/
-void inicializar_lista_tablas_de_paginas();
+ * @brief Función llamada ante una petición de `RESIZE`.
+ *        Evalúa el tamaño solicitado respecto del actual y,
+ *        amplía o reduce según resultado.
+ *
+ * @param pid
+ * @param tamanio
+ * @return `int8_t` : 0 si se pudo ajustar, -1 en caso de error.
+ */
+int8_t ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio);
 
 /**
- * @brief Inicializa el bitmap para saber que frames están ocupados.
- **/
-void inicializar_bitmap();
+ * @brief Amplia memoria para un proceso.
+ *        Si la cantidad de memoria solicitada excede la cantidad
+ *        de memoria disponible, retorna -1.
+ *
+ * @param tabla_de_paginas
+ * @param tamanio_nuevo
+ * @return `int8_t` : 0 si se pudo ampliar, -1 en caso de error.
+ */
+int8_t ampliar_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
 
 /**
- * @brief Modifica el estado de un frame en el bitmap(LIBRE / OCUPADO).
- **/
-void modificar_bitmap(u_int32_t frame, t_estado_frame estado);
-
-u_int32_t get_cantidad_frames(); // AUX
-
-u_int32_t get_numero_de_frame(u_int32_t direccion_fisica); // AUX
-
-void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
-
-void destruir_tabla_de_paginas_para_proceso(u_int32_t pid);
-
-void ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio);
-/**
- * @brief Amplia memoria para un proceso en caso que el RESIZE sea mayor al espacio que ya tiene.
- **/
-void ampliar_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
-
-/**
- * @brief Reduce memoria para un proceso en caso que el RESIZE sea menor al espacio que ya tiene.
- **/
-void reducir_memoria_para_proceso(t_proceso_y_tabla *proceso_y_tabla, u_int32_t tamanio_nuevo);
-
-u_int32_t get_frame_libre(); // AUX
-
-u_int32_t get_cantidad_frames_disponibles(); // AUX
+ * @brief Reduce memoria para un proceso.
+ *
+ * @param tabla_de_paginas
+ * @param tamanio_nuevo
+ * @return `int8_t` : 0 si se pudo reducir, -1 en caso de error.
+ */
+int8_t reducir_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
 
 void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio, int32_t fd);
 
 void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio, int32_t fd);
 
+/**
+ * @brief Función destructor de la memoria de usuario.
+ */
 void destruir_memoria_usuario();
-
-t_proceso_y_tabla *obtener_tabla_segun_proceso(u_int32_t pid);
-
-u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag);
 
 #endif // MEM_USUARIO_H
