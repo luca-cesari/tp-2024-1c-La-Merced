@@ -18,9 +18,8 @@ void set(char **parametros)
    }
 }
 
-void mov_in(char **parametros_recibidos)
+void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Dirección)
 {
-   u_int32_t tamanio_pagina = 32; // lo tengo que traer desde la memoria, se debería hacer en el handshake
    u_int32_t tamanio_registro;
    u_int32_t *registro_datos = dictionary_get(registros, parametros_recibidos[0]);
    u_int32_t *direccion_logica = dictionary_get(registros, parametros_recibidos[1]);
@@ -39,7 +38,7 @@ void mov_in(char **parametros_recibidos)
       tamanio_registro = 1;
    }
 
-   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro, tamanio_pagina);
+   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro);
 
    parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
    parametros_leer.param_leer.tamanio_buffer = tamanio_registro;
@@ -51,13 +50,11 @@ void mov_in(char **parametros_recibidos)
    *registro_datos = recibir_valor();
 }
 
-void mov_out(char **parametros_recibidos)
+void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
 {
-   u_int32_t tamanio_pagina = 32; // lo tengo que traer desde la memoria, se debería hacer en el handshake
    u_int32_t tamanio_registro;
    u_int32_t *direccion_logica = dictionary_get(registros, parametros_recibidos[0]);
    u_int32_t *registro_datos = dictionary_get(registros, parametros_recibidos[1]);
-   // Lee el valor del Registro Datos y lo escribe en la dirección física de memoria obtenida a partir de la Dirección Lógica almacenada en el Registro Dirección.
 
    t_cpu_mem_req *mem_request;
    parametros parametros_escribir;
@@ -73,7 +70,7 @@ void mov_out(char **parametros_recibidos)
       tamanio_registro = 1;
    }
 
-   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro, tamanio_pagina);
+   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro);
 
    parametros_escribir.param_escribir.direcciones_fisicas = direcciones_fisicas;
    parametros_escribir.param_escribir.buffer = registro_datos;
@@ -213,8 +210,10 @@ char **eliminar_primer_elemento(char **array)
    return nuevo_array;
 }
 
-char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro, u_int32_t tamanio_pagina)
+char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro)
 {
+   u_int32_t tamanio_pagina = 32; // lo tengo que traer desde la memoria, se debería hacer en el handshake
+
    u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
    u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
    char *direcciones_fisicas = string_new();
