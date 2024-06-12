@@ -7,13 +7,17 @@ void inicializar_memoria_instrucciones()
     lista_procesos = list_create();
 }
 
-
 void cargar_proceso_a_memoria(int32_t pid, char *path)
 {
     t_list *instrucciones = list_create();
 
-    instrucciones = leer_instrucciones(path);
-    
+    char *path_completo = string_new();
+    string_append(&path_completo, get_path_instrucciones());
+    string_append(&path_completo, "/");
+    string_append(&path_completo, path);
+
+    instrucciones = leer_instrucciones(path_completo);
+
     t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
     proceso->pid = pid;
     proceso->path = strdup(path);
@@ -59,7 +63,7 @@ void eliminar_proceso(t_pcb *pcb)
     free(proceso);
 }
 
-char *proxima_instruccion(u_int32_t pid,int32_t program_counter)
+char *proxima_instruccion(u_int32_t pid, int32_t program_counter)
 {
     int es_proceso_buscado(void *elemento)
     {
