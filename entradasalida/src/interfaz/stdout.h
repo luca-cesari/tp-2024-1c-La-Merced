@@ -12,6 +12,7 @@
 #include "conexion/kernel.h"
 
 void inicializar_interfaz_stdout(void);
+void crear_instrucciones();
 void io_stdout_write(char *parametros);
 
 #endif // STDOUT_H
