@@ -1,47 +1,19 @@
 #include "mem_usuario.h"
 
 void *memoria_usuario;
-t_list *lista_tablas;
 
 static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
-static t_proceso_tabla *obtener_tabla_segun_proceso(u_int32_t pid);
 
 void inicializar_memoria_usuario()
 {
     memoria_usuario = malloc(get_tamanio_memoria());
-    lista_tablas = list_create();
+    inicializar_tabla_paginas();
     inicializar_bitmap_estados();
-}
-
-void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
-{
-    t_proceso_tabla *tabla_paginas = malloc(sizeof(t_proceso_tabla));
-    tabla_paginas->pid = pid;
-    tabla_paginas->lista_frames = list_create();
-    list_add(lista_tablas, tabla_paginas);
-}
-
-void destruir_tabla_de_paginas_para_proceso(u_int32_t pid)
-{
-    t_proceso_tabla *tabla_paginas = obtener_tabla_segun_proceso(pid);
-
-    t_list_iterator *iterador = list_iterator_create(tabla_paginas->lista_frames);
-    while (list_iterator_has_next(iterador))
-    {
-        u_int32_t *nro_frame = (u_int32_t *)list_iterator_next(iterador);
-        set_estado_frame(*nro_frame, LIBRE);
-    }
-
-    list_destroy_and_destroy_elements(tabla_paginas->lista_frames, &free);
-
-    list_iterator_destroy(iterador);
-    free(tabla_paginas);
 }
 
 int8_t ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
 {
-
-    t_proceso_tabla *tabla_paginas = obtener_tabla_segun_proceso(pid);
+    t_proceso_tabla *tabla_paginas = get_tabla_proceso(pid);
     u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t tamanio_nuevo = tamanio;
 
@@ -180,32 +152,11 @@ void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t 
     }
 }
 
-static t_proceso_tabla *obtener_tabla_segun_proceso(u_int32_t pid)
-{
-    int es_tabla_buscada(void *elemento)
-    {
-        t_proceso_tabla *tabla = (t_proceso_tabla *)elemento;
-        return tabla->pid == pid;
-    };
-    return list_find(lista_tablas, (void *)es_tabla_buscada);
-}
-
-u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
-{
-    t_proceso_tabla *proceso_tabla = obtener_tabla_segun_proceso(pid);
-    u_int32_t *valor = (u_int32_t *)list_get(proceso_tabla->lista_frames, nro_pag);
-    if (valor == NULL)
-    {
-        // ES NECESARIO SIGNO DE PREGUNTA
-        printf("No tiene marco asignado");
-    }
-    return *valor;
-}
-
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);
     destruir_bitmap_estados();
+    destruir_tabla_paginas();
 }
 
 static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)
