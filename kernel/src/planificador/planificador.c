@@ -3,6 +3,8 @@
 u_int32_t pid_count;
 u_int32_t quantum;
 
+t_mutext_list *lista_procesos;
+
 sem_t grado_multiprogramacion;
 
 q_estado *cola_new;
@@ -48,6 +50,7 @@ void inicializar_planificador()
    cola_exit = crear_estado(EXIT);
    cola_blocked_interfaces = crear_estado_blocked();
    cola_blocked_recursos = crear_estado_blocked();
+   lista_procesos = mlist_create();
 
    inicializar_recursos(cola_blocked_recursos);
 
@@ -126,11 +129,39 @@ void crear_proceso(char *ruta_ejecutable)
    set_quantum_pcb(pcb, quantum);
    push_proceso(cola_new, pcb);
    log_creacion_proceso(pcb->pid);
+   t_proceso *proceso = crear_estructura_proceso(pid_count++, pcb);
+   mlist_add(lista_procesos, proceso);
 }
 
 void matar_proceso(u_int32_t pid)
 {
-   // TODO
+   t_proceso *proceso_buscado = mlist_find(lista_procesos, pid);
+   t_pcb *pcb = proceso_buscado->pcb;
+   switch (pcb->estado)
+   {
+   case NEW:
+      proceso_buscado->pcb = remove_proceso(cola_new, pid);
+      break;
+   case READY:
+      proceso_buscado->pcb = remove_proceso(cola_ready, pid);
+      break;
+   case BLOCKED:
+      if (proceso_buscado->pcb->motivo_desalojo == WAIT)
+      {
+         proceso_buscado->pcb = remove_proceso(cola_blocked_recursos, pid);
+      }
+      if (proceso_buscado->pcb->motivo_desalojo == IO)
+      {
+         proceso_buscado->pcb = remove_proceso(cola_blocked_interfaces, pid);
+      }
+      break;
+   case EXEC:
+      enviar_interrupcion();
+      break;
+   default:
+      return;
+   }
+   pasar_a_exit(proceso_buscado->pcb, INTERRUPTED_BY_USER);
 }
 
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
