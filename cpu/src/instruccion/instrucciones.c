@@ -154,14 +154,14 @@ void io_stdin_read(char **parametros)
    char *tamanio_valor = string_itoa(*registro_tamanio);
    // obtener direcciones fisicas con mmu
    char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
-   char *tamanio_direcciones = string_new();
+   char *direcciones_tamanio = string_new();
 
    // concatenar tamanio con direcciones fisicas
-   string_append(&tamanio_direcciones, tamanio_valor);
-   string_append(&tamanio_direcciones, " ");
-   string_append(&tamanio_direcciones, direcciones_fisicas);
+   string_append(&direcciones_tamanio, direcciones_fisicas);
+   string_append(&direcciones_tamanio, " ");
+   string_append(&direcciones_tamanio, tamanio_valor);
 
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", tamanio_direcciones);
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
    pcb->io_request = io_request;
 }
 
@@ -173,14 +173,14 @@ void io_stdout_write(char **parametros)
 
    // obtener direcciones fisicas con mmu
    char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
-   char *tamanio_direcciones = string_new();
+   char *direcciones_tamanio = string_new();
 
    // concatenar tamanio con direcciones fisicas
-   string_append(&tamanio_direcciones, tamanio_valor);
-   string_append(&tamanio_direcciones, " ");
-   string_append(&tamanio_direcciones, direcciones_fisicas);
+   string_append(&direcciones_tamanio, direcciones_fisicas);
+   string_append(&direcciones_tamanio, " ");
+   string_append(&direcciones_tamanio, tamanio_valor);
 
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", tamanio_direcciones);
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
    pcb->io_request = io_request;
 }
 
@@ -229,16 +229,6 @@ char **eliminar_primer_elemento(char **array)
       nuevo_array[i] = strdup(array[i + 1]);
    }
 
-   // if (tamano > 0)
-   // {
-   //    // Desplazar todos los punteros una posición hacia la izquierda
-   //    for (int i = 0; i < tamano - 1; i++)
-   //    {
-   //       array[i] = array[i + 1];
-   //    }
-   //    // Establecer el último puntero a NULL para marcar el final del array
-   //    array[tamano - 1] = NULL;
-   // }
    return nuevo_array;
 }
 
