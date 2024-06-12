@@ -212,8 +212,7 @@ char **eliminar_primer_elemento(char **array)
 
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro)
 {
-   u_int32_t tamanio_pagina = 32; // lo tengo que traer desde la memoria, se debería hacer en el handshake
-
+   u_int32_t tamanio_pagina = get_tamanio_pagina();
    u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
    u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
    char *direcciones_fisicas = string_new();

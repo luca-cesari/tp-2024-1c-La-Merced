@@ -4,7 +4,7 @@ u_int32_t mmu(u_int32_t direccion_logica)
 {
    u_int32_t pid = process_getpid();
 
-   u_int32_t tamanio_pagina = recibir_tamanio_pagina(); // lo tengo que traer desde la memoria
+   u_int32_t tamanio_pagina = get_tamanio_pagina(); // lo tengo que traer desde la memoria
    u_int32_t numero_pagina = direccion_logica / tamanio_pagina;
    u_int32_t desplazamiento = direccion_logica - (numero_pagina * tamanio_pagina);
 
