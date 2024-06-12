@@ -1,6 +1,6 @@
 #include "entradasalida.h"
 
-t_io_mem_req *crear_cpu_mem_request(io_req_operation operacion, u_int32_t pid, parametros parametro)
+t_io_mem_req *crear_io_mem_request(io_req_operation operacion, u_int32_t pid, parametros parametro)
 {
    t_io_mem_req *mem_request = malloc(sizeof(t_io_mem_req));
    mem_request->operacion = operacion;
@@ -47,7 +47,7 @@ void enviar_io_mem_request(int32_t fd_memoria, t_io_mem_req *mem_request)
    eliminar_paquete(paquete);
 }
 
-t_io_mem_req *recibir_cpu_mem_request(int32_t fd_io)
+t_io_mem_req *recibir_io_mem_request(int32_t fd_io)
 {
    t_list *paquete = recibir_paquete(fd_io);
    t_io_mem_req *mem_request = malloc(sizeof(t_io_mem_req));

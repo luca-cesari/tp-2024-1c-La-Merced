@@ -36,9 +36,9 @@ typedef struct
 
 } t_io_mem_req;
 
-t_io_mem_req *crear_cpu_mem_request(io_req_operation operacion, u_int32_t pid, parametros parametro);
-void enviar_cpu_mem_request(int32_t fd_memoria, t_io_mem_req *mem_request);
-t_io_mem_req *recibir_cpu_mem_request(int32_t fd);
-void destruir_cpu_mem_request(t_io_mem_req *mem_request);
+t_io_mem_req *crear_io_mem_request(io_req_operation operacion, u_int32_t pid, parametros parametro);
+void enviar_io_mem_request(int32_t fd_memoria, t_io_mem_req *mem_request);
+t_io_mem_req *recibir_io_mem_request(int32_t fd);
+void destruir_io_mem_request(t_io_mem_req *mem_request);
 
 #endif // UTILS_MEM_REQUEST_ENTRADASALIDA_H
