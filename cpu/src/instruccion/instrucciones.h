@@ -6,10 +6,14 @@
 #include <string.h>
 #include <pcb/pcb.h>
 #include <io_request/io_request.h>
+#include <mem_request/cpu.h>
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
 #include <mem_request/cpu.h>
 
+#include "conexion/memoria.h"
+
+#include "mmu/mmu.h"
 #include "conexion/memoria.h"
 
 /// ESTRUCTURAS DECODE ////////
@@ -31,7 +35,7 @@ void inicializar_diccionario_registros();
 /////////AUX//////
 char *array_a_string(char **array);
 char **eliminar_primer_elemento(char **array);
-
+char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro);
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)
