@@ -20,11 +20,13 @@ typedef enum
 
 typedef enum
 {
+   NONE,
    TERMINATED,
    QUANTUM,
    IO,
    WAIT,
-   SIGNAL
+   SIGNAL,
+   ERROR
 } motivo_desalojo;
 
 typedef enum

@@ -9,6 +9,7 @@
 #include <pcb/pcb.h>
 
 #include "logger/logger.h"
+#include "procesos/procesos.h"
 #include "estado/estado.h"
 #include "blocked/interfaces.h"
 #include "blocked/recursos.h"

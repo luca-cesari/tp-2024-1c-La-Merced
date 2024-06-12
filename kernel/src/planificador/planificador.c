@@ -49,6 +49,8 @@ void inicializar_planificador()
    cola_blocked_interfaces = crear_estado_blocked();
    cola_blocked_recursos = crear_estado_blocked();
 
+   inicializar_lista_procesos();
+
    inicializar_recursos(cola_blocked_recursos);
 
    // ...................................................................
@@ -95,6 +97,8 @@ void destruir_planificador()
    destruir_estado(cola_exit);
    destruir_estado_blocked(cola_blocked_interfaces, &destruir_io_queue);
    destruir_estado_blocked(cola_blocked_recursos, &destruir_resource_queue);
+
+   destruir_lista_procesos();
 }
 
 void iniciar_planificacion()
@@ -124,13 +128,46 @@ void crear_proceso(char *ruta_ejecutable)
 {
    t_pcb *pcb = crear_pcb(pid_count++, ruta_ejecutable);
    set_quantum_pcb(pcb, quantum);
+
+   registrar_proceso(pcb);
    push_proceso(cola_new, pcb);
+
    log_creacion_proceso(pcb->pid);
 }
 
 void matar_proceso(u_int32_t pid)
 {
-   // TODO
+   t_pcb *proceso = obtener_proceso_por_pid(pid);
+   if (proceso == NULL)
+      return;
+
+   switch (proceso->estado)
+   {
+   case NEW:
+      proceso = remove_proceso(cola_new, pid);
+      break;
+   case READY:
+      proceso = remove_proceso(cola_ready, pid);
+      break;
+   case BLOCKED:
+      if (proceso->motivo_desalojo == WAIT)
+         proceso = remove_proceso_cola_recurso(cola_blocked_recursos,
+                                               proceso->resource,
+                                               pid);
+      if (proceso->motivo_desalojo == IO)
+         proceso = remove_proceso_cola_io(cola_blocked_interfaces,
+                                          proceso->io_request->interface_name,
+                                          pid);
+      break;
+   case EXEC:
+      proceso = remove_proceso(cola_exec, pid);
+      enviar_interrupcion();
+      break;
+   case EXIT:
+      return;
+   }
+
+   pasar_a_exit(proceso, INTERRUPTED_BY_USER);
 }
 
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
@@ -173,6 +210,9 @@ static void *consumir_io(void *cola_io)
          break;
       case EXECUTED:
          pasar_a_ready_segun_prioridad(pcb);
+         break;
+      case FAILED:
+         pasar_a_exit(pcb, ERROR);
          break;
       case -1: // cuando una interfaz se desconecta
          pasar_a_exit(pcb, INVALID_INTERFACE);
@@ -219,8 +259,10 @@ static void *finalizar_proceso()
    while (1)
    {
       t_pcb *pcb = pop_proceso(cola_exit);
+
       memoria_finalizar_proceso(pcb->pid);
       liberar_recursos(pcb);
+      quitar_proceso_por_pid(pcb->pid); // a chequear
 
       log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
       destruir_pcb(pcb);
@@ -258,7 +300,9 @@ static void liberar_recursos(t_pcb *proceso)
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
 {
-   q_estado *ready = proceso->priority == 0 ? cola_ready : cola_ready_prioridad;
+   q_estado *ready = proceso->priority == 0
+                         ? cola_ready
+                         : cola_ready_prioridad;
    push_proceso(ready, proceso);
 
    // el valor de proceso->priority coincide con el tipo_cola_ready
@@ -295,6 +339,11 @@ static void pasar_a_siguiente(t_pcb *pcb)
    case TERMINATED:
       pasar_a_exit(pcb, SUCCESS);
       break;
+   case ERROR:
+      pasar_a_exit(pcb, pcb->motivo_finalizacion);
+      break;
+   default: // no debería llegar aca nunca (caso NONE)
+      break;
    }
 }
 
@@ -317,8 +366,6 @@ static void manejar_wait(t_pcb *pcb)
    default: // no debería llegar aca nunca (caso RELEASED)
       break;
    }
-
-   set_recurso_pcb(pcb, ""); // resetea el campo resource
 }
 
 static void manejar_signal(t_pcb *pcb)
@@ -338,8 +385,6 @@ static void manejar_signal(t_pcb *pcb)
    default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
       break;
    }
-
-   set_recurso_pcb(pcb, ""); // resetea el campo resource
 }
 
 static void *planificar_por_fifo()
@@ -347,6 +392,7 @@ static void *planificar_por_fifo()
    while (1)
    {
       t_pcb *proceso = pop_proceso(cola_ready);
+      set_motivo_desalojo(proceso, NONE);
       push_proceso(cola_exec, proceso);
 
       proceso = peek_proceso(cola_exec);
@@ -374,6 +420,7 @@ static void *planificar_por_rr()
    while (1)
    {
       t_pcb *proceso = pop_proceso(cola_ready);
+      set_motivo_desalojo(proceso, NONE);
       push_proceso(cola_exec, proceso);
 
       proceso = peek_proceso(cola_exec);
@@ -403,8 +450,12 @@ static void *planificar_por_vrr()
 
    while (1)
    {
-      q_estado *ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
+      q_estado *ready = hay_proceso(cola_ready_prioridad)
+                            ? cola_ready_prioridad
+                            : cola_ready;
+
       t_pcb *proceso = pop_proceso(ready);
+      set_motivo_desalojo(proceso, NONE);
       push_proceso(cola_exec, proceso);
 
       proceso = peek_proceso(cola_exec);
@@ -429,7 +480,9 @@ static void *planificar_por_vrr()
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
-      u_int32_t quantum_proceso_nuevo = transcurrido < quantum ? quantum - transcurrido : quantum;
+      u_int32_t quantum_proceso_nuevo = transcurrido < quantum
+                                            ? quantum - transcurrido
+                                            : quantum;
       set_quantum_pcb(proceso, quantum_proceso_nuevo);
 
       int8_t prioridad = transcurrido < quantum ? 1 : 0;

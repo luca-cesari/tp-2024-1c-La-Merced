@@ -113,6 +113,15 @@ void desbloquear_colas_de_recursos(q_blocked *estado)
    mlist_iterate(estado->lista_colas, &_desbloquear_recurso);
 }
 
+t_pcb *remove_proceso_cola_recurso(q_blocked *estado, char *nombre_recurso, u_int32_t pid)
+{
+   resource_queue *recurso = buscar_recurso(estado, nombre_recurso);
+   if (recurso == NULL)
+      return NULL;
+
+   return remove_proceso(recurso->cola_procesos, pid);
+}
+
 static resource_queue *crear_recurso(char *nombre_recurso, u_int32_t instancias)
 {
    resource_queue *recurso = malloc(sizeof(resource_queue));

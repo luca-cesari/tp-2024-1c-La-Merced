@@ -118,4 +118,14 @@ void bloquear_colas_de_recursos(q_blocked *estado);
  */
 void desbloquear_colas_de_recursos(q_blocked *estado);
 
+/**
+ * @brief Busca el recurso en el estado y remueve un proceso según el PID.
+ *
+ * @param estado
+ * @param nombre_recurso
+ * @param pid
+ * @return `t_pcb*`
+ */
+t_pcb *remove_proceso_cola_recurso(q_blocked *estado, char *nombre_recurso, u_int32_t pid);
+
 #endif // RECURSOS_H
