@@ -104,11 +104,10 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
 t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas)
 {
    t_list *lista_direcciones = list_create();
-   char *direccion = strtok(direcciones_fisicas, " ");
-   while (direccion != NULL)
+   char **direcciones = string_split(direcciones_fisicas, " ");
+   for (int i = 0; direcciones[i] != NULL; i++)
    {
-      list_add(lista_direcciones, direccion);
-      direccion = strtok(NULL, " ");
+      list_add(lista_direcciones, direcciones[i]);
    }
    return lista_direcciones;
 }

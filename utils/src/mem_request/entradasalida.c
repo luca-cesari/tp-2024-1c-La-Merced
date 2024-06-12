@@ -50,6 +50,9 @@ void enviar_io_mem_request(int32_t fd_memoria, t_io_mem_req *mem_request)
 t_io_mem_req *recibir_io_mem_request(int32_t fd_io)
 {
    t_list *paquete = recibir_paquete(fd_io);
+   if (paquete == NULL)
+      return NULL;
+
    t_io_mem_req *mem_request = malloc(sizeof(t_io_mem_req));
 
    mem_request->operacion = *(io_req_operation *)list_get(paquete, 0);

@@ -11,7 +11,7 @@ void inicializar_memoria_usuario()
     inicializar_bitmap_estados();
 }
 
-int8_t ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
+t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
 {
     t_proceso_tabla *tabla_paginas = get_tabla_proceso(pid);
     u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
@@ -27,17 +27,14 @@ int8_t ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
     }
 }
 
-int8_t ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
+t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
 {
     u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina();
     u_int32_t cantidad_frames_disponibles = get_cantidad_frames_disponibles();
 
     if (cantidad_frames_necesarios > cantidad_frames_disponibles)
-    {
-        // ERROR OUT OF MEMORY
-        return -1;
-    }
+        return OPERATION_FAILED;
 
     for (u_int32_t i = 0; i < cantidad_frames_necesarios; i++)
     {
@@ -48,10 +45,10 @@ int8_t ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t ta
         list_add(tabla_paginas->lista_frames, nro_frame);
     }
 
-    return 0;
+    return OPERATION_SUCCEED;
 }
 
-int8_t reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
+t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
 {
     u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t cantidad_frames_a_liberar = tamanio_actual / get_tamanio_pagina() - tamanio_nuevo / get_tamanio_pagina();
@@ -63,7 +60,7 @@ int8_t reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t ta
         list_remove(tabla_paginas->lista_frames, list_size(tabla_paginas->lista_frames) - 1);
     }
 
-    return 0;
+    return OPERATION_SUCCEED;
 }
 
 /*
@@ -101,14 +98,10 @@ void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *
         }
         i++;
     }
-    if (tamanio_guardado == tamanio_buffer)
-    {
-        enviar_mensaje("OK", fd);
-    }
-    else
-    {
-        // ERROR
-    }
+
+    return tamanio_guardado == tamanio_buffer
+               ? enviar_senial(OPERATION_SUCCEED, fd)
+               : enviar_senial(OPERATION_FAILED, fd);
 }
 
 void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer, int32_t fd)

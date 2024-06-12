@@ -2,7 +2,10 @@
 #define UTILS_MEM_REQUEST_CPU_H
 
 #include <stdlib.h>
+#include <commons/string.h>
 #include <protocol/protocol.h>
+#include "mem_response.h"
+
 typedef enum
 {
    FETCH_INSTRUCCION,

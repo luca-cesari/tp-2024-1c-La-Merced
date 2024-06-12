@@ -58,7 +58,7 @@ void escuchar_kernel(int32_t fd_kernel)
             crear_tabla_de_paginas_para_proceso(mem_request->pid);
 
             // Siempre envía resultado exitoso, podría haber error??
-            enviar_senial(0, fd_kernel);
+            enviar_senial(OPERATION_SUCCEED, fd_kernel);
             break;
 
         case FINALIZAR_PROCESO:
@@ -78,6 +78,7 @@ void escuchar_kernel(int32_t fd_kernel)
 void escuchar_cpu(int32_t fd_cpu)
 {
     printf("CPU conectado \n");
+    enviar_senial(get_tamanio_pagina(), fd_cpu);
 
     while (1)
     {
@@ -90,8 +91,6 @@ void escuchar_cpu(int32_t fd_cpu)
         case FETCH_INSTRUCCION:
             printf("FETCH_INSTRUCCION \n");
             char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
-            // u_int32_t tamanio_pagina = get_tamanio_pagina();
-            // enviar_senial(tamanio_pagina, fd_cpu);
             enviar_mensaje(instruccion, fd_cpu);
             break;
 
@@ -104,18 +103,25 @@ void escuchar_cpu(int32_t fd_cpu)
         case LEER:
             printf("LEER \n");
             direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            leer_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
+            leer_memoria_usuario(mem_request->pid,
+                                 direcciones_fisicas,
+                                 mem_request->parametros.param_leer.tamanio_buffer,
+                                 fd_cpu);
             break;
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
             direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
+            escribir_memoria_usuario(mem_request->pid,
+                                     direcciones_fisicas,
+                                     mem_request->parametros.param_escribir.buffer,
+                                     mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
             break;
 
         case RESIZE:
             printf("RESIZE \n");
-            ajustar_memoria_para_proceso(mem_request->pid, mem_request->parametros.tamanio_nuevo);
+            t_mem_response resultado = ajustar_memoria_para_proceso(mem_request->pid, mem_request->parametros.tamanio_nuevo);
+            enviar_senial(resultado, fd_cpu);
             break;
 
         default:
@@ -129,7 +135,35 @@ void escuchar_cpu(int32_t fd_cpu)
 void escuchar_interfaz_es(int32_t fd_es)
 {
     printf("Interfaz E/S conectada \n");
-    recibir_mensaje(fd_es);
+
+    while (1)
+    {
+        t_io_mem_req *mem_request = recibir_io_mem_request(fd_cpu);
+        t_list *direcciones_fisicas;
+
+        retardo_respuesta();
+        switch (mem_request->operacion)
+        {
+        case LEER_IO:
+            printf("LEER_IO \n");
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
+            leer_memoria_usuario(mem_request->pid,
+                                 direcciones_fisicas,
+                                 mem_request->parametros.param_leer.tamanio_buffer,
+                                 fd_es);
+            break;
+
+        case ESCRIBIR_IO:
+            printf("ESCRIBIR_IO \n");
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_escribir.direcciones_fisicas);
+            escribir_memoria_usuario(mem_request->pid,
+                                     direcciones_fisicas,
+                                     mem_request->parametros.param_escribir.buffer,
+                                     mem_request->parametros.param_escribir.tamanio_buffer,
+                                     fd_es);
+            break;
+        }
+    }
 }
 
 static void retardo_respuesta()
