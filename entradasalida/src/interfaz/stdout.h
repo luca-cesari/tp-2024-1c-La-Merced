@@ -10,9 +10,11 @@
 #include "config/config.h"
 #include "logger/logger.h"
 #include "conexion/kernel.h"
+#include "conexion/memoria.h"
+#include "mem_request/entradasalida.h"
 
 void inicializar_interfaz_stdout(void);
-void crear_instrucciones();
-void io_stdout_write(char *parametros);
+void io_stdout_write(char *argumentos, u_int32_t pid);
+char *array_a_string(char **array);
 
 #endif // STDOUT_H
