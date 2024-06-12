@@ -27,6 +27,7 @@ void mov_in(char **parametros_recibidos)
 
    t_cpu_mem_req *mem_request;
    parametros parametros_leer;
+
    char *direcciones_fisicas;
 
    if (string_starts_with(parametros_recibidos[0], "E"))
@@ -50,6 +51,44 @@ void mov_in(char **parametros_recibidos)
    *registro_datos = recibir_valor();
 }
 
+void mov_out(char **parametros)
+{
+   u_int32_t tamanio_pagina = 32; // lo tengo que traer desde la memoria, se debería hacer en el handshake
+   u_int32_t tamanio_registro;
+   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_datos = dictionary_get(registros, parametros[1]);
+   // Lee el valor del Registro Datos y lo escribe en la dirección física de memoria obtenida a partir de la Dirección Lógica almacenada en el Registro Dirección.
+
+   t_cpu_mem_req *mem_request;
+   parametros parametros_escribir;
+
+   char *direcciones_fisicas;
+
+   if (string_starts_with(parametros[1], "E"))
+   {
+      direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, 4, tamanio_pagina);
+   }
+   else
+   {
+      direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, 1, tamanio_pagina);
+   }
+
+   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro, tamanio_pagina);
+
+   parametros_escribir.param_escribir.direcciones_fisicas = direcciones_fisicas;
+   parametros_escribir.param_escribir.buffer = *registro_datos;
+   parametros_escribir.param_escribir.tamanio_buffer = tamanio_registro;
+
+   mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
+
+   enviar_mem_request(mem_request);
+
+   if (strcmp(recibir_mensaje(), "OK") != 0)
+   {
+      printf("Error al escribir en memoria\n");
+   }
+}
+
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro, u_int32_t tamanio_pagina)
 {
    u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
@@ -67,13 +106,6 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
    }
 
    return direcciones_fisicas;
-}
-
-void mov_out(char **parametros)
-{
-   // u_int32_t *registro_direccion = dictionary_get(registros, parametros[0]);
-   // u_int32_t *registro_datos = dictionary_get(registros, parametros[1]);
-   //  Lee el valor del Registro Datos y lo escribe en la dirección física de memoria obtenida a partir de la Dirección Lógica almacenada en el Registro Dirección.
 }
 
 void sum(char **parametros)
