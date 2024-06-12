@@ -12,7 +12,7 @@ t_pcb *crear_pcb(u_int32_t pid, char *ejecutable)
    pcb->executable = strdup(ejecutable);
    pcb->resource = strdup("");
    pcb->io_request = crear_io_request(pcb->pid, "", "", "");
-   pcb->motivo_desalojo = -1;
+   pcb->motivo_desalojo = NONE;
    pcb->motivo_finalizacion = -1;
    pcb->estado = -1;
 
@@ -109,20 +109,15 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
 
 void actualizar_pcb(t_pcb *pcb, t_pcb *nuevo_pcb)
 {
-   pcb->pid = nuevo_pcb->pid;
    pcb->program_counter = nuevo_pcb->program_counter;
    pcb->quantum = nuevo_pcb->quantum;
-   pcb->priority = nuevo_pcb->priority;
    pcb->cpu_registers = nuevo_pcb->cpu_registers;
 
-   free(pcb->executable);
-   pcb->executable = strdup(nuevo_pcb->executable);
    set_recurso_pcb(pcb, nuevo_pcb->resource);
    set_io_request(pcb, nuevo_pcb->io_request);
 
    pcb->motivo_desalojo = nuevo_pcb->motivo_desalojo;
    pcb->motivo_finalizacion = nuevo_pcb->motivo_finalizacion;
-   pcb->estado = nuevo_pcb->estado;
 }
 
 void set_quantum_pcb(t_pcb *pcb, u_int32_t quantum)

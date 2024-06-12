@@ -21,6 +21,11 @@ int8_t obtener_estado_por_pid(u_int32_t pid)
    return proceso == NULL ? -1 : proceso->estado;
 }
 
+t_pcb *obtener_proceso_por_pid(u_int32_t pid)
+{
+   return buscar_proceso_por_pid(pid);
+}
+
 void quitar_proceso_por_pid(u_int32_t pid)
 {
 }

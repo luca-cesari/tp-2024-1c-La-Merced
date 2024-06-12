@@ -74,6 +74,20 @@ void desbloquear_colas_io(q_blocked *estado)
    mlist_iterate(estado->lista_colas, &_desbloquear_interfaz);
 }
 
+t_pcb *remove_proceso_cola_io(q_blocked *estado, char *nombre_interfaz, u_int32_t pid)
+{
+   int32_t _es_interfaz_buscada(void *elemento)
+   {
+      io_queue *io = (io_queue *)elemento;
+      return strcmp(io->nombre_interfaz, nombre_interfaz) == 0;
+   };
+   io_queue *io_encontrado = mlist_find(estado->lista_colas, &_es_interfaz_buscada);
+   if (io_encontrado == NULL)
+      return NULL;
+
+   return remove_proceso(io_encontrado->cola_procesos, pid);
+}
+
 static void _bloquear_interfaz(void *ptr_interfaz)
 {
    io_queue *interfaz = (io_queue *)ptr_interfaz;

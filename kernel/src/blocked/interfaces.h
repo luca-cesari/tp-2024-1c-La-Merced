@@ -73,4 +73,6 @@ void bloquear_colas_io(q_blocked *estado);
  */
 void desbloquear_colas_io(q_blocked *estado);
 
+t_pcb *remove_proceso_cola_io(q_blocked *estado, char *nombre_interfaz, u_int32_t pid);
+
 #endif // BLOCKED_IO_QUEUE_H
