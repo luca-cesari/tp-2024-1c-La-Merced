@@ -104,7 +104,7 @@ void ejecutar_comando(char *operacion, char *argumento)
    {
       printf("Finalizar Proceso \n");
       printf("PID del Proceso: %s \n", argumento);
-      finalizar_proceso(atoi(argumento));
+      matar_proceso(atoi(argumento));
       return;
    }
 

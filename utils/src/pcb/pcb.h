@@ -51,15 +51,8 @@ typedef struct
    state estado;
 } t_pcb;
 
-typedef struct
-{
-   u_int32_t pid;
-   t_pcb *pcb; // Puntero al pcb
-} t_proceso;
-
 t_pcb *crear_pcb(u_int32_t pid, char *ejecutable);
 void destruir_pcb(t_pcb *pcb);
-t_proceso *crear_estructura_proceso(u_int32_t pid, t_pcb *pcb);
 
 t_packet *serializar_pcb(t_pcb *pcb);
 void enviar_pcb(int32_t fd_conexion, t_pcb *pcb);
