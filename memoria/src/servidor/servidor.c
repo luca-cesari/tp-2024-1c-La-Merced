@@ -138,7 +138,7 @@ void escuchar_interfaz_es(int32_t fd_es)
 
     while (1)
     {
-        t_io_mem_req *mem_request = recibir_io_mem_request(fd_cpu);
+        t_io_mem_req *mem_request = recibir_io_mem_request(fd_es);
         t_list *direcciones_fisicas;
 
         retardo_respuesta();
