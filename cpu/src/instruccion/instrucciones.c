@@ -156,7 +156,7 @@ void io_stdin_read(char **parametros)
    char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
    char *tamanio_direcciones = string_new();
 
-   // concatenar direcciones fisicas con el 4 o 1 y enviarlo como parametros, con el numero adelante
+   // concatenar tamanio con direcciones fisicas
    string_append(&tamanio_direcciones, tamanio_valor);
    string_append(&tamanio_direcciones, " ");
    string_append(&tamanio_direcciones, direcciones_fisicas);
