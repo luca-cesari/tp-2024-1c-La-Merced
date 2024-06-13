@@ -1,5 +1,6 @@
 #include "servidor.h"
 
+static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion);
 static void retardo_respuesta(void);
 
 void iniciar_servidor()
@@ -103,19 +104,15 @@ void escuchar_cpu(int32_t fd_cpu)
         case LEER:
             printf("LEER \n");
             direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            leer_memoria_usuario(mem_request->pid,
-                                 direcciones_fisicas,
-                                 mem_request->parametros.param_leer.tamanio_buffer,
-                                 fd_cpu);
+            void *buffer_response = leer_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
+            responder_lectura(buffer_response, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
             break;
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
             direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            escribir_memoria_usuario(mem_request->pid,
-                                     direcciones_fisicas,
-                                     mem_request->parametros.param_escribir.buffer,
-                                     mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
+            t_mem_response response = escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
+            enviar_senial(response, fd_cpu);
             break;
 
         case RESIZE:
@@ -147,23 +144,26 @@ void escuchar_interfaz_es(int32_t fd_es)
         case LEER_IO:
             printf("LEER_IO \n");
             direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            leer_memoria_usuario(mem_request->pid,
-                                 direcciones_fisicas,
-                                 mem_request->parametros.param_leer.tamanio_buffer,
-                                 fd_es);
+            void *buffer_response = leer_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_leer.tamanio_buffer, fd_es);
+            responder_lectura(buffer_response, mem_request->parametros.param_leer.tamanio_buffer, fd_es);
             break;
 
         case ESCRIBIR_IO:
             printf("ESCRIBIR_IO \n");
             direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_escribir.direcciones_fisicas);
-            escribir_memoria_usuario(mem_request->pid,
-                                     direcciones_fisicas,
-                                     mem_request->parametros.param_escribir.buffer,
-                                     mem_request->parametros.param_escribir.tamanio_buffer,
-                                     fd_es);
+            t_mem_response response = escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_es);
+            enviar_senial(response, fd_es);
             break;
         }
     }
+}
+
+static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion)
+{
+    t_mem_response response = buffer == NULL ? OPERATION_FAILED : OPERATION_SUCCEED;
+    t_mem_buffer_response *buffer_response = crear_buffer_response(response, buffer, tamanio_buffer);
+    enviar_buffer_response(fd_conexion, buffer_response);
+    destruir_buffer_response(buffer_response);
 }
 
 static void retardo_respuesta()

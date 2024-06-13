@@ -39,7 +39,7 @@ t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio);
  * @param tamanio_nuevo
  * @return `t_mem_response`
  */
-t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
+t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo);
 
 /**
  * @brief Reduce memoria para un proceso.
@@ -48,7 +48,7 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u
  * @param tamanio_nuevo
  * @return `t_mem_response`
  */
-t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
+t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo);
 
 /**
  * @brief
@@ -58,10 +58,11 @@ t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u
  * @param buffer
  * @param tamanio
  * @param fd
+ * @return `t_mem_response`
  */
-void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio, int32_t fd);
+t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio, int32_t fd);
 
-void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio, int32_t fd);
+void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio, int32_t fd);
 
 /**
  * @brief Función destructor de la memoria de usuario.
