@@ -9,6 +9,7 @@
 #include <mem_request/cpu.h>
 #include <conexion/memoria.h>
 #include "tlb.h"
+#include "logger/logger.h"
 
 u_int32_t mmu(u_int32_t direccion_logica_hex);
 

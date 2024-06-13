@@ -11,10 +11,9 @@
 #include <commons/collections/dictionary.h>
 #include <mem_request/cpu.h>
 
-#include "conexion/memoria.h"
-
 #include "mmu/mmu.h"
 #include "conexion/memoria.h"
+#include "logger/logger.h"
 
 /// ESTRUCTURAS DECODE ////////
 

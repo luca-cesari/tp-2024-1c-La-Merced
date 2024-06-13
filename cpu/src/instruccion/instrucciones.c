@@ -47,7 +47,12 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 
    enviar_mem_request(mem_request);
 
-   *registro_datos = recibir_valor();
+   u_int32_t *nuevos_datos = recibir_paquete_de_memoria();
+   *registro_datos = *nuevos_datos;
+
+   log_escritura_lectura_memoria(pcb->pid, READ, *direccion_logica, string_itoa(*nuevos_datos));
+
+   free(nuevos_datos);
 }
 
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
@@ -84,6 +89,8 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
    {
       printf("Error al escribir en memoria\n");
    }
+
+   log_escritura_lectura_memoria(pcb->pid, WRITE, *direccion_logica, string_itoa(*registro_datos));
 }
 
 void sum(char **parametros)
@@ -133,12 +140,45 @@ void resize(char **parametros_char)
    parametro.tamanio_nuevo = atoi(parametros_char[0]);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(RESIZE, pcb->pid, parametro);
    enviar_mem_request(mem_request);
+   if (recibir_valor_numerico()) // succes es 0 (false), failed es 1 (true)
+   {
+      pcb->motivo_desalojo = ERROR;
+      pcb->motivo_finalizacion = OUT_OF_MEMORY;
+   }
 }
 
-void copy_string(char **parametros)
+void copy_string(char **param)
 {
-   // Toma del string apuntado por el registro SI y copia la cantidad de bytes indicadas en el parámetro tamaño
-   // a la posición de memoria apuntada por el registro DI.
+   int tamanio_valor = atoi(param[0]);
+
+   char *direcciones_fisicas_SI = obtener_direcciones_fisicas(pcb->cpu_registers.SI, tamanio_valor);
+   char *direccion_fisica_SI_inicial = string_split(direcciones_fisicas_SI, " ")[0];
+
+   parametros parametros_leer;
+   parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas_SI;
+   parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
+
+   t_cpu_mem_req *mem_request_leer = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
+
+   enviar_mem_request(mem_request_leer);
+
+   char *string_escribir = recibir_paquete_de_memoria();
+
+   log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica_SI_inicial), string_escribir);
+
+   char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
+   char *direccion_fisica_DI_inicial = string_split(direcciones_fisicas_DI, " ")[0];
+
+   parametros parametros_escribir;
+   parametros_escribir.param_leer.direcciones_fisicas = direcciones_fisicas_DI;
+   parametros_escribir.param_escribir.buffer = string_escribir;
+   parametros_escribir.param_leer.tamanio_buffer = tamanio_valor;
+
+   t_cpu_mem_req *mem_request_escribir = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
+
+   enviar_mem_request(mem_request_escribir);
+
+   log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica_DI_inicial), string_escribir);
 }
 
 void io_gen_sleep(char **parametros)
@@ -149,20 +189,38 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
-   char *tamanio_valor = "255";
-   if (string_starts_with(parametros[1], "E"))
-   {
-      tamanio_valor = "4294967295";
-   }
+   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_tamanio = dictionary_get(registros, parametros[1]);
+   char *tamanio_valor = string_itoa(*registro_tamanio);
    // obtener direcciones fisicas con mmu
-   // concatenar direcciones fisicas con el 4 o 1 y enviarlo como parametros, con el numero adelante
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", array_a_string(eliminar_primer_elemento(parametros)));
+   char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
+   char *direcciones_tamanio = string_new();
+
+   // concatenar tamanio con direcciones fisicas
+   string_append(&direcciones_tamanio, direcciones_fisicas);
+   string_append(&direcciones_tamanio, " ");
+   string_append(&direcciones_tamanio, tamanio_valor);
+
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
    pcb->io_request = io_request;
 }
 
 void io_stdout_write(char **parametros)
 {
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", array_a_string(eliminar_primer_elemento(parametros)));
+   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
+   u_int32_t *registro_tamanio = dictionary_get(registros, parametros[1]);
+   char *tamanio_valor = string_itoa(*registro_tamanio);
+
+   // obtener direcciones fisicas con mmu
+   char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
+   char *direcciones_tamanio = string_new();
+
+   // concatenar tamanio con direcciones fisicas
+   string_append(&direcciones_tamanio, direcciones_fisicas);
+   string_append(&direcciones_tamanio, " ");
+   string_append(&direcciones_tamanio, tamanio_valor);
+
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
    pcb->io_request = io_request;
 }
 
@@ -211,16 +269,6 @@ char **eliminar_primer_elemento(char **array)
       nuevo_array[i] = strdup(array[i + 1]);
    }
 
-   // if (tamano > 0)
-   // {
-   //    // Desplazar todos los punteros una posición hacia la izquierda
-   //    for (int i = 0; i < tamano - 1; i++)
-   //    {
-   //       array[i] = array[i + 1];
-   //    }
-   //    // Establecer el último puntero a NULL para marcar el final del array
-   //    array[tamano - 1] = NULL;
-   // }
    return nuevo_array;
 }
 
