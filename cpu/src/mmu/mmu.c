@@ -19,9 +19,15 @@ u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
    numero_marco = tlb_disponible ? get_marco(pid, numero_pagina) : -1;
 
    if (numero_marco == -1) // TLB miss, sea porque no hay TLB o porque no se encontró
+   {
+      log_tlb_miss(pid, numero_pagina);
       numero_marco = buscar_en_memoria(pid, numero_pagina);
+      log_obtener_marco(pid, numero_pagina, numero_marco);
+   }
+   else
+      log_tlb_hit(pid, numero_pagina);
 
-   cargar_nueva_entrada(pid, numero_pagina, numero_marco);
+   cargar_nueva_entrada(pid, numero_pagina, numero_marco); // Esta sentencia estaba por fuera del if y la dejo ahi por las dudas, pero creo que debería estar adentro
 
    return (numero_marco * tamanio_pagina) + desplazamiento;
 }
