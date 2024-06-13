@@ -26,3 +26,8 @@ void liberar_conexion_memoria()
 {
    liberar_conexion(fd_memoria);
 }
+
+u_int32_t recibir_valor()
+{
+   return recibir_senial(fd_memoria);
+}

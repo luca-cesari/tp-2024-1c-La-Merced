@@ -44,6 +44,12 @@ u_int32_t recibir_valor()
    return recibir_senial(fd_memoria);
 }
 
+void *recibir_paquete_de_memoria()
+{
+   t_list *paquete = recibir_paquete(fd_memoria);
+   return list_get(paquete, 0);
+}
+
 u_int32_t recibir_marco()
 {
    return recibir_senial(fd_memoria);

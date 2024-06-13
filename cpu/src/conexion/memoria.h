@@ -16,6 +16,7 @@ void enviar_mem_request(t_cpu_mem_req *mem_request);
 char *recibir_instruccion();
 char *recibir_confirmacion();
 u_int32_t recibir_valor();
+void *recibir_paquete_de_memoria();
 u_int32_t recibir_marco();
 u_int32_t get_tamanio_pagina();
 
