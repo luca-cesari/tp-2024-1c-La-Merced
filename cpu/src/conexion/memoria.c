@@ -39,7 +39,7 @@ char *recibir_confirmacion()
    return instruccion;
 }
 
-u_int32_t recibir_valor()
+u_int32_t recibir_valor_numerico()
 {
    return recibir_senial(fd_memoria);
 }
