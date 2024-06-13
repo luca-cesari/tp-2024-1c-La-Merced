@@ -1,6 +1,6 @@
 #include "consola.h"
 
-char *iniciar_consola(int tamanio_valor)
+char *iniciar_consola(u_int32_t tamanio_valor)
 {
    char *comando = NULL;
    char *valor = NULL;

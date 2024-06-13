@@ -1,5 +1,5 @@
-#ifndef CONSOLA_H
-#define CONSOLA_H
+#ifndef KERNEL_CONSOLA_H
+#define KERNEL_CONSOLA_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,4 +22,4 @@ void iniciar_consola();
 void leer_script(char *);
 void ejecutar_comando(char *, char *);
 
-#endif // CONSOLA_H
+#endif // KERNEL_CONSOLA_H
