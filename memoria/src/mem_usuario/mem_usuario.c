@@ -82,7 +82,7 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
     }
 
     if (tamanio_guardado == tamanio_buffer)
-        log_acceso_espacio_usuario(pid, "ESCRIBIR", *direccion_fisica_a_recorrer, tamanio_buffer);
+        log_acceso_espacio_usuario(pid, "ESCRIBIR", *(u_int32_t *)list_get(direcciones_fisicas, 0), tamanio_buffer);
 
     return tamanio_guardado == tamanio_buffer ? OPERATION_SUCCEED : OPERATION_FAILED;
 }
@@ -115,6 +115,8 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
             tamanio_leido++;
         }
     }
+    if (ttamanio_leido == tamanio_buffer)
+        log_acceso_espacio_usuario(pid, "LEER", *(u_int32_t *)list_get(direcciones_fisicas, 0), tamanio_buffer);
 
     return tamanio_leido == tamanio_buffer ? buffer : NULL;
 }
