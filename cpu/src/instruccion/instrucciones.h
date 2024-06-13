@@ -16,6 +16,13 @@
 #include "conexion/memoria.h"
 #include "logger/logger.h"
 
+typedef union
+{
+   u_int32_t *direccion_logica;
+   u_int32_t *registro_tamanio;
+   char *direcciones_fisicas;
+} elementos;
+
 /// ESTRUCTURAS DECODE ////////
 
 void set(char **parametros);
@@ -36,6 +43,12 @@ void inicializar_diccionario_registros();
 char *array_a_string(char **array);
 char **eliminar_primer_elemento(char **array);
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro);
+parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor);
+parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);
+u_int32_t obtener_tamanio_registro(char **parametros_recibidos, int num);
+elementos obtenerElementos(char **parametros_recibidos, int num);
+char *obtenerElem(char **parametros, int num);
+
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
 //  MOV_IN (Registro Datos, Registro Dirección)

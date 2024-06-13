@@ -1,3 +1,4 @@
+
 #include "instrucciones.h"
 
 t_dictionary *registros;
@@ -20,38 +21,22 @@ void set(char **parametros)
 
 void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Dirección)
 {
-   u_int32_t tamanio_registro;
-   u_int32_t *registro_datos = dictionary_get(registros, parametros_recibidos[0]);
-   u_int32_t *direccion_logica = dictionary_get(registros, parametros_recibidos[1]);
+   elementos elementos = obtenerElementos(parametros_recibidos, 1);
+
+   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos, 0);
 
    t_cpu_mem_req *mem_request;
    parametros parametros_leer;
 
-   char *direcciones_fisicas;
-
-   if (string_starts_with(parametros_recibidos[0], "E"))
-   {
-      tamanio_registro = 4;
-   }
-   else
-   {
-      tamanio_registro = 1;
-   }
-
-   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro);
-
-   parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
-   parametros_leer.param_leer.tamanio_buffer = tamanio_registro;
-
+   parametros_leer = crearParametrosLeer(elementos.direcciones_fisicas, tamanio_registro);
    mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
-
    enviar_mem_request(mem_request);
 
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
    if (response->tamanio_buffer == tamanio_registro)
    {
-      *registro_datos = *(u_int32_t *)response->buffer;
-      log_escritura_lectura_memoria(pcb->pid, READ, *direccion_logica, string_itoa(*registro_datos));
+      *elementos.registro_tamanio = *(u_int32_t *)response->buffer;
+      log_escritura_lectura_memoria(pcb->pid, READ, *elementos.direccion_logica, string_itoa(*elementos.registro_tamanio));
    }
    else
    {
@@ -63,37 +48,20 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
 {
-   u_int32_t tamanio_registro;
-   u_int32_t *direccion_logica = dictionary_get(registros, parametros_recibidos[0]);
-   u_int32_t *registro_datos = dictionary_get(registros, parametros_recibidos[1]);
+   elementos elementos = obtenerElementos(parametros_recibidos, 0);
+   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos, 1);
 
    t_cpu_mem_req *mem_request;
    parametros parametros_escribir;
 
-   char *direcciones_fisicas;
-
-   if (string_starts_with(parametros_recibidos[1], "E"))
-   {
-      tamanio_registro = 4;
-   }
-   else
-   {
-      tamanio_registro = 1;
-   }
-
-   direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, tamanio_registro);
-
-   parametros_escribir.param_escribir.direcciones_fisicas = direcciones_fisicas;
-   parametros_escribir.param_escribir.buffer = registro_datos;
-   parametros_escribir.param_escribir.tamanio_buffer = tamanio_registro;
-
+   parametros_escribir = crearParametrosEscribir(elementos.direcciones_fisicas, elementos.registro_tamanio, tamanio_registro);
    mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
    enviar_mem_request(mem_request);
 
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
    {
-      log_escritura_lectura_memoria(pcb->pid, WRITE, *direccion_logica, string_itoa(*registro_datos));
+      log_escritura_lectura_memoria(pcb->pid, WRITE, *elementos.direccion_logica, string_itoa(*elementos.registro_tamanio));
    }
    else
    {
@@ -103,33 +71,31 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
 
 void sum(char **parametros)
 {
+   void *registro1 = dictionary_get(registros, parametros[0]);
+   void *registro2 = dictionary_get(registros, parametros[1]);
+
    if (string_starts_with(parametros[0], "E"))
    {
-      u_int32_t *registro1 = dictionary_get(registros, parametros[0]);
-      u_int32_t *registro2 = dictionary_get(registros, parametros[1]);
-      *registro1 += *registro2;
+      *(u_int32_t *)registro1 += *(u_int32_t *)registro2;
    }
    else
    {
-      u_int8_t *registro = dictionary_get(registros, parametros[0]);
-      u_int8_t *registro2 = dictionary_get(registros, parametros[1]);
-      *registro += *registro2;
+      *(u_int8_t *)registro1 += *(u_int8_t *)registro2;
    }
 }
 
 void sub(char **parametros)
 {
+   void *registro1 = dictionary_get(registros, parametros[0]);
+   void *registro2 = dictionary_get(registros, parametros[1]);
+
    if (string_starts_with(parametros[0], "E"))
    {
-      u_int32_t *registro = dictionary_get(registros, parametros[0]);
-      u_int32_t *registro2 = dictionary_get(registros, parametros[1]);
-      *registro -= *registro2;
+      *(u_int32_t *)registro1 -= *(u_int32_t *)registro2;
    }
    else
    {
-      u_int8_t *registro = dictionary_get(registros, parametros[0]);
-      u_int8_t *registro2 = dictionary_get(registros, parametros[1]);
-      *registro -= *registro2;
+      *(u_int8_t *)registro1 -= *(u_int8_t *)registro2;
    }
 }
 
@@ -162,10 +128,7 @@ void copy_string(char **param)
    char *direcciones_fisicas_SI = obtener_direcciones_fisicas(pcb->cpu_registers.SI, tamanio_valor);
    char *direccion_fisica_SI_inicial = string_split(direcciones_fisicas_SI, " ")[0];
 
-   parametros parametros_leer;
-   parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas_SI;
-   parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
-
+   parametros parametros_leer = crearParametrosLeer(direcciones_fisicas_SI, tamanio_valor);
    t_cpu_mem_req *mem_request_leer = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
 
    enviar_mem_request(mem_request_leer);
@@ -187,10 +150,7 @@ void copy_string(char **param)
    char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
    char *direccion_fisica_DI_inicial = string_split(direcciones_fisicas_DI, " ")[0];
 
-   parametros parametros_escribir;
-   parametros_escribir.param_leer.direcciones_fisicas = direcciones_fisicas_DI;
-   parametros_escribir.param_escribir.buffer = string_escribir;
-   parametros_escribir.param_leer.tamanio_buffer = tamanio_valor;
+   parametros parametros_escribir = crearParametrosEscribir(direcciones_fisicas_DI, string_escribir, tamanio_valor);
 
    t_cpu_mem_req *mem_request_escribir = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
@@ -216,17 +176,7 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
-   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
-   u_int32_t *registro_tamanio = dictionary_get(registros, parametros[1]);
-   char *tamanio_valor = string_itoa(*registro_tamanio);
-   // obtener direcciones fisicas con mmu
-   char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
-   char *direcciones_tamanio = string_new();
-
-   // concatenar tamanio con direcciones fisicas
-   string_append(&direcciones_tamanio, direcciones_fisicas);
-   string_append(&direcciones_tamanio, " ");
-   string_append(&direcciones_tamanio, tamanio_valor);
+   char *direcciones_tamanio = obtenerElem(parametros, 0);
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
    pcb->io_request = io_request;
@@ -234,18 +184,7 @@ void io_stdin_read(char **parametros)
 
 void io_stdout_write(char **parametros)
 {
-   u_int32_t *direccion_logica = dictionary_get(registros, parametros[0]);
-   u_int32_t *registro_tamanio = dictionary_get(registros, parametros[1]);
-   char *tamanio_valor = string_itoa(*registro_tamanio);
-
-   // obtener direcciones fisicas con mmu
-   char *direcciones_fisicas = obtener_direcciones_fisicas(*direccion_logica, *registro_tamanio);
-   char *direcciones_tamanio = string_new();
-
-   // concatenar tamanio con direcciones fisicas
-   string_append(&direcciones_tamanio, direcciones_fisicas);
-   string_append(&direcciones_tamanio, " ");
-   string_append(&direcciones_tamanio, tamanio_valor);
+   char *direcciones_tamanio = obtenerElem(parametros, 0);
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
    pcb->io_request = io_request;
@@ -318,4 +257,64 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
    }
 
    return direcciones_fisicas;
+}
+parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor)
+{
+   parametros parametros_leer;
+   parametros_leer.param_leer.direcciones_fisicas = direccion_fisica;
+   parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
+   return parametros_leer;
+}
+parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor)
+{
+   parametros parametros_escribir;
+   parametros_escribir.param_escribir.direcciones_fisicas = direccion_fisica;
+   parametros_escribir.param_escribir.tamanio_buffer = tamanio_valor;
+   parametros_escribir.param_escribir.buffer = buffer;
+   return parametros_escribir;
+}
+
+u_int32_t obtener_tamanio_registro(char **parametros_recibidos, int num)
+{
+   if (string_starts_with(parametros_recibidos[num], "E"))
+   {
+      return 4;
+   }
+   else
+   {
+      return 1;
+   }
+}
+
+elementos obtenerElementos(char **parametros_recibidos, int num)
+{
+   elementos elementos;
+   int num1, num2;
+   if (num == 0)
+   {
+      num1 = 0, num2 = 1;
+   }
+   else
+   {
+      num1 = 1, num2 = 0;
+   }
+   elementos.direccion_logica = dictionary_get(registros, parametros_recibidos[num1]);
+   elementos.registro_tamanio = dictionary_get(registros, parametros_recibidos[num2]);
+   elementos.direcciones_fisicas = obtener_direcciones_fisicas(*elementos.direccion_logica, *elementos.registro_tamanio);
+   return elementos;
+}
+
+char *obtenerElem(char **parametros, int num)
+{
+   elementos elementos = obtenerElementos(parametros, 0);
+
+   char *tamanio_valor = string_itoa(*elementos.registro_tamanio);
+
+   char *direcciones_tamanio = string_new();
+
+   // concatenar tamanio con direcciones fisicas
+   string_append(&direcciones_tamanio, elementos.direcciones_fisicas);
+   string_append(&direcciones_tamanio, " ");
+   string_append(&direcciones_tamanio, tamanio_valor);
+   return direcciones_tamanio;
 }
