@@ -279,13 +279,13 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
    u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
    char *direcciones_fisicas = string_new();
 
-   char *direccion_fisica_actual_str = string_itoa(mmu(direccion_logica));
+   char *direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica));
 
    direcciones_fisicas = direccion_fisica_actual_str;
 
    for (u_int32_t pagina = pagina_inicial + 1; pagina <= pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
    {
-      direccion_fisica_actual_str = string_itoa(mmu(direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
+      direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
       string_append(&direcciones_fisicas, " ");
       string_append(&direcciones_fisicas, direccion_fisica_actual_str);
    }
