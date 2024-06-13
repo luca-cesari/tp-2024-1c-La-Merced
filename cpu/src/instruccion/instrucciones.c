@@ -152,19 +152,18 @@ void copy_string(char **param)
 
    enviar_mem_request(mem_request_leer);
 
-   //t_list *string = recibir_paquete();
+   char *string_escribir = recibir_paquete_de_memoria();
 
    char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
 
    parametros parametros_escribir;
    parametros_escribir.param_leer.direcciones_fisicas = direcciones_fisicas_DI;
-   // parametros_escribir.param_escribir.buffer = string;
+   parametros_escribir.param_escribir.buffer = string_escribir;
    parametros_escribir.param_leer.tamanio_buffer = tamanio_valor;
 
    t_cpu_mem_req *mem_request_escribir = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
    enviar_mem_request(mem_request_escribir);
-
 }
 
 void io_gen_sleep(char **parametros)
