@@ -11,6 +11,7 @@
 #include "config/config.h"
 #include "estado_frame/estado_frame.h"
 #include "tabla_paginas/tabla_paginas.h"
+#include "logger/logger.h"
 
 /**
  * @brief Función constructor de la memoria de usuario.

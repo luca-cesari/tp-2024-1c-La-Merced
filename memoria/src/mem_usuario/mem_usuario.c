@@ -34,6 +34,8 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
     for (u_int32_t i = 0; i < cantidad_frames_necesarios; i++)
         asignar_frame_a_tabla(tabla_paginas);
 
+    log_ampliacion_proceso(tabla_paginas->pid, tamanio_actual, tamanio_nuevo);
+
     return OPERATION_SUCCEED;
 }
 
@@ -44,16 +46,10 @@ t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
     for (u_int32_t i = 0; i < cantidad_frames_a_liberar; i++)
         liberar_frame_de_tabla(tabla_paginas);
 
+    log_reduccion_proceso(tabla_paginas->pid, tamanio_actual, tamanio_nuevo);
+
     return OPERATION_SUCCEED;
 }
-
-/*
-Acceso a espacio de usuario
-Esta petición puede venir tanto de la CPU como de un Módulo de Interfaz de I/O, es importante tener en cuenta que las peticiones pueden ocupar más de una página.
-El módulo Memoria deberá realizar lo siguiente:
-Ante un pedido de lectura, devolver el valor que se encuentra a partir de la dirección física pedida.
-Ante un pedido de escritura, escribir lo indicado a partir de la dirección física pedida. En caso satisfactorio se responderá un mensaje de ‘OK’.
-*/
 
 t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
 {
@@ -84,6 +80,9 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
         }
         i++;
     }
+
+    if (tamanio_guardado == tamanio_buffer)
+        log_acceso_espacio_usuario(pid, "ESCRIBIR", *(u_int32_t *)list_get(direcciones_fisicas, 0), tamanio_buffer);
 
     return tamanio_guardado == tamanio_buffer ? OPERATION_SUCCEED : OPERATION_FAILED;
 }
@@ -116,6 +115,9 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
             tamanio_leido++;
         }
     }
+
+    if (tamanio_leido == tamanio_buffer)
+        log_acceso_espacio_usuario(pid, "LEER", *(u_int32_t *)list_get(direcciones_fisicas, 0), tamanio_buffer);
 
     return tamanio_leido == tamanio_buffer ? buffer : NULL;
 }

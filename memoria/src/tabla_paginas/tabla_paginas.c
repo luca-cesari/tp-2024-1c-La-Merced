@@ -16,11 +16,15 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
    tabla_paginas->pid = pid;
    tabla_paginas->lista_frames = mlist_create();
    mlist_add(lista_tablas, tabla_paginas);
+
+   log_creacion_tabla_paginas(pid, get_cantidad_paginas(tabla_paginas));
 }
 
 void destruir_tabla_de_paginas_para_proceso(u_int32_t pid)
 {
    t_proceso_tabla *tabla_paginas = get_tabla_proceso(pid);
+   u_int32_t cantidad_paginas = get_cantidad_paginas(tabla_paginas);
+
    mlist_iterate(tabla_paginas->lista_frames, &liberar_frame);
 
    int32_t es_tabla_buscada(void *elemento)
@@ -29,6 +33,8 @@ void destruir_tabla_de_paginas_para_proceso(u_int32_t pid)
       return tabla->pid == pid;
    };
    mlist_remove_and_destroy_by_condition(lista_tablas, &es_tabla_buscada, &destruir_proceso_tabla);
+
+   log_destruccion_tabla_paginas(pid, cantidad_paginas);
 }
 
 u_int32_t get_cantidad_paginas(t_proceso_tabla *tabla_paginas)
@@ -67,6 +73,9 @@ u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
 {
    t_proceso_tabla *proceso_tabla = get_tabla_proceso(pid);
    u_int32_t *valor = (u_int32_t *)mlist_get(proceso_tabla->lista_frames, nro_pag);
+
+   if (valor != NULL)
+      log_acceso_tabla_paginas(pid, nro_pag, *valor);
 
    return valor == NULL ? -1 : *valor;
 }
