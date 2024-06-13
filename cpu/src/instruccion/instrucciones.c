@@ -138,10 +138,32 @@ void resize(char **parametros_char)
    enviar_mem_request(mem_request);
 }
 
-void copy_string(char **parametros)
+void copy_string(char **param)
 {
-   // Toma del string apuntado por el registro SI y copia la cantidad de bytes indicadas en el parámetro tamaño
-   // a la posición de memoria apuntada por el registro DI.
+   int tamanio_valor = atoi(param[0]);
+
+   char *direcciones_fisicas_SI = obtener_direcciones_fisicas(pcb->cpu_registers.SI, tamanio_valor);
+
+   parametros parametros_leer;
+   parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas_SI;
+   parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
+
+   t_cpu_mem_req *mem_request_leer = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
+
+   enviar_mem_request(mem_request_leer);
+
+   char *string_escribir = recibir_paquete_de_memoria();
+
+   char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
+
+   parametros parametros_escribir;
+   parametros_escribir.param_leer.direcciones_fisicas = direcciones_fisicas_DI;
+   parametros_escribir.param_escribir.buffer = string_escribir;
+   parametros_escribir.param_leer.tamanio_buffer = tamanio_valor;
+
+   t_cpu_mem_req *mem_request_escribir = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
+
+   enviar_mem_request(mem_request_escribir);
 }
 
 void io_gen_sleep(char **parametros)
