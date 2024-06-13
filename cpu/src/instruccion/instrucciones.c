@@ -149,7 +149,7 @@ void copy_string(char **param)
 
    enviar_mem_request(mem_request_leer);
 
-   // char* string = recibir();
+   //t_list *string = recibir_paquete();
 
    char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
 
@@ -162,8 +162,6 @@ void copy_string(char **param)
 
    enviar_mem_request(mem_request_escribir);
 
-   // Toma del string apuntado por el registro SI y copia la cantidad de bytes indicadas en el parámetro tamaño
-   // a la posición de memoria apuntada por el registro DI.
 }
 
 void io_gen_sleep(char **parametros)
