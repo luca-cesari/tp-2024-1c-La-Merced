@@ -47,7 +47,10 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 
    enviar_mem_request(mem_request);
 
-   *registro_datos = recibir_valor();
+   u_int32_t *nuevos_datos = recibir_paquete_de_memoria();
+   *registro_datos = *nuevos_datos;
+
+   free(nuevos_datos);
 }
 
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
