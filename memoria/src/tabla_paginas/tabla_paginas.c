@@ -52,6 +52,11 @@ u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag)
    t_proceso_tabla *proceso_tabla = get_tabla_proceso(pid);
    u_int32_t *valor = (u_int32_t *)list_get(proceso_tabla->lista_frames, nro_pag);
 
+   if (valor != NULL)
+   {
+      log_acceso_tabla_paginas(pid, nro_pag, *valor);
+   }
+
    return valor == NULL ? -1 : *valor;
 }
 

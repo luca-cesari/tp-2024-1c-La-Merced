@@ -87,6 +87,9 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
         i++;
     }
 
+    if (tamanio_guardado == tamanio_buffer)
+        log_acceso_espacio_usuario(pid, "ESCRIBIR", *direccion_fisica_a_recorrer, tamanio_buffer);
+
     return tamanio_guardado == tamanio_buffer ? OPERATION_SUCCEED : OPERATION_FAILED;
 }
 
