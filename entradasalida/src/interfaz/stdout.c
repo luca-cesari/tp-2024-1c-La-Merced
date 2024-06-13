@@ -12,9 +12,12 @@ void inicializar_interfaz_stdout()
             enviar_respuesta(INVALID_INSTRUCTION);
 
         int8_t io_result = io_stdout_write(peticion_io->arguments, peticion_io->pid);
+        if (io_result == -1)
+        {
+            enviar_respuesta(FAILED);
+            continue;
+        }
         log_operacion(peticion_io->pid, peticion_io->instruction);
-
-        // responder segun io_result ???
         enviar_respuesta(EXECUTED);
     }
 }
