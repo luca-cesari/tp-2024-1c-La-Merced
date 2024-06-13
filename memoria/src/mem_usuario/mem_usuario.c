@@ -45,6 +45,8 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
         list_add(tabla_paginas->lista_frames, nro_frame);
     }
 
+    log_ampliacion_proceso(tabla_paginas->pid, tamanio_actual, tamanio_nuevo);
+
     return OPERATION_SUCCEED;
 }
 
@@ -60,16 +62,10 @@ t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
         list_remove(tabla_paginas->lista_frames, list_size(tabla_paginas->lista_frames) - 1);
     }
 
+    log_reduccion_proceso(tabla_paginas->pid, tamanio_actual, tamanio_nuevo);
+
     return OPERATION_SUCCEED;
 }
-
-/*
-Acceso a espacio de usuario
-Esta petición puede venir tanto de la CPU como de un Módulo de Interfaz de I/O, es importante tener en cuenta que las peticiones pueden ocupar más de una página.
-El módulo Memoria deberá realizar lo siguiente:
-Ante un pedido de lectura, devolver el valor que se encuentra a partir de la dirección física pedida.
-Ante un pedido de escritura, escribir lo indicado a partir de la dirección física pedida. En caso satisfactorio se responderá un mensaje de ‘OK’.
-*/
 
 void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
 {
@@ -99,8 +95,8 @@ void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *
         i++;
     }
 
-    return tamanio_guardado == tamanio_buffer
-               ? enviar_senial(OPERATION_SUCCEED, fd)
+        return tamanio_guardado == tamanio_buffer
+               ? enviar_senial(OPERATION_SUCCEED, fd) // Falta log para acceso a espacio usuario
                : enviar_senial(OPERATION_FAILED, fd);
 }
 
@@ -108,6 +104,7 @@ void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t 
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
+    char *direccion_fisica_inicial = list_get(direcciones_fisicas, 0);
     u_int32_t *direccion_fisica_a_recorrer;
     u_int32_t frame;
     u_int32_t limite_de_frame;
@@ -132,6 +129,8 @@ void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t 
 
     if (tamanio_leido == tamanio_buffer)
     {
+        log_acceso_espacio_usuario(pid, "LEER", *direccion_fisica_inicial, tamanio_buffer);
+
         // DEVOLVER BUFFER A CPU (la cpu se debe encargar de castearlo ya que puede ser un int32 o int8) O STRING A INTERFAZ DE I/O
         t_packet *paquete = crear_paquete();
         crear_buffer(paquete);

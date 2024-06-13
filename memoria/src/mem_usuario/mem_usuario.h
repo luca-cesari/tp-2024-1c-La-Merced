@@ -10,6 +10,7 @@
 #include "config/config.h"
 #include "estado_frame/estado_frame.h"
 #include "tabla_paginas/tabla_paginas.h"
+#include "logger/logger.h"
 
 /**
  * @brief Función constructor de la memoria de usuario.
@@ -50,13 +51,13 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u
 t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
 
 /**
- * @brief 
- * 
- * @param pid 
- * @param direcciones_fisicas 
- * @param buffer 
- * @param tamanio 
- * @param fd 
+ * @brief
+ *
+ * @param pid
+ * @param direcciones_fisicas
+ * @param buffer
+ * @param tamanio
+ * @param fd
  */
 void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio, int32_t fd);
 

@@ -6,6 +6,7 @@
 
 #include "config/config.h"
 #include "estado_frame/estado_frame.h"
+#include "logger/logger.h"
 
 typedef struct
 {

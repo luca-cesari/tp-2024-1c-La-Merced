@@ -13,23 +13,28 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid)
    tabla_paginas->pid = pid;
    tabla_paginas->lista_frames = list_create();
    list_add(lista_tablas, tabla_paginas);
+   log_creacion_tabla_paginas(pid, 0);
 }
 
 void destruir_tabla_de_paginas_para_proceso(u_int32_t pid)
 {
    t_proceso_tabla *tabla_paginas = get_tabla_proceso(pid);
+   int cont_paginas_liberadas = 0;
 
    t_list_iterator *iterador = list_iterator_create(tabla_paginas->lista_frames);
    while (list_iterator_has_next(iterador))
    {
       u_int32_t *nro_frame = (u_int32_t *)list_iterator_next(iterador);
       set_estado_frame(*nro_frame, LIBRE);
+      cont_paginas_liberadas++;
    }
 
    list_destroy_and_destroy_elements(tabla_paginas->lista_frames, &free);
 
    list_iterator_destroy(iterador);
    free(tabla_paginas);
+
+   log_destruccion_tabla_paginas(pid, cont_paginas_liberadas);
 }
 
 t_proceso_tabla *get_tabla_proceso(u_int32_t pid)

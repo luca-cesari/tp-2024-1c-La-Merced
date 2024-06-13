@@ -17,9 +17,9 @@ void log_creacion_tabla_paginas(u_int32_t pid, u_int32_t cantidad_paginas)
     log_info(memoria_logger, "PID: %d - Tamaño: %d", pid, cantidad_paginas);
 }
 
-void log_destruccion_tabla_paginas(u_int32_t pid)
+void log_destruccion_tabla_paginas(u_int32_t pid, u_int32_t cantidad_paginas)
 {
-    log_info(memoria_logger, "PID: %d - Tabla de páginas destruida", pid);
+    log_info(memoria_logger, "PID: %d - Tamaño: %d", pid, cantidad_paginas);
 }
 
 void log_acceso_tabla_paginas(u_int32_t pid, u_int32_t pagina, u_int32_t marco)
