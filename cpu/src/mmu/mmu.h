@@ -1,16 +1,16 @@
-#ifndef CPU_MMU_H
-#define CPU_MMU_H
+#ifndef MMU_H
+#define MMU_H
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <commons/process.h>
-#include <commons/collections/list.h>
 #include <mem_request/cpu.h>
-#include <conexion/memoria.h>
-#include "tlb.h"
+
 #include "logger/logger.h"
+#include "conexion/memoria.h"
+#include "tlb.h"
 
-u_int32_t mmu(u_int32_t direccion_logica_hex);
+void inicializar_mmu(void);
+u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica);
+void destruir_mmu(void);
 
-#endif // CPU_MMU_H
+#endif // MMU_H
