@@ -57,6 +57,8 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
    {
       perror("Error al leer en memoria\n");
    }
+
+   destruir_buffer_response(response);
 }
 
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
@@ -202,6 +204,8 @@ void copy_string(char **param)
    {
       perror("Error al escribir en memoria\n");
    }
+
+   destruir_buffer_response(response);
 }
 
 void io_gen_sleep(char **parametros)
