@@ -136,6 +136,11 @@ void resize(char **parametros_char)
    parametro.tamanio_nuevo = atoi(parametros_char[0]);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(RESIZE, pcb->pid, parametro);
    enviar_mem_request(mem_request);
+   if (recibir_valor_numerico()) // succes es 0 (false), failed es 1 (true)
+   {
+      pcb->motivo_desalojo = ERROR;
+      pcb->motivo_finalizacion = OUT_OF_MEMORY;
+   }
 }
 
 void copy_string(char **param)
