@@ -32,22 +32,15 @@ char *recibir_instruccion()
    return instruccion;
 }
 
-char *recibir_confirmacion()
-{
-   char *instruccion = recibir_mensaje(fd_memoria);
-
-   return instruccion;
-}
-
-u_int32_t recibir_valor_numerico()
+t_mem_response recibir_response_de_memoria()
 {
    return recibir_senial(fd_memoria);
 }
 
-void *recibir_paquete_de_memoria()
+t_mem_buffer_response *recibir_buffer_response_de_memoria()
 {
-   t_list *paquete = recibir_paquete(fd_memoria);
-   return list_get(paquete, 0);
+   t_mem_buffer_response *response = recibir_buffer_response(fd_memoria);
+   return response;
 }
 
 u_int32_t recibir_marco()
