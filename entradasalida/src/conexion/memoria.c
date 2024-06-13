@@ -22,7 +22,7 @@ void enviar_mem_request(t_io_mem_req *mem_request)
    enviar_io_mem_request(fd_memoria, mem_request);
 }
 
-u_int32_t recibir_valor()
+int32_t recibir_valor()
 {
    return recibir_senial(fd_memoria);
 }
@@ -30,7 +30,7 @@ u_int32_t recibir_valor()
 void *recibir_mem_buffer()
 {
    t_mem_buffer_response *response = recibir_buffer_response(fd_memoria);
-   return response == NULL ? NULL : response->buffer;
+   return response->buffer;
 }
 
 void liberar_conexion_memoria()

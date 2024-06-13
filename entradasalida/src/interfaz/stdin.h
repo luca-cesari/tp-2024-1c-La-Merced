@@ -12,6 +12,6 @@
 #include "mem_request/entradasalida.h"
 
 void iniciar_rutina_interfaz_stdin(void);
-void io_stdin_read(char *argumentos, u_int32_t pid);
+int8_t io_stdin_read(char *argumentos, u_int32_t pid);
 
 #endif // STDIN_H
