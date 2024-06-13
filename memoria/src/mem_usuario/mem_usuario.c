@@ -63,7 +63,7 @@ Ante un pedido de lectura, devolver el valor que se encuentra a partir de la dir
 Ante un pedido de escritura, escribir lo indicado a partir de la dirección física pedida. En caso satisfactorio se responderá un mensaje de ‘OK’.
 */
 
-void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
+t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
@@ -91,12 +91,10 @@ void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *
         i++;
     }
 
-    return tamanio_guardado == tamanio_buffer
-               ? enviar_senial(OPERATION_SUCCEED, fd)
-               : enviar_senial(OPERATION_FAILED, fd);
+    return tamanio_guardado == tamanio_buffer ? OPERATION_SUCCEED : OPERATION_FAILED;
 }
 
-void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer, int32_t fd)
+void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer, int32_t fd)
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
@@ -125,15 +123,17 @@ void leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t 
     if (tamanio_leido == tamanio_buffer)
     {
         // DEVOLVER BUFFER A CPU (la cpu se debe encargar de castearlo ya que puede ser un int32 o int8) O STRING A INTERFAZ DE I/O
-        t_packet *paquete = crear_paquete();
-        crear_buffer(paquete);
-        agregar_a_paquete(paquete, buffer, tamanio_buffer);
-        enviar_paquete(paquete, fd);
-        eliminar_paquete(paquete);
+        // t_packet *paquete = crear_paquete();
+        // crear_buffer(paquete);
+        // agregar_a_paquete(paquete, buffer, tamanio_buffer);
+        // enviar_paquete(paquete, fd);
+        // eliminar_paquete(paquete);
+        return buffer;
     }
     else
     {
         // ERROR
+        return NULL;
     }
 }
 
