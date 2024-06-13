@@ -24,4 +24,6 @@ void enviar_mem_request(t_io_mem_req *mem_request);
  */
 void liberar_conexion_memoria();
 
+u_int32_t recibir_valor();
+
 #endif // CONEXION_MEMORIA_H
