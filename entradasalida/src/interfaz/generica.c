@@ -2,7 +2,6 @@
 
 void iniciar_rutina_interfaz_generica(void)
 {
-
     while (1)
     {
         t_io_request *peticion_io = esperar_instruccion();
@@ -18,8 +17,8 @@ void iniciar_rutina_interfaz_generica(void)
 
 void gen_sleep(char *cant_unidad_trabajo)
 {
-    u_int32_t tiempo_en_ms = get_tiempo_unidad_trabajo();
+    u_int32_t tiempo_unidad_trabajo = get_tiempo_unidad_trabajo();
 
-    u_int32_t tiempo_a_bloquear = atoi(cant_unidad_trabajo) * tiempo_en_ms;
-    sleep(tiempo_a_bloquear / 1000);
+    u_int32_t tiempo_a_bloquear = atoi(cant_unidad_trabajo) * tiempo_unidad_trabajo;
+    usleep(tiempo_a_bloquear * 1000);
 }

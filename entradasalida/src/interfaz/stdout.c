@@ -1,11 +1,7 @@
 #include "stdout.h"
-/*
-IO_STDOUT_WRITE (Interfaz, Registro Dirección, Registro Tamaño):
-Esta instrucción solicita al Kernel que mediante la interfaz seleccionada,
-se lea desde la posición de memoria indicada por la Dirección Lógica almacenada
-en el Registro Dirección, un tamaño indicado por el Registro Tamaño y se imprima
-por pantalla.
-*/
+
+static char *array_a_string(char **array);
+
 void inicializar_interfaz_stdout()
 {
     while (1)
@@ -15,17 +11,19 @@ void inicializar_interfaz_stdout()
         if (strcmp(peticion_io->instruction, "IO_STDOUT_WRITE") != 0)
             enviar_respuesta(INVALID_INSTRUCTION);
 
-        io_stdout_write(peticion_io->arguments, peticion_io->pid);
+        int8_t io_result = io_stdout_write(peticion_io->arguments, peticion_io->pid);
         log_operacion(peticion_io->pid, peticion_io->instruction);
+
+        // responder segun io_result ???
         enviar_respuesta(EXECUTED);
     }
 }
 
-void io_stdout_write(char *argumentos, u_int32_t pid)
+int8_t io_stdout_write(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
+    u_int32_t tamanio_valor = atoi(string_array_pop(parametros));
     char *direcciones_fisicas = array_a_string(parametros);
-    int tamanio_valor = atoi(string_array_pop(parametros));
 
     parametros_io parametros_leer;
     parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
@@ -33,18 +31,20 @@ void io_stdout_write(char *argumentos, u_int32_t pid)
 
     t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, parametros_leer);
     enviar_mem_request(mem_request);
-    int32_t respuesta = recibir_valor();
-    printf("El valor recibido es: %d\n", respuesta); //
+
+    char *respuesta = (char *)recibir_mem_buffer();
+    if (respuesta == NULL)
+        return -1;
+
+    printf("%s\n", respuesta);
+    return 0;
 }
 
-char *array_a_string(char **array)
+static char *array_a_string(char **array)
 {
     char *string = string_new();
-    int i = 0;
-    while (array[i] != NULL)
-    {
+    for (int i = 0; array[i] != NULL; i++)
         string_append(&string, array[i]);
-        i++;
-    }
+
     return string;
 }

@@ -1,5 +1,7 @@
 #include "stdin.h"
 
+static char *array_a_string(char **array);
+
 void iniciar_rutina_interfaz_stdin()
 {
     while (1)
@@ -18,7 +20,7 @@ void iniciar_rutina_interfaz_stdin()
 void io_stdin_read(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
-    int tamanio_valor = atoi(string_array_pop(parametros));
+    u_int32_t tamanio_valor = atoi(string_array_pop(parametros));
 
     char *direcciones_fisicas = array_a_string(parametros);
 
@@ -39,7 +41,7 @@ void io_stdin_read(char *argumentos, u_int32_t pid)
     //    }
 }
 
-char *array_a_string(char **array)
+static char *array_a_string(char **array)
 {
     char *string = string_new();
     int i = 0;
