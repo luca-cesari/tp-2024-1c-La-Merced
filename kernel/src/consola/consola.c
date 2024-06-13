@@ -46,7 +46,9 @@ void leer_script(char *ruta_script)
    {
       char **vec_comando = string_split(linea, " ");
       char *operacion = vec_comando[0];
-      char *argumento = vec_comando[1];
+      char *argumento = (vec_comando[1][strlen(vec_comando[1]) - 1] == '\n')
+                            ? string_substring_until(vec_comando[1], strlen(vec_comando[1]) - 1)
+                            : vec_comando[1];
 
       ejecutar_comando(operacion, argumento);
 
