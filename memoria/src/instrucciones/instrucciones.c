@@ -11,9 +11,9 @@ void cargar_proceso_a_memoria(int32_t pid, char *path)
 {
     t_list *instrucciones = list_create();
 
+    // char *path_completo = path;
     char *path_completo = string_new();
     string_append(&path_completo, get_path_instrucciones());
-    string_append(&path_completo, "/");
     string_append(&path_completo, path);
 
     instrucciones = leer_instrucciones(path_completo);
@@ -49,11 +49,12 @@ t_list *leer_instrucciones(char *path)
     return instrucciones;
 }
 
-void eliminar_proceso(t_pcb *pcb)
+void eliminar_proceso(u_int32_t pid)
 {
     int es_proceso_buscado(void *elemento)
     {
-        return ((t_proceso_instrucciones *)elemento)->pid == pcb->pid;
+        t_proceso_instrucciones *proceso_instruccion = (t_proceso_instrucciones *)elemento;
+        return proceso_instruccion->pid == pid;
     };
     t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
 

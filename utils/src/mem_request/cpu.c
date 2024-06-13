@@ -88,7 +88,8 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
    case ESCRIBIR:
       mem_request->parametros.param_escribir.direcciones_fisicas = strdup(list_get(paquete, 2));
       mem_request->parametros.param_escribir.tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
-      mem_request->parametros.param_escribir.buffer = (void *)list_get(paquete, 4);
+      mem_request->parametros.param_escribir.buffer = malloc(mem_request->parametros.param_escribir.tamanio_buffer);
+      memcpy(mem_request->parametros.param_escribir.buffer, list_get(paquete, 4), mem_request->parametros.param_escribir.tamanio_buffer);
       break;
    case RESIZE:
       mem_request->parametros.tamanio_nuevo = *(u_int32_t *)list_get(paquete, 2);
@@ -97,7 +98,7 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
       break;
    }
 
-   list_destroy(paquete);
+   list_clean_and_destroy_elements(paquete, &free);
    return mem_request;
 }
 
@@ -114,15 +115,17 @@ t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas)
 
 void destruir_cpu_mem_request(t_cpu_mem_req *mem_request)
 {
-   // VER SI SE USA
-   // switch (mem_request->operacion)
-   // {
-   // case FETCH_INSTRUCCION:
-   //    break;
-   // case OBTENER_MARCO:
-   //    break;
-   // default:
-   //    break;
-   // }
+   switch (mem_request->operacion)
+   {
+   case LEER:
+      free(mem_request->parametros.param_leer.direcciones_fisicas);
+      break;
+   case ESCRIBIR:
+      free(mem_request->parametros.param_escribir.direcciones_fisicas);
+      free(mem_request->parametros.param_escribir.buffer);
+      break;
+   default: // cualquier otro caso
+      break;
+   }
    free(mem_request);
 }

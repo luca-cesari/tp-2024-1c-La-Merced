@@ -55,7 +55,7 @@ void escuchar_kernel(int32_t fd_kernel)
         {
         case INICIAR_PROCESO:
             printf("INICIAR_PROCESO \n");
-            cargar_proceso_a_memoria(mem_request->pid, mem_request->parametros.path);
+            cargar_proceso_a_memoria(mem_request->pid, mem_request->path);
             crear_tabla_de_paginas_para_proceso(mem_request->pid);
 
             // Siempre envía resultado exitoso, podría haber error??

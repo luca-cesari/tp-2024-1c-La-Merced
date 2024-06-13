@@ -4,7 +4,12 @@ t_mem_buffer_response *crear_buffer_response(t_mem_response resultado, void *buf
 {
    t_mem_buffer_response *mem_buffer_response = malloc(sizeof(t_mem_buffer_response));
    mem_buffer_response->resultado = resultado;
-   mem_buffer_response->buffer = buffer;
+   mem_buffer_response->buffer = NULL;
+   if (buffer != NULL)
+   {
+      mem_buffer_response->buffer = malloc(tamanio_buffer);
+      memcpy(mem_buffer_response->buffer, buffer, tamanio_buffer);
+   }
    mem_buffer_response->tamanio_buffer = tamanio_buffer;
 
    return mem_buffer_response;
