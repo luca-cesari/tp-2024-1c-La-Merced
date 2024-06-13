@@ -21,6 +21,7 @@ u_int32_t mmu(u_int32_t direccion_logica)
       t_cpu_mem_req *mem_request = crear_cpu_mem_request(OBTENER_MARCO, pid, parametro);
       enviar_mem_request(mem_request);
       numero_marco = recibir_marco();
+      log_obtener_marco(pid, numero_pagina, numero_marco);
       return ((numero_marco * tamanio_pagina) + desplazamiento);
       cargar_matriz_tlb(pid, numero_pagina, numero_marco);
    }
