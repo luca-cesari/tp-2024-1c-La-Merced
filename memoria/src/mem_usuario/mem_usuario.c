@@ -11,25 +11,18 @@ void inicializar_memoria_usuario()
     inicializar_bitmap_estados();
 }
 
-t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio)
+t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio_nuevo)
 {
     t_proceso_tabla *tabla_paginas = get_tabla_proceso(pid);
     u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
-    u_int32_t tamanio_nuevo = tamanio;
 
-    if (tamanio_nuevo > tamanio_actual)
-    {
-        return ampliar_memoria_para_proceso(tabla_paginas, tamanio_nuevo);
-    }
-    else
-    {
-        return reducir_memoria_para_proceso(tabla_paginas, tamanio_nuevo);
-    }
+    return tamanio_nuevo > tamanio_actual
+               ? ampliar_memoria_para_proceso(tabla_paginas, tamanio_actual, tamanio_nuevo)
+               : reducir_memoria_para_proceso(tabla_paginas, tamanio_actual, tamanio_nuevo);
 }
 
-t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
+t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo)
 {
-    u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina();
     u_int32_t cantidad_frames_disponibles = get_cantidad_frames_disponibles();
 
@@ -48,9 +41,8 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
     return OPERATION_SUCCEED;
 }
 
-t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_nuevo)
+t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo)
 {
-    u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
     u_int32_t cantidad_frames_a_liberar = tamanio_actual / get_tamanio_pagina() - tamanio_nuevo / get_tamanio_pagina();
 
     for (u_int32_t i = 0; i < cantidad_frames_a_liberar; i++)

@@ -38,7 +38,7 @@ t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio);
  * @param tamanio_nuevo
  * @return `t_mem_response`
  */
-t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
+t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo);
 
 /**
  * @brief Reduce memoria para un proceso.
@@ -47,16 +47,16 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u
  * @param tamanio_nuevo
  * @return `t_mem_response`
  */
-t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_de_paginas, u_int32_t tamanio_nuevo);
+t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo);
 
 /**
- * @brief 
- * 
- * @param pid 
- * @param direcciones_fisicas 
- * @param buffer 
- * @param tamanio 
- * @param fd 
+ * @brief
+ *
+ * @param pid
+ * @param direcciones_fisicas
+ * @param buffer
+ * @param tamanio
+ * @param fd
  */
 void escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio, int32_t fd);
 
