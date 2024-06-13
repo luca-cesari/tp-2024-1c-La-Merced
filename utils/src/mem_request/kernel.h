@@ -8,18 +8,13 @@ typedef enum
 {
    INICIAR_PROCESO,
    FINALIZAR_PROCESO,
-   // Otros tipos de instrucciones si los hay
 } kernel_req_operation;
 
 typedef struct
 {
    kernel_req_operation operacion;
    u_int32_t pid; // El PID está presente en todos los casos
-   union
-   {
-      char *path; // Presente solo para INICIAR_PROCESO
-                  // Otros parámetros específicos para otros tipos de instrucciones si los hay
-   } parametros;
+   char *path;    // Presente solo para INICIAR_PROCESO
 } t_kernel_mem_req;
 
 t_kernel_mem_req *crear_kernel_mem_request(kernel_req_operation operacion, u_int32_t pid, char *path);
