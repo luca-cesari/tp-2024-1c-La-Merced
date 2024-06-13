@@ -12,6 +12,7 @@
 #include "conexion/kernel.h"
 #include "conexion/memoria.h"
 #include "mem_request/entradasalida.h"
+#include "conexion/memoria.h"
 
 void inicializar_interfaz_stdout(void);
 void io_stdout_write(char *argumentos, u_int32_t pid);

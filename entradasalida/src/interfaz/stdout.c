@@ -33,6 +33,8 @@ void io_stdout_write(char *argumentos, u_int32_t pid)
 
     t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, parametros_leer);
     enviar_mem_request(mem_request);
+    int32_t respuesta = recibir_valor();
+    printf("El valor recibido es: %d\n", respuesta); //
 }
 
 char *array_a_string(char **array)

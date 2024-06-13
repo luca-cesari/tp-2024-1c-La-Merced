@@ -182,8 +182,6 @@ void io_stdout_write(char **parametros)
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
    pcb->io_request = io_request;
-   int32_t response = recibir_valor();
-   printf("El valor recibido es: %d\n", response);
 }
 
 void exit_instruction(char **parametros)
