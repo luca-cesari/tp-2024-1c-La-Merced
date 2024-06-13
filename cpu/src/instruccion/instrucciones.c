@@ -47,12 +47,18 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 
    enviar_mem_request(mem_request);
 
-   u_int32_t *nuevos_datos = recibir_paquete_de_memoria();
-   *registro_datos = *nuevos_datos;
+   t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
+   if (response->tamanio_buffer == tamanio_registro)
+   {
+      *registro_datos = *(u_int32_t *)response->buffer;
+      log_escritura_lectura_memoria(pcb->pid, READ, *direccion_logica, string_itoa(*registro_datos));
+   }
+   else
+   {
+      perror("Error al leer en memoria\n");
+   }
 
-   log_escritura_lectura_memoria(pcb->pid, READ, *direccion_logica, string_itoa(*nuevos_datos));
-
-   free(nuevos_datos);
+   destruir_buffer_response(response);
 }
 
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
@@ -85,12 +91,14 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
 
    enviar_mem_request(mem_request);
 
-   if (strcmp(recibir_confirmacion(), "OK") != 0)
+   if (recibir_response_de_memoria() == OPERATION_SUCCEED)
    {
-      printf("Error al escribir en memoria\n");
+      log_escritura_lectura_memoria(pcb->pid, WRITE, *direccion_logica, string_itoa(*registro_datos));
    }
-
-   log_escritura_lectura_memoria(pcb->pid, WRITE, *direccion_logica, string_itoa(*registro_datos));
+   else
+   {
+      perror("Error al escribir en memoria\n");
+   }
 }
 
 void sum(char **parametros)
@@ -140,7 +148,7 @@ void resize(char **parametros_char)
    parametro.tamanio_nuevo = atoi(parametros_char[0]);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(RESIZE, pcb->pid, parametro);
    enviar_mem_request(mem_request);
-   if (recibir_valor_numerico()) // succes es 0 (false), failed es 1 (true)
+   if (recibir_response_de_memoria() == OPERATION_FAILED)
    {
       pcb->motivo_desalojo = ERROR;
       pcb->motivo_finalizacion = OUT_OF_MEMORY;
@@ -162,7 +170,17 @@ void copy_string(char **param)
 
    enviar_mem_request(mem_request_leer);
 
-   char *string_escribir = recibir_paquete_de_memoria();
+   char *string_escribir;
+   t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
+
+   if (response->tamanio_buffer == tamanio_valor)
+   {
+      string_escribir = response->buffer;
+   }
+   else
+   {
+      perror("Error al leer en memoria\n");
+   }
 
    log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica_SI_inicial), string_escribir);
 
@@ -178,7 +196,16 @@ void copy_string(char **param)
 
    enviar_mem_request(mem_request_escribir);
 
-   log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica_DI_inicial), string_escribir);
+   if (recibir_response_de_memoria() == OPERATION_SUCCEED)
+   {
+      log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica_DI_inicial), string_escribir);
+   }
+   else
+   {
+      perror("Error al escribir en memoria\n");
+   }
+
+   destruir_buffer_response(response);
 }
 
 void io_gen_sleep(char **parametros)
