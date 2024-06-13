@@ -2,7 +2,7 @@
 #define TABLA_PAGINAS_H
 
 #include <stdlib.h>
-#include <commons/collections/list.h>
+#include <mlist/mlist.h>
 
 #include "config/config.h"
 #include "estado_frame/estado_frame.h"
@@ -14,7 +14,7 @@ typedef struct
 
    // posición de lista: nro_pag
    // contenido de lista: nro_frame
-   t_list *lista_frames;
+   t_mutext_list *lista_frames;
 } t_proceso_tabla;
 
 /**
@@ -40,6 +40,29 @@ void crear_tabla_de_paginas_para_proceso(u_int32_t pid);
 void destruir_tabla_de_paginas_para_proceso(u_int32_t pid);
 
 /**
+ * @brief Retorna la cantidad de páginas que tiene una tabla.
+ *
+ * @param tabla_paginas
+ * @return `u_int32_t`
+ */
+u_int32_t get_cantidad_paginas(t_proceso_tabla *tabla_paginas);
+
+/**
+ * @brief Asigna un frame a la tabla de páginas.
+ *
+ * @param tabla_paginas
+ */
+void asignar_frame_a_tabla(t_proceso_tabla *tabla_paginas);
+
+/**
+ * @brief Libera un frame de la tabla de páginas.
+ *
+ * @param tabla_paginas
+ * @param nro_frame
+ */
+void liberar_frame_de_tabla(t_proceso_tabla *tabla_paginas);
+
+/**
  * @brief Devuelve la tabla de páginas correspondiente al proceso.
  *
  * @param pid
@@ -63,6 +86,6 @@ u_int32_t obtener_marco(u_int32_t pid, u_int32_t nro_pag);
  * @brief Función destructor de la lista de tablas de páginas.
  *
  */
-void destruir_tabla_paginas(void);
+void destruir_lista_tablas(void);
 
 #endif // TABLA_PAGINAS_H

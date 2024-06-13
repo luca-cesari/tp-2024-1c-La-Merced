@@ -1,27 +1,42 @@
 #include "mmu.h"
 
-u_int32_t mmu(u_int32_t direccion_logica)
-{
-   u_int32_t pid = process_getpid();
+u_int8_t tlb_disponible;
 
-   u_int32_t tamanio_pagina = get_tamanio_pagina(); // lo tengo que traer desde la memoria
+static u_int32_t buscar_en_memoria(u_int32_t pid, u_int32_t numero_pagina);
+
+void inicializar_mmu()
+{
+   tlb_disponible = inicializar_tlb();
+}
+
+u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
+{
+   u_int32_t tamanio_pagina = get_tamanio_pagina();
    u_int32_t numero_pagina = direccion_logica / tamanio_pagina;
    u_int32_t desplazamiento = direccion_logica - (numero_pagina * tamanio_pagina);
-
    u_int32_t numero_marco;
-   if (buscar_en_tlb(pid, numero_pagina) != -1)
-   {
-      numero_marco = buscar_en_tlb(pid, numero_pagina);
-      return ((numero_marco * tamanio_pagina) + desplazamiento);
-   }
-   else
-   {
-      parametros parametro;
-      parametro.nro_pag = numero_pagina;
-      t_cpu_mem_req *mem_request = crear_cpu_mem_request(OBTENER_MARCO, pid, parametro);
-      enviar_mem_request(mem_request);
-      numero_marco = recibir_marco();
-      return ((numero_marco * tamanio_pagina) + desplazamiento);
-      cargar_matriz_tlb(pid, numero_pagina, numero_marco);
-   }
+
+   numero_marco = tlb_disponible ? get_marco(pid, numero_pagina) : -1;
+
+   if (numero_marco == -1) // TLB miss, sea porque no hay TLB o porque no se encontró
+      numero_marco = buscar_en_memoria(pid, numero_pagina);
+
+   cargar_nueva_entrada(pid, numero_pagina, numero_marco);
+
+   return (numero_marco * tamanio_pagina) + desplazamiento;
+}
+
+void destruir_mmu()
+{
+   if (tlb_disponible)
+      destruir_tlb();
+}
+
+static u_int32_t buscar_en_memoria(u_int32_t pid, u_int32_t numero_pagina)
+{
+   parametros parametro;
+   parametro.nro_pag = numero_pagina;
+   t_cpu_mem_req *mem_request = crear_cpu_mem_request(OBTENER_MARCO, pid, parametro);
+   enviar_mem_request(mem_request);
+   return recibir_marco();
 }

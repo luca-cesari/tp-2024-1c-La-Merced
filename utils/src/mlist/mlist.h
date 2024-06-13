@@ -22,6 +22,14 @@ t_mutext_list *mlist_create(void);
  * @brief
  *
  * @param lista_mutex
+ * @return `u_int32_t`
+ */
+u_int32_t mlist_size(t_mutext_list *lista_mutex);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
  * @return `int8_t` : 1 si la lista está vacía, 0 en caso contrario.
  */
 int8_t mlist_is_empty(t_mutext_list *lista_mutex);
@@ -46,7 +54,24 @@ void mlist_add_all(t_mutext_list *lista_mutex, t_mutext_list *otra_lista_mutex);
  * @brief
  *
  * @param lista_mutex
- * @return void*
+ * @param index
+ * @return `void*`
+ */
+void *mlist_get(t_mutext_list *lista_mutex, u_int32_t index);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
+ * @return `void*`
+ */
+void *mlist_get_last(t_mutext_list *lista_mutex);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
+ * @return `void*`
  */
 void *mlist_peek(t_mutext_list *lista_mutex);
 
@@ -62,7 +87,7 @@ void mlist_push_as_queue(t_mutext_list *lista_mutex, void *elemento);
  * @brief
  *
  * @param lista_mutex
- * @return void*
+ * @return `void*`
  */
 void *mlist_pop_as_queue(t_mutext_list *lista_mutex);
 
@@ -71,7 +96,7 @@ void *mlist_pop_as_queue(t_mutext_list *lista_mutex);
  *
  * @param lista_mutex
  * @param criterio
- * @return void*
+ * @return `void*`
  */
 void *mlist_find(t_mutext_list *lista_mutex, int32_t (*criterio)(void *));
 
@@ -80,7 +105,7 @@ void *mlist_find(t_mutext_list *lista_mutex, int32_t (*criterio)(void *));
  *
  * @param lista_mutex
  * @param conversor
- * @return t_mutext_list*
+ * @return `t_mutext_list*`
  */
 t_mutext_list *mlist_map(t_mutext_list *lista_mutex, void *(*conversor)(void *));
 
@@ -106,7 +131,7 @@ int32_t mlist_index_of(t_mutext_list *lista_mutex, int32_t (*criterio)(void *));
  *
  * @param lista_mutex
  * @param index
- * @return void*
+ * @return `void*`
  */
 void *mlist_remove(t_mutext_list *lista_mutex, u_int32_t index);
 
@@ -114,8 +139,15 @@ void *mlist_remove(t_mutext_list *lista_mutex, u_int32_t index);
  * @brief
  *
  * @param lista_mutex
+ */
+void *mlist_remove_last(t_mutext_list *lista_mutex);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
  * @param condicion
- * @return void*
+ * @return `void*`
  */
 void *mlist_remove_by_condition(t_mutext_list *lista_mutex, int32_t (*condicion)(void *));
 

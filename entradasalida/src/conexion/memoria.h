@@ -19,11 +19,13 @@ int8_t conectar_con_memoria();
 
 void enviar_mem_request(t_io_mem_req *mem_request);
 
+int32_t recibir_valor();
+
+void *recibir_mem_buffer();
+
 /**
  * @brief Libera la conexion con el módulo Memoria
  */
 void liberar_conexion_memoria();
-
-u_int32_t recibir_valor();
 
 #endif // CONEXION_MEMORIA_H

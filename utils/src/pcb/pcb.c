@@ -103,7 +103,7 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 20);
    pcb->estado = *(state *)list_get(paquete, 21);
 
-   list_destroy(paquete);
+   list_destroy_and_destroy_elements(paquete, &free);
    return pcb;
 }
 

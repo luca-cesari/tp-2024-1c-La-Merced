@@ -36,7 +36,7 @@ static void *cronometrar_quantum(void *);
 
 void inicializar_planificador()
 {
-   pid_count = 0;
+   pid_count = 1;
    quantum = get_quantum();
 
    sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());

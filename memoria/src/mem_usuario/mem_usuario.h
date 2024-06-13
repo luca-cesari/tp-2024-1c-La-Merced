@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <commons/collections/list.h>
 #include <protocol/protocol.h>
 #include <mem_request/mem_response.h>

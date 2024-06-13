@@ -67,23 +67,30 @@ t_io_mem_req *recibir_io_mem_request(int32_t fd_io)
    case ESCRIBIR_IO:
       mem_request->parametros.param_escribir.direcciones_fisicas = strdup(list_get(paquete, 2));
       mem_request->parametros.param_escribir.tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
-      mem_request->parametros.param_escribir.buffer = (void *)list_get(paquete, 4);
+      mem_request->parametros.param_escribir.buffer = malloc(mem_request->parametros.param_escribir.tamanio_buffer);
+      memcpy(mem_request->parametros.param_escribir.buffer, list_get(paquete, 4), mem_request->parametros.param_escribir.tamanio_buffer);
       break;
    default:
       break;
    }
 
-   list_destroy(paquete);
+   list_destroy_and_destroy_elements(paquete, free);
    return mem_request;
 }
 
 void destruir_io_mem_request(t_io_mem_req *mem_request)
 {
-   // VER SI SE USA
-   // switch (mem_request->operacion)
-   // {
-   // default:
-   //    break;
-   // }
+   switch (mem_request->operacion)
+   {
+   case LEER_IO:
+      free(mem_request->parametros.param_leer.direcciones_fisicas);
+      break;
+   case ESCRIBIR_IO:
+      free(mem_request->parametros.param_escribir.direcciones_fisicas);
+      free(mem_request->parametros.param_escribir.buffer);
+      break;
+   default: // cualquier otro caso
+      break;
+   }
    free(mem_request);
 }

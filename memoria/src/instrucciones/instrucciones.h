@@ -45,7 +45,7 @@ t_list *leer_instrucciones(char *path);
  *
  * @param pcb
  */
-void eliminar_proceso(t_pcb *pcb);
+void eliminar_proceso(u_int32_t pid);
 
 /**
  * @brief

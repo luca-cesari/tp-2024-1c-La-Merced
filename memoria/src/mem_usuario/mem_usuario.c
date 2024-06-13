@@ -1,6 +1,7 @@
 #include "mem_usuario.h"
 
 void *memoria_usuario;
+pthread_mutex_t memoria_usuario_mutex;
 
 static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
 
@@ -9,12 +10,13 @@ void inicializar_memoria_usuario()
     memoria_usuario = malloc(get_tamanio_memoria());
     inicializar_tabla_paginas();
     inicializar_bitmap_estados();
+    pthread_mutex_init(&memoria_usuario_mutex, NULL);
 }
 
 t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio_nuevo)
 {
     t_proceso_tabla *tabla_paginas = get_tabla_proceso(pid);
-    u_int32_t tamanio_actual = list_size(tabla_paginas->lista_frames) * get_tamanio_pagina();
+    u_int32_t tamanio_actual = get_cantidad_paginas(tabla_paginas) * get_tamanio_pagina();
 
     return tamanio_nuevo > tamanio_actual
                ? ampliar_memoria_para_proceso(tabla_paginas, tamanio_actual, tamanio_nuevo)
@@ -30,13 +32,7 @@ t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
         return OPERATION_FAILED;
 
     for (u_int32_t i = 0; i < cantidad_frames_necesarios; i++)
-    {
-        u_int32_t frame = get_frame_libre();
-        set_estado_frame(frame, OCUPADO);
-        u_int32_t *nro_frame = malloc(sizeof(u_int32_t));
-        *nro_frame = frame;
-        list_add(tabla_paginas->lista_frames, nro_frame);
-    }
+        asignar_frame_a_tabla(tabla_paginas);
 
     log_ampliacion_proceso(tabla_paginas->pid, tamanio_actual, tamanio_nuevo);
 
@@ -48,11 +44,7 @@ t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
     u_int32_t cantidad_frames_a_liberar = tamanio_actual / get_tamanio_pagina() - tamanio_nuevo / get_tamanio_pagina();
 
     for (u_int32_t i = 0; i < cantidad_frames_a_liberar; i++)
-    {
-        u_int32_t *nro_frame = list_get(tabla_paginas->lista_frames, list_size(tabla_paginas->lista_frames) - 1);
-        set_estado_frame(*nro_frame, LIBRE);
-        list_remove(tabla_paginas->lista_frames, list_size(tabla_paginas->lista_frames) - 1);
-    }
+        liberar_frame_de_tabla(tabla_paginas);
 
     log_reduccion_proceso(tabla_paginas->pid, tamanio_actual, tamanio_nuevo);
 
@@ -72,14 +64,16 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
 
     while (tamanio_guardado <= tamanio_buffer)
     {
-
         direccion_fisica_a_recorrer = list_get(direcciones_fisicas, i);
         frame = get_numero_de_frame(*direccion_fisica_a_recorrer);
         limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
 
         while ((*direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_guardado <= tamanio_buffer))
         {
+            pthread_mutex_lock(&memoria_usuario_mutex);
             memcpy(memoria_usuario + (*direccion_fisica_a_recorrer), buffer, 1); // Va copiando byte por byte del buffer a la memoria
+            pthread_mutex_unlock(&memoria_usuario_mutex);
+
             (*direccion_fisica_a_recorrer)++;
             buffer++;
             tamanio_guardado++;
@@ -97,7 +91,7 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
-    char *direccion_fisica_inicial = list_get(direcciones_fisicas, 0);
+
     u_int32_t *direccion_fisica_a_recorrer;
     u_int32_t frame;
     u_int32_t limite_de_frame;
@@ -106,44 +100,31 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
 
     while (tamanio_leido <= tamanio_buffer)
     {
-
         direccion_fisica_a_recorrer = list_get(direcciones_fisicas, 0);
         frame = get_numero_de_frame(*direccion_fisica_a_recorrer);
         limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
 
         while ((*direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido <= tamanio_buffer))
         {
+            pthread_mutex_lock(&memoria_usuario_mutex);
             memcpy(buffer, memoria_usuario + (*direccion_fisica_a_recorrer), 1); // Va copiando byte por byte del buffer a la memoria
+            pthread_mutex_unlock(&memoria_usuario_mutex);
+
             (*direccion_fisica_a_recorrer)++;
             buffer++;
             tamanio_leido++;
         }
     }
 
-    if (tamanio_leido == tamanio_buffer)
-    {
-        log_acceso_espacio_usuario(pid, "LEER", *direccion_fisica_inicial, tamanio_buffer);
-
-        // DEVOLVER BUFFER A CPU (la cpu se debe encargar de castearlo ya que puede ser un int32 o int8) O STRING A INTERFAZ DE I/O
-        // t_packet *paquete = crear_paquete();
-        // crear_buffer(paquete);
-        // agregar_a_paquete(paquete, buffer, tamanio_buffer);
-        // enviar_paquete(paquete, fd);
-        // eliminar_paquete(paquete);
-        return buffer;
-    }
-    else
-    {
-        // ERROR
-        return NULL;
-    }
+    return tamanio_leido == tamanio_buffer ? buffer : NULL;
 }
 
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);
     destruir_bitmap_estados();
-    destruir_tabla_paginas();
+    destruir_lista_tablas();
+    pthread_mutex_destroy(&memoria_usuario_mutex);
 }
 
 static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)

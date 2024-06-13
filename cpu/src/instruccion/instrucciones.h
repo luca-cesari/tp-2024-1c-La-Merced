@@ -13,6 +13,7 @@
 
 #include "mmu/mmu.h"
 #include "conexion/memoria.h"
+#include "logger/logger.h"
 
 /// ESTRUCTURAS DECODE ////////
 

@@ -9,6 +9,15 @@ t_mutext_list *mlist_create(void)
    return lista_mutex;
 }
 
+u_int32_t mlist_size(t_mutext_list *lista_mutex)
+{
+   pthread_mutex_lock(&(lista_mutex->mutex));
+   u_int32_t size = list_size(lista_mutex->list);
+   pthread_mutex_unlock(&(lista_mutex->mutex));
+
+   return size;
+}
+
 int8_t mlist_is_empty(t_mutext_list *lista_mutex)
 {
    pthread_mutex_lock(&(lista_mutex->mutex));
@@ -32,13 +41,26 @@ void mlist_add_all(t_mutext_list *lista_mutex, t_mutext_list *otra_lista_mutex)
    pthread_mutex_unlock(&(lista_mutex->mutex));
 }
 
-void *mlist_peek(t_mutext_list *lista_mutex)
+void *mlist_get(t_mutext_list *lista_mutex, u_int32_t index)
 {
+   if (mlist_is_empty(lista_mutex))
+      return NULL;
+
    pthread_mutex_lock(&(lista_mutex->mutex));
-   void *elemento = list_get(lista_mutex->list, 0);
+   void *elemento = list_get(lista_mutex->list, index);
    pthread_mutex_unlock(&(lista_mutex->mutex));
 
    return elemento;
+}
+
+void *mlist_get_last(t_mutext_list *lista_mutex)
+{
+   return mlist_get(lista_mutex, mlist_size(lista_mutex) - 1);
+}
+
+void *mlist_peek(t_mutext_list *lista_mutex)
+{
+   return mlist_get(lista_mutex, 0);
 }
 
 void mlist_push_as_queue(t_mutext_list *lista_mutex, void *elemento)
@@ -107,6 +129,11 @@ void *mlist_remove(t_mutext_list *lista_mutex, u_int32_t index)
    pthread_mutex_unlock(&(lista_mutex->mutex));
 
    return elemento;
+}
+
+void *mlist_remove_last(t_mutext_list *lista_mutex)
+{
+   return mlist_remove(lista_mutex, mlist_size(lista_mutex) - 1);
 }
 
 void *mlist_remove_by_condition(t_mutext_list *lista_mutex, int32_t (*condicion)(void *))

@@ -50,6 +50,8 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
    u_int32_t *nuevos_datos = recibir_paquete_de_memoria();
    *registro_datos = *nuevos_datos;
 
+   log_escritura_lectura_memoria(pcb->pid, READ, *direccion_logica, string_itoa(*nuevos_datos));
+
    free(nuevos_datos);
 }
 
@@ -87,6 +89,8 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
    {
       printf("Error al escribir en memoria\n");
    }
+
+   log_escritura_lectura_memoria(pcb->pid, WRITE, *direccion_logica, string_itoa(*registro_datos));
 }
 
 void sum(char **parametros)
@@ -136,6 +140,11 @@ void resize(char **parametros_char)
    parametro.tamanio_nuevo = atoi(parametros_char[0]);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(RESIZE, pcb->pid, parametro);
    enviar_mem_request(mem_request);
+   if (recibir_valor_numerico()) // succes es 0 (false), failed es 1 (true)
+   {
+      pcb->motivo_desalojo = ERROR;
+      pcb->motivo_finalizacion = OUT_OF_MEMORY;
+   }
 }
 
 void copy_string(char **param)
@@ -143,6 +152,7 @@ void copy_string(char **param)
    int tamanio_valor = atoi(param[0]);
 
    char *direcciones_fisicas_SI = obtener_direcciones_fisicas(pcb->cpu_registers.SI, tamanio_valor);
+   char *direccion_fisica_SI_inicial = string_split(direcciones_fisicas_SI, " ")[0];
 
    parametros parametros_leer;
    parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas_SI;
@@ -154,7 +164,10 @@ void copy_string(char **param)
 
    char *string_escribir = recibir_paquete_de_memoria();
 
+   log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica_SI_inicial), string_escribir);
+
    char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
+   char *direccion_fisica_DI_inicial = string_split(direcciones_fisicas_DI, " ")[0];
 
    parametros parametros_escribir;
    parametros_escribir.param_leer.direcciones_fisicas = direcciones_fisicas_DI;
@@ -164,6 +177,8 @@ void copy_string(char **param)
    t_cpu_mem_req *mem_request_escribir = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
    enviar_mem_request(mem_request_escribir);
+
+   log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica_DI_inicial), string_escribir);
 }
 
 void io_gen_sleep(char **parametros)
@@ -264,13 +279,13 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
    u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
    char *direcciones_fisicas = string_new();
 
-   char *direccion_fisica_actual_str = string_itoa(mmu(direccion_logica));
+   char *direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica));
 
    direcciones_fisicas = direccion_fisica_actual_str;
 
    for (u_int32_t pagina = pagina_inicial + 1; pagina <= pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
    {
-      direccion_fisica_actual_str = string_itoa(mmu(direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
+      direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
       string_append(&direcciones_fisicas, " ");
       string_append(&direcciones_fisicas, direccion_fisica_actual_str);
    }
