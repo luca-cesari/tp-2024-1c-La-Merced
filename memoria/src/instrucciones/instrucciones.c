@@ -41,8 +41,7 @@ t_list *leer_instrucciones(char *path)
 
     while ((read = getline(&linea, &len, archivo)) != -1)
     {
-        char *linea_sin_salto = eliminar_salto_linea(linea);
-        list_add(instrucciones, linea_sin_salto);
+        list_add(instrucciones, eliminar_salto_linea(linea));
     }
 
     free(linea);
