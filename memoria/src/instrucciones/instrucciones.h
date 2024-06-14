@@ -10,6 +10,7 @@
 #include <commons/string.h>
 
 #include "config/config.h"
+#include "extended/string.h"
 
 typedef struct
 {

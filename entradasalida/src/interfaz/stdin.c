@@ -1,7 +1,5 @@
 #include "stdin.h"
 
-static char *array_a_string(char **array);
-
 void iniciar_rutina_interfaz_stdin()
 {
     while (1)
@@ -42,16 +40,4 @@ int8_t io_stdin_read(char *argumentos, u_int32_t pid)
 
     t_mem_response response = recibir_valor();
     return response == OPERATION_SUCCEED ? 0 : -1;
-}
-
-static char *array_a_string(char **array)
-{
-    char *string = string_new();
-    int i = 0;
-    while (array[i] != NULL)
-    {
-        string_append(&string, array[i]);
-        i++;
-    }
-    return string;
 }
