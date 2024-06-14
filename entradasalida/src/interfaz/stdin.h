@@ -10,6 +10,7 @@
 #include "conexion/memoria.h"
 #include "consola/consola.h"
 #include "mem_request/entradasalida.h"
+#include "extended/string.h"
 
 void iniciar_rutina_interfaz_stdin(void);
 int8_t io_stdin_read(char *argumentos, u_int32_t pid);

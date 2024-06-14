@@ -1,7 +1,5 @@
 #include "stdout.h"
 
-static char *array_a_string(char **array);
-
 void inicializar_interfaz_stdout()
 {
     while (1)
@@ -42,13 +40,4 @@ int8_t io_stdout_write(char *argumentos, u_int32_t pid)
 
     printf("%s\n", respuesta);
     return 0;
-}
-
-static char *array_a_string(char **array)
-{
-    char *string = string_new();
-    for (int i = 0; array[i] != NULL; i++)
-        string_append(&string, array[i]);
-
-    return string;
 }
