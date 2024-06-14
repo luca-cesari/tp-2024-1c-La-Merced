@@ -25,6 +25,7 @@ void destruir_pcb(t_pcb *pcb)
    free(pcb->resource);
    destruir_io_request(pcb->io_request);
    free(pcb);
+   // pcb = NULL;
 }
 
 t_packet *serializar_pcb(t_pcb *pcb)

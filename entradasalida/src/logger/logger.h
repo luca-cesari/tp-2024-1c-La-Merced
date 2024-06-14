@@ -11,7 +11,8 @@
 void iniciar_logger(char *nombre_interfaz);
 void destruir_logger(void);
 
-void log_operacion(u_int32_t pid, char* operacion);
+void log_peticion(u_int32_t pid);
+void log_operacion(u_int32_t pid, char *operacion);
 // void log_crear_archivo(u_int32_t pid, char* nombre_archivo);
 // void log_eliminar_archivo(u_int32_t pid, char* nombre_archivo);
 // void log_truncar_archivo(u_int32_t pid, char* nombre_archivo, u_int32_t tamanio);

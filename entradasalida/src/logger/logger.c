@@ -4,7 +4,7 @@ t_log *io_logger;
 
 void iniciar_logger(char *nombre_interfaz)
 {
-   
+
    char *archivo_log = string_new();
    string_append(&archivo_log, string_duplicate(nombre_interfaz));
    string_append(&archivo_log, "_");
@@ -15,6 +15,11 @@ void iniciar_logger(char *nombre_interfaz)
 void destruir_logger(void)
 {
    log_destroy(io_logger);
+}
+
+void log_peticion(u_int32_t pid)
+{
+   log_info(io_logger, "Llegada de peticion por PID: %d ", pid);
 }
 
 void log_operacion(u_int32_t pid, char *operacion)

@@ -44,9 +44,9 @@ t_pcb *recibir_pcb_cpu()
    return pcb;
 }
 
-void enviar_interrupcion()
+void enviar_interrupcion(interrupt_code code)
 {
-   enviar_senial(1, fd_interrupt);
+   enviar_senial(code, fd_interrupt);
 }
 
 void liberar_conexion_cpu()

@@ -7,6 +7,12 @@
 
 #include "config/config.h"
 
+typedef enum
+{
+   USER_INT,    // 0
+   QUANTUM_INT, // 1
+} interrupt_code;
+
 /**
  * @brief Realiza la conexion y el handshake con el módulo CPU
  *        por el puerto de dispatch
@@ -42,8 +48,10 @@ t_pcb *recibir_pcb_cpu();
 /**
  * @brief Envía señal por el puerto de interrupción al módulo CPU
  *        para desalojar el proceso en ejecución
+ *
+ * @param code Código de interrupción a enviar
  */
-void enviar_interrupcion();
+void enviar_interrupcion(interrupt_code code);
 
 /**
  * @brief Libera la conexion con el módulo CPU,

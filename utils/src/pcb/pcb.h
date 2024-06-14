@@ -23,6 +23,7 @@ typedef enum
    NONE,
    TERMINATED,
    QUANTUM,
+   KILL,
    IO,
    WAIT,
    SIGNAL,
