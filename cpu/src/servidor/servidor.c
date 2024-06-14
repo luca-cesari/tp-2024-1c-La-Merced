@@ -31,7 +31,6 @@ void *atender_kernel_dispatch(void *fd_ptr)
 
    printf("Kernel conectado por dispatch \n");
    inicializar_diccionario_instrucciones();
-   
 
    while (1)
    {
@@ -61,8 +60,9 @@ void *atender_kernel_interrupt(void *fd_ptr)
 
    while (1)
    {
-      if (recibir_senial(fd_interrupt))
-         set_interrupcion();
+      int32_t interrupcion = recibir_senial(fd_interrupt);
+      if (interrupcion == 0 || interrupcion == 1)
+         set_interrupcion(interrupcion);
    }
 
    sem_post(&fin_de_proceso);

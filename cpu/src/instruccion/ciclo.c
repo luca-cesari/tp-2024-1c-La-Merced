@@ -37,9 +37,14 @@ int check_interrupt()
 {
    if (hay_interrupcion())
    {
-      pcb->motivo_desalojo = QUANTUM;
+      if (tipo_interrupcion())
+      {
+         pcb->motivo_desalojo = QUANTUM;
+         return 1;
+      }
+      pcb->motivo_desalojo = KILL;
       return 1;
-   }
+      }
    return 0;
 }
 
