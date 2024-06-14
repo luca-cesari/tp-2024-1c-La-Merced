@@ -17,10 +17,10 @@
 #include "logger/logger.h"
 #include "extended/string.h"
 
-typedef union
+typedef struct
 {
    u_int32_t *direccion_logica;
-   u_int32_t *registro_tamanio;
+   u_int8_t *registro_tamanio; // Recordar ver
    char *direcciones_fisicas;
 } elementos;
 
@@ -47,7 +47,7 @@ void inicializar_diccionario_registros();
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro);
 parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor);
 parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);
-u_int32_t obtener_tamanio_registro(char **parametros_recibidos, int num);
+u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
 elementos obtenerElementos(char **parametros_recibidos, int num);
 char *obtenerElem(char **parametros, int num);
 

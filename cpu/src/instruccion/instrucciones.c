@@ -23,7 +23,7 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 {
    elementos elementos = obtenerElementos(parametros_recibidos, 1);
 
-   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos, 0);
+   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[0]);
 
    t_cpu_mem_req *mem_request;
    parametros parametros_leer;
@@ -49,12 +49,15 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
 {
    elementos elementos = obtenerElementos(parametros_recibidos, 0);
-   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos, 1);
+   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[1]);
 
    t_cpu_mem_req *mem_request;
    parametros parametros_escribir;
 
-   parametros_escribir = crearParametrosEscribir(elementos.direcciones_fisicas, elementos.registro_tamanio, tamanio_registro);
+   void *buffer = malloc(tamanio_registro);
+   memcpy(buffer, elementos.registro_tamanio, tamanio_registro);
+
+   parametros_escribir = crearParametrosEscribir(elementos.direcciones_fisicas, buffer, tamanio_registro);
    mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
    enviar_mem_request(mem_request);
@@ -213,16 +216,22 @@ void inicializar_diccionario_registros()
 
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro)
 {
-   u_int32_t tamanio_pagina = get_tamanio_pagina();
-   u_int32_t pagina_inicial = direccion_logica / tamanio_pagina;
-   u_int32_t pagina_final = (direccion_logica + tamanio_registro - 1) / tamanio_pagina;
+   int32_t tamanio_pagina = get_tamanio_pagina();
+   int32_t pagina_inicial = direccion_logica / tamanio_pagina;
+   int32_t tamanio_registro_aux = tamanio_registro;
+   int32_t direccion_logica_aux = (int32_t)direccion_logica;
+
+   int32_t pagina_final = (direccion_logica_aux + tamanio_registro_aux - 1) / tamanio_pagina;
+
+   pagina_final = pagina_final < 0 ? 0 : pagina_final;
+
    char *direcciones_fisicas = string_new();
 
    char *direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica));
 
    direcciones_fisicas = direccion_fisica_actual_str;
 
-   for (u_int32_t pagina = pagina_inicial + 1; pagina <= pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
+   for (u_int32_t pagina = pagina_inicial + 1; pagina < pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
    {
       direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
       string_append(&direcciones_fisicas, " ");
@@ -247,9 +256,9 @@ parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32
    return parametros_escribir;
 }
 
-u_int32_t obtener_tamanio_registro(char **parametros_recibidos, int num)
+u_int32_t obtener_tamanio_registro(char *parametros_recibidos)
 {
-   if (string_starts_with(parametros_recibidos[num], "E"))
+   if (string_starts_with(parametros_recibidos, "E"))
    {
       return 4;
    }
@@ -273,7 +282,7 @@ elementos obtenerElementos(char **parametros_recibidos, int num)
    }
    elementos.direccion_logica = dictionary_get(registros, parametros_recibidos[num1]);
    elementos.registro_tamanio = dictionary_get(registros, parametros_recibidos[num2]);
-   elementos.direcciones_fisicas = obtener_direcciones_fisicas(*elementos.direccion_logica, *elementos.registro_tamanio);
+   elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica), *(elementos.registro_tamanio));
    return elementos;
 }
 
