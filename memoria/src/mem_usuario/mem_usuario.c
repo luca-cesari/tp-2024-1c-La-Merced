@@ -63,14 +63,14 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
     char *direccion_fisica_a_recorrer_str;
     int i = 0;
 
-    while (tamanio_guardado <= tamanio_buffer)
+    while (tamanio_guardado < tamanio_buffer)
     {
         direccion_fisica_a_recorrer_str = strdup(list_get(direcciones_fisicas, i)); // Aca obtengo una direccion fisica que esta mal
         direccion_fisica_a_recorrer = atoi(direccion_fisica_a_recorrer_str);
         frame = get_numero_de_frame(direccion_fisica_a_recorrer);
         limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
 
-        while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_guardado <= tamanio_buffer))
+        while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_guardado < tamanio_buffer))
         {
             pthread_mutex_lock(&memoria_usuario_mutex);
             memcpy(memoria_usuario + (direccion_fisica_a_recorrer), buffer, 1); // Va copiando byte por byte del buffer a la memoria
@@ -101,14 +101,14 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     char *direccion_fisica_a_recorrer_str;
     void *buffer = malloc(tamanio_buffer);
 
-    while (tamanio_leido <= tamanio_buffer)
+    while (tamanio_leido < tamanio_buffer)
     {
         direccion_fisica_a_recorrer_str = list_get(direcciones_fisicas, 0);
         direccion_fisica_a_recorrer = atoi(direccion_fisica_a_recorrer_str);
         frame = get_numero_de_frame(direccion_fisica_a_recorrer);
         limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
 
-        while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido <= tamanio_buffer))
+        while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido < tamanio_buffer))
         {
             pthread_mutex_lock(&memoria_usuario_mutex);
             memcpy(buffer, memoria_usuario + direccion_fisica_a_recorrer, 1); // Va copiando byte por byte del buffer a la memoria
