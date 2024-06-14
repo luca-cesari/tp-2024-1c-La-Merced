@@ -41,6 +41,7 @@ void memoria_finalizar_proceso(u_int32_t pid)
    pthread_mutex_lock(&mutex_memoria);
    enviar_kernel_mem_request(fd_memoria, mem_request);
    pthread_mutex_unlock(&mutex_memoria);
+   destruir_kernel_mem_request(mem_request);
 }
 
 void liberar_conexion_memoria()

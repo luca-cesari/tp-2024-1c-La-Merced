@@ -34,6 +34,7 @@ int8_t io_stdout_write(char *argumentos, u_int32_t pid)
 
     t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, parametros_leer);
     enviar_mem_request(mem_request);
+    destruir_io_mem_request(mem_request);
 
     char *respuesta = (char *)recibir_mem_buffer();
     if (respuesta == NULL)
