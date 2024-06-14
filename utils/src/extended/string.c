@@ -27,3 +27,8 @@ char **eliminar_primer_elemento(char **array)
 
    return nuevo_array;
 }
+
+char *eliminar_salto_linea(char *linea)
+{
+   return string_replace(linea, "\n", "");
+}

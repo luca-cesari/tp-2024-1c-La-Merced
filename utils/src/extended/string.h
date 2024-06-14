@@ -7,5 +7,6 @@
 
 char *array_a_string(char **array);
 char **eliminar_primer_elemento(char **array);
+char *eliminar_salto_linea(char *linea);
 
 #endif // UTILS_STRING_H
