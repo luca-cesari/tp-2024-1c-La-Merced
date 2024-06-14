@@ -160,9 +160,10 @@ void matar_proceso(u_int32_t pid)
                                           pid);
       break;
    case EXEC:
-      proceso = remove_proceso(cola_exec, pid);
+      // proceso = remove_proceso(cola_exec, pid);
       enviar_interrupcion();
-      break;
+      return;
+
    case EXIT:
       return;
    }
@@ -404,10 +405,18 @@ static void *planificar_por_fifo()
       // si durante la ejecución se interrumpe por usuario, se
       // seteará el motivo de desalojo y el estado; por lo que
       // no se tenría que sobreescribir esos campos.
+
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
+      if (proceso->motivo_desalojo == QUANTUM)
+      {
+         set_motivo_desalojo(proceso, ERROR);
+         set_motivo_finalizacion(proceso, INTERRUPTED_BY_USER);
+      }
+
       proceso = remove_proceso(cola_exec, proceso->pid);
+
       if (proceso != NULL)
          pasar_a_siguiente(proceso);
    }
