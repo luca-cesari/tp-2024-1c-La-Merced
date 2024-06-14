@@ -10,6 +10,8 @@ void inicializar_bitmap_estados()
    frames_totales = get_tamanio_memoria() / get_tamanio_pagina();
    frames_libres = frames_totales;
    bitmap = malloc(frames_totales * sizeof(t_estado_frame));
+   for (u_int32_t i = 0; i < frames_totales; i++)
+      bitmap[i] = LIBRE;
    pthread_mutex_init(&frames_mutex, NULL);
 }
 
@@ -43,7 +45,7 @@ void set_estado_frame(u_int32_t frame, t_estado_frame estado)
 
 u_int32_t get_frame_libre()
 {
-   u_int32_t frame = -1;
+   int32_t frame = -1;
 
    pthread_mutex_unlock(&frames_mutex);
    for (u_int32_t i = 0; i < frames_totales; i++)
