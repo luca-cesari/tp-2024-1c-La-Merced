@@ -144,30 +144,28 @@ void matar_proceso(u_int32_t pid)
    switch (proceso->estado)
    {
    case NEW:
-      proceso = remove_proceso(cola_new, pid);
-      break;
+      proceso->motivo_finalizacion = INTERRUPTED_BY_USER;
+      return;
    case READY:
       proceso = remove_proceso(cola_ready, pid);
-      break;
+      pasar_a_exit(proceso, INTERRUPTED_BY_USER);
+      return;
    case BLOCKED:
-      if (proceso->motivo_desalojo == WAIT)
-         proceso = remove_proceso_cola_recurso(cola_blocked_recursos,
-                                               proceso->resource,
-                                               pid);
       if (proceso->motivo_desalojo == IO)
-         proceso = remove_proceso_cola_io(cola_blocked_interfaces,
-                                          proceso->io_request->interface_name,
-                                          pid);
-      break;
+         proceso->motivo_finalizacion = INTERRUPTED_BY_USER;
+
+      if (proceso->motivo_desalojo == WAIT)
+      {
+         proceso = remove_proceso_cola_recurso(cola_blocked_recursos, proceso->resource, pid);
+         pasar_a_exit(proceso, INTERRUPTED_BY_USER);
+      }
+      return;
    case EXEC:
-      proceso = remove_proceso(cola_exec, pid);
-      enviar_interrupcion();
-      break;
+      enviar_interrupcion(USER_INT);
+      return;
    case EXIT:
       return;
    }
-
-   pasar_a_exit(proceso, INTERRUPTED_BY_USER);
 }
 
 void conectar_entrada_salida(char *nombre_interfaz, int32_t fd_conexion)
@@ -200,8 +198,11 @@ static void *consumir_io(void *cola_io)
       set_io_request(pcb, empty_io_req);
 
       pcb = remove_proceso(interfaz->cola_procesos, pcb->pid);
-      if (pcb == NULL)
+      if (pcb->motivo_finalizacion == INTERRUPTED_BY_USER)
+      {
+         pasar_a_exit(pcb, INTERRUPTED_BY_USER);
          continue;
+      }
 
       switch (response)
       {
@@ -239,14 +240,15 @@ static void *admitir_proceso()
          continue;
       }
 
-      sem_wait(&grado_multiprogramacion);
-      // La razón por la que se hace un remove y la validación
-      // es por si el proceso fue interrumpido por usuario
-      // durante la espera de la memoria.
-      // véase matar_proceso()
-      pcb = remove_proceso(cola_new, pcb->pid);
-      if (pcb == NULL)
+      if (pcb->motivo_finalizacion == INTERRUPTED_BY_USER)
+      {
+         pcb = remove_proceso(cola_new, pcb->pid);
+         pasar_a_exit(pcb, INTERRUPTED_BY_USER);
          continue;
+      }
+
+      sem_wait(&grado_multiprogramacion);
+      pcb = remove_proceso(cola_new, pcb->pid);
       push_proceso(cola_ready, pcb);
       log_ingreso_a_ready(get_pids(cola_ready), NORMAL);
    }
@@ -342,6 +344,9 @@ static void pasar_a_siguiente(t_pcb *pcb)
    case ERROR:
       pasar_a_exit(pcb, pcb->motivo_finalizacion);
       break;
+   case KILL:
+      pasar_a_exit(pcb, INTERRUPTED_BY_USER);
+      break;
    default: // no debería llegar aca nunca (caso NONE)
       break;
    }
@@ -399,17 +404,11 @@ static void *planificar_por_fifo()
       enviar_pcb_cpu(proceso);
       t_pcb *pos_exec = recibir_pcb_cpu();
 
-      // revisar función, capaz no hay que asignar todo
-      // se tendría que evitar modificar el estado del proceso
-      // si durante la ejecución se interrumpe por usuario, se
-      // seteará el motivo de desalojo y el estado; por lo que
-      // no se tenría que sobreescribir esos campos.
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
       proceso = remove_proceso(cola_exec, proceso->pid);
-      if (proceso != NULL)
-         pasar_a_siguiente(proceso);
+      pasar_a_siguiente(proceso);
    }
 
    return NULL;
@@ -433,12 +432,14 @@ static void *planificar_por_rr()
       t_pcb *pos_exec = recibir_pcb_cpu();
       pthread_cancel(rutina_cronometro);
 
+      if (pos_exec->motivo_desalojo == QUANTUM)
+         log_fin_de_quantum(pos_exec->pid);
+
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
       proceso = remove_proceso(cola_exec, proceso->pid);
-      if (proceso != NULL)
-         pasar_a_siguiente(proceso);
+      pasar_a_siguiente(proceso);
    }
 
    return NULL;
@@ -477,6 +478,9 @@ static void *planificar_por_vrr()
       // se crea uno nuevo por cada ciclo del while
       temporal_destroy(temporal);
 
+      if (pos_exec->motivo_desalojo == QUANTUM)
+         log_fin_de_quantum(pos_exec->pid);
+
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
@@ -489,8 +493,7 @@ static void *planificar_por_vrr()
       set_prioridad(proceso, prioridad);
 
       proceso = remove_proceso(cola_exec, proceso->pid);
-      if (proceso != NULL)
-         pasar_a_siguiente(proceso);
+      pasar_a_siguiente(proceso);
    }
 
    return NULL;
@@ -508,6 +511,6 @@ static void *cronometrar_quantum(void *milisegundos)
       pthread_testcancel();
    }
 
-   enviar_interrupcion();
+   enviar_interrupcion(QUANTUM_INT);
    return NULL;
 }

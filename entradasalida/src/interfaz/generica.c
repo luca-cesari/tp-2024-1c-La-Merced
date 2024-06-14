@@ -5,6 +5,7 @@ void iniciar_rutina_interfaz_generica(void)
     while (1)
     {
         t_io_request *peticion_io = esperar_instruccion();
+        log_peticion(peticion_io->pid);
 
         if (strcmp(peticion_io->instruction, "IO_GEN_SLEEP") != 0)
             enviar_respuesta(INVALID_INSTRUCTION);
