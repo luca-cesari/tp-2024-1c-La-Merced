@@ -29,6 +29,7 @@ void log_finalizacion_proceso(u_int32_t, motivo_finalizacion);
 void log_cambio_de_estado(u_int32_t, state, state);
 void log_motivo_bloqueo(u_int32_t, motivo_bloqueo, char *);
 void log_fin_de_quantum(u_int32_t);
+void log_envio_de_interrupcion(u_int32_t);
 void log_ingreso_a_ready(t_list *, tipo_cola_ready); // void para q compile, hay q ver si usar list o array
 
 #endif // KERNEL_LOGGER_H

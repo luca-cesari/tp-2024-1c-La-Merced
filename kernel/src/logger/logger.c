@@ -93,6 +93,12 @@ void log_fin_de_quantum(u_int32_t pid)
    log_info(kernel_logger, "PID: %d - Desalojado por fin de Quantum", pid);
 }
 
+void log_envio_de_interrupcion(u_int32_t interrupt_code)
+{
+   char *interrupt_str = interrupt_code ? "QUANTUM" : "PKILL";
+   log_info(kernel_logger, "Se envía interrupción: %s", interrupt_str);
+}
+
 void log_ingreso_a_ready(t_list *lista_pid, tipo_cola_ready tipo)
 {
    char *pids_str = string_new();
