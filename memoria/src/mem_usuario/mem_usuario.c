@@ -25,7 +25,7 @@ t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio_nue
 
 t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo)
 {
-    u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina();
+    u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina() + 1;
     u_int32_t cantidad_frames_disponibles = get_cantidad_frames_disponibles();
 
     if (cantidad_frames_necesarios > cantidad_frames_disponibles)
