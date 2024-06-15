@@ -100,6 +100,7 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     u_int32_t direccion_fisica_a_recorrer;
     char *direccion_fisica_a_recorrer_str;
     void *buffer = malloc(tamanio_buffer);
+    void *buffer_inicial = buffer;
 
     while (tamanio_leido < tamanio_buffer)
     {
@@ -123,7 +124,7 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     if (tamanio_leido == tamanio_buffer)
         log_acceso_espacio_usuario(pid, "LEER", atoi(list_get(direcciones_fisicas, 0)), tamanio_buffer);
 
-    return tamanio_leido == tamanio_buffer ? buffer : NULL;
+    return tamanio_leido == tamanio_buffer ? buffer_inicial : NULL;
 }
 
 void destruir_memoria_usuario()
