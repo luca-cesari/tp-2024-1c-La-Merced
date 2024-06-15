@@ -432,9 +432,6 @@ static void *planificar_por_rr()
       t_pcb *pos_exec = recibir_pcb_cpu();
       pthread_cancel(rutina_cronometro);
 
-      if (pos_exec->motivo_desalojo == QUANTUM)
-         log_fin_de_quantum(pos_exec->pid);
-
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
@@ -478,18 +475,17 @@ static void *planificar_por_vrr()
       // se crea uno nuevo por cada ciclo del while
       temporal_destroy(temporal);
 
-      if (pos_exec->motivo_desalojo == QUANTUM)
-         log_fin_de_quantum(pos_exec->pid);
-
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
-      u_int32_t quantum_proceso_nuevo = transcurrido < quantum
-                                            ? quantum - transcurrido
-                                            : quantum;
-      set_quantum_pcb(proceso, quantum_proceso_nuevo);
+      motivo_desalojo motivo = proceso->motivo_desalojo;
 
-      int8_t prioridad = transcurrido < quantum ? 1 : 0;
+      u_int32_t quantum_nuevo = motivo == QUANTUM
+                                    ? quantum
+                                    : quantum - transcurrido;
+      set_quantum_pcb(proceso, quantum_nuevo);
+
+      int8_t prioridad = motivo == QUANTUM ? 0 : 1;
       set_prioridad(proceso, prioridad);
 
       proceso = remove_proceso(cola_exec, proceso->pid);
@@ -504,13 +500,14 @@ static void *cronometrar_quantum(void *milisegundos)
    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
-   u_int64_t microsegundos = (*(u_int32_t *)milisegundos) * 1000;
-   for (u_int64_t i = 0; i < microsegundos; ++i)
+   u_int64_t _milisegundos = *(u_int32_t *)milisegundos;
+   for (u_int64_t i = 0; i < _milisegundos; i++)
    {
       usleep(1000);
       pthread_testcancel();
    }
 
    enviar_interrupcion(QUANTUM_INT);
+   log_envio_de_interrupcion(QUANTUM_INT);
    return NULL;
 }
