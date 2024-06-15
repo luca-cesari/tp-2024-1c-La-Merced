@@ -25,7 +25,7 @@ t_mem_response ajustar_memoria_para_proceso(u_int32_t pid, u_int32_t tamanio_nue
 
 t_mem_response ampliar_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_int32_t tamanio_actual, u_int32_t tamanio_nuevo)
 {
-    u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina();
+    u_int32_t cantidad_frames_necesarios = tamanio_nuevo / get_tamanio_pagina() - tamanio_actual / get_tamanio_pagina() + 1;
     u_int32_t cantidad_frames_disponibles = get_cantidad_frames_disponibles();
 
     if (cantidad_frames_necesarios > cantidad_frames_disponibles)
@@ -84,7 +84,7 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
     }
 
     if (tamanio_guardado == tamanio_buffer)
-        log_acceso_espacio_usuario(pid, "ESCRIBIR", *(u_int32_t *)list_get(direcciones_fisicas, 0), tamanio_buffer);
+        log_acceso_espacio_usuario(pid, "ESCRIBIR", atoi(list_get(direcciones_fisicas, 0)), tamanio_buffer);
 
     return tamanio_guardado == tamanio_buffer ? OPERATION_SUCCEED : OPERATION_FAILED;
 }
@@ -100,6 +100,7 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     u_int32_t direccion_fisica_a_recorrer;
     char *direccion_fisica_a_recorrer_str;
     void *buffer = malloc(tamanio_buffer);
+    void *buffer_inicial = buffer;
 
     while (tamanio_leido < tamanio_buffer)
     {
@@ -121,9 +122,9 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     }
 
     if (tamanio_leido == tamanio_buffer)
-        log_acceso_espacio_usuario(pid, "LEER", *(u_int32_t *)list_get(direcciones_fisicas, 0), tamanio_buffer);
+        log_acceso_espacio_usuario(pid, "LEER", atoi(list_get(direcciones_fisicas, 0)), tamanio_buffer);
 
-    return tamanio_leido == tamanio_buffer ? buffer : NULL;
+    return tamanio_leido == tamanio_buffer ? buffer_inicial : NULL;
 }
 
 void destruir_memoria_usuario()

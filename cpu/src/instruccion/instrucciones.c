@@ -35,8 +35,9 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
    if (response->tamanio_buffer == tamanio_registro)
    {
+      char *direccion_fisica = (string_split(elementos.direcciones_fisicas, " "))[0];
       *elementos.registro_tamanio = *(u_int32_t *)response->buffer;
-      log_escritura_lectura_memoria(pcb->pid, READ, *elementos.direccion_logica, string_itoa(*elementos.registro_tamanio));
+      log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_tamanio));
    }
    else
    {
@@ -64,7 +65,8 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
 
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
    {
-      log_escritura_lectura_memoria(pcb->pid, WRITE, *elementos.direccion_logica, string_itoa(*elementos.registro_tamanio));
+      char *direccion_fisica = (string_split(elementos.direcciones_fisicas, " "))[0];
+      log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*elementos.registro_tamanio));
    }
    else
    {
@@ -179,7 +181,8 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
-   char *direcciones_tamanio = obtenerElem(parametros, 0);
+
+   char *direcciones_tamanio = obtenerElem(eliminar_primer_elemento(parametros), 0);
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
    pcb->io_request = io_request;
@@ -231,9 +234,10 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
 
    direcciones_fisicas = direccion_fisica_actual_str;
 
-   for (u_int32_t pagina = pagina_inicial + 1; pagina < pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
+   for (u_int32_t pagina = pagina_inicial; pagina < pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
    {
-      direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, direccion_logica + (pagina * tamanio_pagina))); // Esto debería devolver la dirección física de la página nueva que se necesita
+
+      direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, (++pagina) * tamanio_pagina)); // Esto debería devolver la dirección física de la página nueva que se necesita
       string_append(&direcciones_fisicas, " ");
       string_append(&direcciones_fisicas, direccion_fisica_actual_str);
    }

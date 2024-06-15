@@ -43,6 +43,7 @@ void log_escritura_lectura_memoria(u_int32_t pid, accion accion, u_int32_t direc
    {
    case READ:
       log_info(cpu_logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", pid, direccion_fisica, valor);
+      return;
    case WRITE:
       log_info(cpu_logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", pid, direccion_fisica, valor);
       return;

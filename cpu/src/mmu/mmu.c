@@ -27,7 +27,8 @@ u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
    else
       log_tlb_hit(pid, numero_pagina);
 
-   cargar_nueva_entrada(pid, numero_pagina, numero_marco); // Esta sentencia estaba por fuera del if y la dejo ahi por las dudas, pero creo que debería estar adentro
+   if (tlb_disponible)
+      cargar_nueva_entrada(pid, numero_pagina, numero_marco);
 
    return (numero_marco * tamanio_pagina) + desplazamiento;
 }
