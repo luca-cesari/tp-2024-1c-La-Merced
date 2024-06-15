@@ -36,9 +36,16 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
    if (response->tamanio_buffer == tamanio_registro)
    {
       char *direccion_fisica = (string_split(elementos.direcciones_fisicas, " "))[0];
-
-      *(elementos.registro_datos.registro_datos_32) = *(u_int32_t *)response->buffer; // Capaz hace falta un if para ver si es de 8 o 32 bits
-      log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_32));
+      if (tamanio_registro == 1)
+      {
+         *(elementos.registro_datos.registro_datos_8) = *(u_int8_t *)response->buffer;
+         log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_8));
+      }
+      else
+      {
+         *(elementos.registro_datos.registro_datos_32) = *(u_int32_t *)response->buffer;
+         log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_32));
+      }
    }
    else
    {
