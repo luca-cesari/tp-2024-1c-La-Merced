@@ -43,7 +43,7 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
       }
       else
       {
-         *(elementos.registro_datos.registro_datos_32) = *(u_int32_t *)response->buffer;
+         *(elementos.registro_datos.registro_datos_32) = *(u_int32_t *)(response->buffer);
          log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_32));
       }
    }

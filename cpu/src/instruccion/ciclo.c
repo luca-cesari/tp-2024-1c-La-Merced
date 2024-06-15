@@ -26,11 +26,11 @@ void execute(void (*instruccion)(char **param), char *char_instruccion)
    char **instruc_parametros = string_split(char_instruccion, " ");
    char **parametros = eliminar_primer_elemento(instruc_parametros);
    aumentar_program_counter();
-   instruccion(parametros);
    if (strcmp(instruc_parametros[0], "EXIT") != 0) // Buscar otra forma de loggear mejor
       log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], array_a_string(parametros));
    else
       log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], "");
+   instruccion(parametros);
 }
 
 int check_interrupt()
