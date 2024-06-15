@@ -478,12 +478,14 @@ static void *planificar_por_vrr()
       actualizar_pcb(proceso, pos_exec);
       destruir_pcb(pos_exec);
 
-      u_int32_t quantum_proceso_nuevo = transcurrido < quantum
-                                            ? quantum - transcurrido
-                                            : quantum;
-      set_quantum_pcb(proceso, quantum_proceso_nuevo);
+      motivo_desalojo motivo = proceso->motivo_desalojo;
 
-      int8_t prioridad = transcurrido < quantum ? 1 : 0;
+      u_int32_t quantum_nuevo = motivo == QUANTUM
+                                    ? quantum
+                                    : quantum - transcurrido;
+      set_quantum_pcb(proceso, quantum_nuevo);
+
+      int8_t prioridad = motivo == QUANTUM ? 0 : 1;
       set_prioridad(proceso, prioridad);
 
       proceso = remove_proceso(cola_exec, proceso->pid);
