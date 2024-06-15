@@ -181,7 +181,8 @@ void io_gen_sleep(char **parametros)
 
 void io_stdin_read(char **parametros)
 {
-   char *direcciones_tamanio = obtenerElem(parametros, 0);
+
+   char *direcciones_tamanio = obtenerElem(eliminar_primer_elemento(parametros), 0);
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
    pcb->io_request = io_request;

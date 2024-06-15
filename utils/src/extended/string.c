@@ -14,15 +14,15 @@ char *array_a_string(char **array)
 
 char **eliminar_primer_elemento(char **array)
 {
-   int tamano = string_array_size(array);
+   // int tamano = string_array_size(array);
 
-   char **nuevo_array = malloc(sizeof(char *) * (tamano - 1));
+   char **nuevo_array = string_array_new();
 
    // Verificar que el array no esté vacío
 
-   for (int i = 0; i < tamano - 1; i++)
+   for (int i = 1; array[i] != NULL; i++)
    {
-      nuevo_array[i] = strdup(array[i + 1]);
+      string_array_push(&nuevo_array, array[i]);
    }
 
    return nuevo_array;
