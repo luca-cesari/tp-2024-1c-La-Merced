@@ -36,8 +36,9 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
    if (response->tamanio_buffer == tamanio_registro)
    {
       char *direccion_fisica = (string_split(elementos.direcciones_fisicas, " "))[0];
-      *elementos.registro_tamanio = *(u_int32_t *)response->buffer;
-      log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_tamanio));
+
+      *(elementos.registro_datos.registro_datos_32) = *(u_int32_t *)response->buffer; // Capaz hace falta un if para ver si es de 8 o 32 bits
+      log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_32));
    }
    else
    {
@@ -49,14 +50,22 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
 
 void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
 {
+
    elementos elementos = obtenerElementos(parametros_recibidos, 0);
    u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[1]);
 
    t_cpu_mem_req *mem_request;
    parametros parametros_escribir;
 
-   void *buffer = malloc(tamanio_registro);
-   memcpy(buffer, elementos.registro_tamanio, tamanio_registro);
+   void *buffer = malloc(tamanio_registro); // ESTO NO VA, REPENSAR
+   if (tamanio_registro == 1)
+   {
+      memcpy(buffer, elementos.registro_datos.registro_datos_8, tamanio_registro);
+   }
+   else
+   {
+      memcpy(buffer, elementos.registro_datos.registro_datos_32, tamanio_registro);
+   }
 
    parametros_escribir = crearParametrosEscribir(elementos.direcciones_fisicas, buffer, tamanio_registro);
    mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
@@ -66,7 +75,14 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
    {
       char *direccion_fisica = (string_split(elementos.direcciones_fisicas, " "))[0];
-      log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*elementos.registro_tamanio));
+      if (tamanio_registro == 1)
+      {
+         log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_8));
+      }
+      else
+      {
+         log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_32));
+      }
    }
    else
    {
@@ -190,7 +206,7 @@ void io_stdin_read(char **parametros)
 
 void io_stdout_write(char **parametros)
 {
-   char *direcciones_tamanio = obtenerElem(parametros, 0);
+   char *direcciones_tamanio = obtenerElem(eliminar_primer_elemento(parametros), 0);
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
    pcb->io_request = io_request;
@@ -275,26 +291,212 @@ u_int32_t obtener_tamanio_registro(char *parametros_recibidos)
 elementos obtenerElementos(char **parametros_recibidos, int num)
 {
    elementos elementos;
-   int num1, num2;
-   if (num == 0)
+
+   if (obtener_tamanio_registro(parametros_recibidos[0]) == 1 && obtener_tamanio_registro(parametros_recibidos[1]) == 1)
    {
-      num1 = 0, num2 = 1;
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), sizeof(*(elementos.registro_datos.registro_datos_8)));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), sizeof(*(elementos.registro_datos.registro_datos_8)));
+      }
+   }
+   else if (obtener_tamanio_registro(parametros_recibidos[0]) == 1 && obtener_tamanio_registro(parametros_recibidos[1]) == 4)
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), sizeof(*(elementos.registro_datos.registro_datos_32)));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), sizeof(*(elementos.registro_datos.registro_datos_32)));
+      }
+   }
+   else if (obtener_tamanio_registro(parametros_recibidos[0]) == 4 && obtener_tamanio_registro(parametros_recibidos[1]) == 1)
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), sizeof(*(elementos.registro_datos.registro_datos_8)));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), sizeof(*(elementos.registro_datos.registro_datos_8)));
+      }
    }
    else
    {
-      num1 = 1, num2 = 0;
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), sizeof(*(elementos.registro_datos.registro_datos_32)));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), sizeof(*(elementos.registro_datos.registro_datos_32)));
+      }
    }
-   elementos.direccion_logica = dictionary_get(registros, parametros_recibidos[num1]);
-   elementos.registro_tamanio = dictionary_get(registros, parametros_recibidos[num2]);
-   elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica), *(elementos.registro_tamanio));
+
    return elementos;
 }
 
-char *obtenerElem(char **parametros, int num)
+char *obtenerElem(char **parametros_recibidos, int num)
 {
-   elementos elementos = obtenerElementos(parametros, 0);
+   elementos elementos;
 
-   char *tamanio_valor = string_itoa(*elementos.registro_tamanio);
+   /*
+   if (obtener_tamanio_registro(parametros_recibidos[0]) == 1)
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[0]);
+         if (obtener_tamanio_registro(parametros_recibidos[1]) == 1)
+         {
+            elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[1]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_8));
+         }
+         else
+         {
+            elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[1]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_32));
+         }
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[1]);
+         if (obtener_tamanio_registro(parametros_recibidos[0]) == 1)
+         {
+            elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[0]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_8));
+         }
+         else
+         {
+            elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[0]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_32));
+         }
+      }
+   }
+   else
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[0]);
+         if (obtener_tamanio_registro(parametros_recibidos[1]) == 1)
+         {
+            elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[1]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_8));
+         }
+         else
+         {
+            elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[1]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_32));
+         }
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[1]);
+         if (obtener_tamanio_registro(parametros_recibidos[0]) == 1)
+         {
+            elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[0]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_8));
+         }
+         else
+         {
+            elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[0]);
+            elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_32));
+         }
+      }
+   }
+   */
+
+   if (obtener_tamanio_registro(parametros_recibidos[0]) == 1 && obtener_tamanio_registro(parametros_recibidos[1]) == 1)
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_8));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_8));
+      }
+   }
+   else if (obtener_tamanio_registro(parametros_recibidos[0]) == 1 && obtener_tamanio_registro(parametros_recibidos[1]) == 4)
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_32));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_8), *(elementos.registro_datos.registro_datos_32));
+      }
+   }
+   else if (obtener_tamanio_registro(parametros_recibidos[0]) == 4 && obtener_tamanio_registro(parametros_recibidos[1]) == 1)
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_8));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_8 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_8));
+      }
+   }
+   else
+   {
+      if (num == 0)
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_32));
+      }
+      else
+      {
+         elementos.direccion_logica.direccion_logica_32 = dictionary_get(registros, parametros_recibidos[1]);
+         elementos.registro_datos.registro_datos_32 = dictionary_get(registros, parametros_recibidos[0]);
+         elementos.direcciones_fisicas = obtener_direcciones_fisicas(*(elementos.direccion_logica.direccion_logica_32), *(elementos.registro_datos.registro_datos_32));
+      }
+   }
+
+   char *tamanio_valor;
+
+   if (obtener_tamanio_registro(parametros_recibidos[num]) == 1)
+   {
+      tamanio_valor = string_itoa(*elementos.registro_datos.registro_datos_8);
+   }
+   else if (obtener_tamanio_registro(parametros_recibidos[num]) == 4)
+   {
+      tamanio_valor = string_itoa(*elementos.registro_datos.registro_datos_32);
+   }
+   // char *tamanio_valor = string_itoa(*elementos.registro_tamanio);
 
    char *direcciones_tamanio = string_new();
 

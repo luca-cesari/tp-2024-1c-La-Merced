@@ -7,8 +7,11 @@ char *array_a_string(char **array)
    while (array[i] != NULL)
    {
       string_append(&string, array[i]);
+      string_append(&string, " ");
       i++;
    }
+   string_trim_right(&string);
+
    return string;
 }
 

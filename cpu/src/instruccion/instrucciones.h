@@ -17,10 +17,21 @@
 #include "logger/logger.h"
 #include "extended/string.h"
 
+typedef union
+{
+   u_int32_t *direccion_logica_32;
+   u_int8_t *direccion_logica_8;
+} direccion_logica;
+typedef union
+{
+   u_int32_t *registro_datos_32;
+   u_int8_t *registro_datos_8;
+} registro_datos;
+
 typedef struct
 {
-   u_int32_t *direccion_logica;
-   u_int8_t *registro_tamanio; // Recordar ver
+   direccion_logica direccion_logica;
+   registro_datos registro_datos;
    char *direcciones_fisicas;
 } elementos;
 
