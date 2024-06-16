@@ -237,6 +237,8 @@ void inicializar_diccionario_registros()
    dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
    dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
    dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
+   dictionary_put(registros, "ECX", &(pcb->cpu_registers.SI));
+   dictionary_put(registros, "EDX", &(pcb->cpu_registers.DI));
    dictionary_put(registros, "PC", &(pcb->program_counter));
 }
 
