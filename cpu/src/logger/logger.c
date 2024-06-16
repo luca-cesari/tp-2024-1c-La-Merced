@@ -32,6 +32,11 @@ void log_tlb_miss(u_int32_t pid, int numero_pagina) // ver si se abstrae con el 
    log_info(cpu_logger, "PID: %d - TLB MISS - Pagina: %d", pid, numero_pagina);
 }
 
+void log_reemplazo_de_entrada()
+{
+   log_info(cpu_logger, "Reemplazo de entrada en TLB");
+}
+
 void log_obtener_marco(u_int32_t pid, int numero_pagina, int numero_marco)
 {
    log_info(cpu_logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d", pid, numero_pagina, numero_marco);
