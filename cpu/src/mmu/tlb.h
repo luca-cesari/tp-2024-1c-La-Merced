@@ -2,6 +2,8 @@
 #define TLB_H
 
 #include <stdlib.h>
+
+#include "logger/logger.h"
 #include "config/config.h"
 
 typedef struct

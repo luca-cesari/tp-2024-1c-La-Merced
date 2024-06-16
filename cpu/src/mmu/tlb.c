@@ -29,7 +29,10 @@ u_int8_t inicializar_tlb()
 void cargar_nueva_entrada(u_int32_t pid, u_int32_t pagina, u_int32_t marco)
 {
    if (primera_entrada_libre == cantidad_entradas)
+   {
       remove_entrada(0);
+      log_reemplazo_de_entrada();
+   }
 
    tlb[primera_entrada_libre] = crear_entrada_tlb(pid, pagina, marco);
    primera_entrada_libre++;
