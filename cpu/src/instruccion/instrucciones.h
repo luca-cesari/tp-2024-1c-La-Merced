@@ -60,7 +60,7 @@ parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor);
 parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);
 u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
 elementos obtenerElementos(char **parametros_recibidos, int num);
-char *obtenerElem(char **parametros, int num);
+char *obtenerElem(char **parametros);
 
 // Instrucciones////////////////////////////////////////
 //  SET (Registro, Valor)
