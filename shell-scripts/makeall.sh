@@ -18,6 +18,8 @@ clean_and_make() {
    fi
 }
 
+cd ..
+
 cd utils/ && clean_and_make "utils"
 cd kernel/ && clean_and_make "kernel"
 cd cpu/ && clean_and_make "cpu"

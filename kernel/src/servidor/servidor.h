@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sockets/sockets.h>
+#include <commons/string.h>
 #include <protocol/protocol.h>
 
+#include "logger/logger.h"
 #include "config/config.h"
 #include "planificador/planificador.h"
 

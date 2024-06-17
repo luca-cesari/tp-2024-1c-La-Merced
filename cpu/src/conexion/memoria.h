@@ -5,9 +5,8 @@
 #include <sockets/sockets.h>
 #include <pcb/pcb.h>
 #include <protocol/protocol.h>
-#include <unistd.h>
-#include <sys/socket.h>
 #include <mem_request/cpu.h>
+
 #include "config/config.h"
 
 int8_t conectar_con_memoria();

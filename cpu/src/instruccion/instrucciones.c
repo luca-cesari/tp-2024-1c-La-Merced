@@ -48,9 +48,7 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
       }
    }
    else
-   {
       perror("Error al leer en memoria\n");
-   }
 
    destruir_buffer_response(response);
 }
@@ -66,13 +64,9 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
 
    void *buffer = malloc(tamanio_registro); // ESTO NO VA, REPENSAR
    if (tamanio_registro == 1)
-   {
       memcpy(buffer, elementos.registro_datos.registro_datos_8, tamanio_registro);
-   }
    else
-   {
       memcpy(buffer, elementos.registro_datos.registro_datos_32, tamanio_registro);
-   }
 
    parametros_escribir = crearParametrosEscribir(elementos.direcciones_fisicas, buffer, tamanio_registro);
    mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
@@ -83,18 +77,12 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
    {
       char *direccion_fisica = (string_split(elementos.direcciones_fisicas, " "))[0];
       if (tamanio_registro == 1)
-      {
          log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_8));
-      }
       else
-      {
          log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*elementos.registro_datos.registro_datos_32));
-      }
    }
    else
-   {
       perror("Error al escribir en memoria\n");
-   }
 }
 
 void sum(char **parametros)
@@ -103,13 +91,9 @@ void sum(char **parametros)
    void *registro2 = dictionary_get(registros, parametros[1]);
 
    if (string_starts_with(parametros[0], "E"))
-   {
       *(u_int32_t *)registro1 += *(u_int32_t *)registro2;
-   }
    else
-   {
       *(u_int8_t *)registro1 += *(u_int8_t *)registro2;
-   }
 }
 
 void sub(char **parametros)
@@ -118,13 +102,9 @@ void sub(char **parametros)
    void *registro2 = dictionary_get(registros, parametros[1]);
 
    if (string_starts_with(parametros[0], "E"))
-   {
       *(u_int32_t *)registro1 -= *(u_int32_t *)registro2;
-   }
    else
-   {
       *(u_int8_t *)registro1 -= *(u_int8_t *)registro2;
-   }
 }
 
 void jnz(char **parametros)
@@ -142,10 +122,11 @@ void resize(char **parametros_char)
    parametro.tamanio_nuevo = atoi(parametros_char[0]);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(RESIZE, pcb->pid, parametro);
    enviar_mem_request(mem_request);
+
    if (recibir_response_de_memoria() == OPERATION_FAILED)
    {
-      pcb->motivo_desalojo = ERROR;
-      pcb->motivo_finalizacion = OUT_OF_MEMORY;
+      set_motivo_desalojo(pcb, ERROR);
+      set_motivo_finalizacion(pcb, OUT_OF_MEMORY);
    }
 }
 
@@ -165,13 +146,9 @@ void copy_string(char **param)
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
 
    if (response->tamanio_buffer == tamanio_valor)
-   {
       string_escribir = response->buffer;
-   }
    else
-   {
       perror("Error al leer en memoria\n");
-   }
 
    log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica_SI_inicial), string_escribir);
 
@@ -185,13 +162,9 @@ void copy_string(char **param)
    enviar_mem_request(mem_request_escribir);
 
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
-   {
       log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica_DI_inicial), string_escribir);
-   }
    else
-   {
       perror("Error al escribir en memoria\n");
-   }
 
    destruir_buffer_response(response);
 }
@@ -200,6 +173,7 @@ void io_gen_sleep(char **parametros)
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_GEN_SLEEP", parametros[1]);
    set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
 }
 
 void io_stdin_read(char **parametros)
@@ -207,7 +181,8 @@ void io_stdin_read(char **parametros)
    char *direcciones_tamanio = obtenerElem(eliminar_primer_elemento(parametros));
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
-   pcb->io_request = io_request;
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
 }
 
 void io_stdout_write(char **parametros)
@@ -215,12 +190,13 @@ void io_stdout_write(char **parametros)
    char *direcciones_tamanio = obtenerElem(eliminar_primer_elemento(parametros));
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
-   pcb->io_request = io_request;
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
 }
 
 void exit_instruction(char **parametros)
 {
-   pcb->motivo_desalojo = TERMINATED;
+   set_motivo_desalojo(pcb, TERMINATED);
 }
 
 //////////////// AUXILIARES ////////////////////

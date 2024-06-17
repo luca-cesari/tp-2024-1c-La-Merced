@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <pthread.h>
 #include <readline/readline.h>
-#include <commons/string.h>
+#include <readline/history.h>
+#include <extended/string.h>
 
 #include "planificador/planificador.h"
 

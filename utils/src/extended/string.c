@@ -3,12 +3,10 @@
 char *array_a_string(char **array)
 {
    char *string = string_new();
-   int i = 0;
-   while (array[i] != NULL)
+   for (int i = 0; array[i] != NULL; i++)
    {
       string_append(&string, array[i]);
       string_append(&string, " ");
-      i++;
    }
    string_trim_right(&string);
 
@@ -17,16 +15,10 @@ char *array_a_string(char **array)
 
 char **eliminar_primer_elemento(char **array)
 {
-   // int tamano = string_array_size(array);
-
    char **nuevo_array = string_array_new();
 
-   // Verificar que el array no esté vacío
-
    for (int i = 1; array[i] != NULL; i++)
-   {
       string_array_push(&nuevo_array, array[i]);
-   }
 
    return nuevo_array;
 }
