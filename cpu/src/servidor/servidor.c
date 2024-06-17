@@ -41,6 +41,7 @@ void *atender_kernel_dispatch(void *fd_ptr)
       reset_interrupcion();
       ciclo_instruccion(pcb);
       enviar_pcb(fd_dispatch, pcb);
+      destruir_pcb(pcb);
    }
 
    sem_post(&fin_de_proceso);

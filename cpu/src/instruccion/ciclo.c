@@ -9,7 +9,6 @@ static void execute(void (*instruccion)(char **), char *char_instruccion);
 static int check_interrupt();
 static int check_desalojo();
 
-
 void aumentar_program_counter();
 
 static char *fetch()
@@ -87,8 +86,6 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
          return NULL;
    }
 }
-
-//////////FUNCIONES AUXILIARES////////////
 
 void inicializar_diccionario_instrucciones()
 {
