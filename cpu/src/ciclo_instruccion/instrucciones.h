@@ -17,14 +17,14 @@
 
 typedef union
 {
-   u_int32_t *direccion_logica_32;
-   u_int8_t *direccion_logica_8;
+   u_int32_t *_32_bit;
+   u_int8_t *_8_bit;
 } direccion_logica;
 
 typedef union
 {
-   u_int32_t *registro_datos_32;
-   u_int8_t *registro_datos_8;
+   u_int32_t *_32_bit;
+   u_int8_t *_8_bit;
 } registro_datos;
 
 typedef struct
@@ -32,7 +32,13 @@ typedef struct
    direccion_logica direccion_logica;
    registro_datos registro_datos;
    char *direcciones_fisicas;
-} elementos;
+} operandos;
+
+typedef enum
+{
+   REGISTER_SIZE,
+   REGISTER_CONTENT,
+} size_flag;
 
 void inicializar_instrucciones(void);
 
@@ -101,18 +107,30 @@ void set_registros();
  *        en un sóla página, o que simplemente fue dividido en dos páginas.
  *
  * @param direccion_logica Dirección lógica donde se arranca a operar.
- * @param tamanio_registro Tamaño del en bytes del contenido a operar.
+ * @param tamanio_dato Tamaño del en bytes del contenido a operar.
  *
  * @return `char*` en caso de ser varias, será del formato "14 34 56",
  *         siendo cada número una dirección física.
  */
-char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro);
+char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_dato);
 
-parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor);
-parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);
+/**
+ * @brief
+ *
+ * @param parametros
+ * @param flag
+ * @return operandos
+ *
+ * @note [ direccion | dato ]
+ */
+operandos obtener_operandos(char **parametros, size_flag flag);
+u_int32_t set_direccion_logica(operandos *operandos, char *registro_direccion);
+u_int32_t set_registro_datos(operandos *operandos, char *registro_datos);
+char *get_direccion_tamanio(char **parametros);
+
+parametros crear_parametros_leer(char *direccion_fisica, u_int32_t tamanio_valor);
+parametros crear_parametros_escribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);
 u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
-elementos obtenerElementos(char **parametros_recibidos, int num);
-char *obtenerElem(char **parametros);
 
 // Instrucciones
 
