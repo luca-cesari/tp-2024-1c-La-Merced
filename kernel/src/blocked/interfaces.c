@@ -56,12 +56,7 @@ q_estado *desconectar_interfaz(q_blocked *estado, int32_t fd_conexion)
    };
 
    io_queue *io_encontrado = mlist_remove_by_condition(estado->lista_colas, (void *)_es_interfaz_buscada);
-
-   q_estado *procesos = io_encontrado->cola_procesos;
-   free(io_encontrado->nombre_interfaz);
-   free(io_encontrado);
-
-   return procesos;
+   return io_encontrado->cola_procesos;
 }
 
 void bloquear_colas_io(q_blocked *estado)

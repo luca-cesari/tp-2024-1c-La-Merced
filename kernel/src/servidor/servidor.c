@@ -32,11 +32,9 @@ void *atender_interfaz_es(void *fd_ptr)
       return NULL;
    }
 
-   printf("Interfaz Conectada\n");
-
-   // encolar a blocked
    char *nombre_interfaz = recibir_mensaje(fd_conexion);
    conectar_entrada_salida(nombre_interfaz, fd_conexion);
 
+   log_evento(string_from_format("Se conecta la interfaz %s", nombre_interfaz));
    return NULL;
 }

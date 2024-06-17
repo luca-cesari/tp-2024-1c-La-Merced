@@ -13,7 +13,7 @@ void iniciar_consola()
 
       if (vec_comando[0] == NULL)
       {
-         free(comando); // por las dudas
+         free(comando);
          string_array_destroy(vec_comando);
          continue;
       }
@@ -23,7 +23,7 @@ void iniciar_consola()
 
       ejecutar_comando(operacion, argumento);
 
-      free(comando); // lo mismo, por las dudas
+      free(comando);
       string_array_destroy(vec_comando);
    }
 }
@@ -46,13 +46,12 @@ void leer_script(char *ruta_script)
    {
       char **vec_comando = string_split(linea, " ");
       char *operacion = vec_comando[0];
-      char *argumento = (vec_comando[1][strlen(vec_comando[1]) - 1] == '\n')
-                            ? string_substring_until(vec_comando[1], strlen(vec_comando[1]) - 1)
-                            : vec_comando[1];
+      char *argumento = eliminar_salto_linea(vec_comando[1]);
 
       ejecutar_comando(operacion, argumento);
 
       // free(linea); // ni idea si hace falta
+      free(argumento);
       string_array_destroy(vec_comando);
    }
 
@@ -64,21 +63,18 @@ void ejecutar_comando(char *operacion, char *argumento)
 {
    if (strcmp(operacion, INICIAR_PLANIFICACION) == 0)
    {
-      printf("Iniciar Planificacion \n");
       iniciar_planificacion();
       return;
    }
 
    if (strcmp(operacion, DETENER_PLANIFICACION) == 0)
    {
-      printf("Detener Planificacion \n");
       detener_planificacion();
       return;
    }
 
    if (strcmp(operacion, PROCESO_ESTADO) == 0)
    {
-      printf("Estado de Proceso \n");
       return;
    }
 
@@ -88,32 +84,24 @@ void ejecutar_comando(char *operacion, char *argumento)
 
    if (strcmp(operacion, EJECUTAR_SCRIPT) == 0)
    {
-      printf("Ejecutar Script \n");
-      printf("Path del Script: %s \n", argumento);
       leer_script(argumento);
       return;
    }
 
    if (strcmp(operacion, INICIAR_PROCESO) == 0)
    {
-      printf("Iniciar Proceso \n");
-      printf("Path del Ejecutable: %s \n", argumento);
       crear_proceso(argumento);
       return;
    }
 
    if (strcmp(operacion, FINALIZAR_PROCESO) == 0)
    {
-      printf("Finalizar Proceso \n");
-      printf("PID del Proceso: %s \n", argumento);
       matar_proceso(atoi(argumento));
       return;
    }
 
    if (strcmp(operacion, MULTIPROGRAMACION) == 0)
    {
-      printf("Cambio de Multiprogramacion \n");
-      printf("Grado de multiprogramacion: %s \n", argumento);
       modificar_grado_multiprogramacion(atoi(argumento));
       return;
    }

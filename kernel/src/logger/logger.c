@@ -14,6 +14,11 @@ void destruir_logger(void)
    log_destroy(kernel_logger);
 }
 
+void log_evento(char *evento)
+{
+   log_info(kernel_logger, evento);
+}
+
 void log_creacion_proceso(u_int32_t pid)
 {
    log_info(kernel_logger, "Se crea el proceso %d en NEW", pid);
@@ -119,4 +124,9 @@ void log_ingreso_a_ready(t_list *lista_pid, tipo_cola_ready tipo)
 
    list_destroy_and_destroy_elements(lista_pid, &free);
    free(pids_str);
+}
+
+void log_comando_ingresado(char *comando)
+{
+   log_info(kernel_logger, "Comando ingresado: %s", comando);
 }

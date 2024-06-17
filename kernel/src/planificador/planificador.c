@@ -217,9 +217,12 @@ static void *consumir_io(void *cola_io)
          break;
       case -1: // cuando una interfaz se desconecta
          pasar_a_exit(pcb, INVALID_INTERFACE);
+
+         // unicamente desencola la interfaz de la cola blocked (no destruye)
          q_estado *cola = desconectar_interfaz(cola_blocked_interfaces, interfaz->fd_conexion);
          mlist_iterate(cola->lista, &finalizar_proceso_por_desconexion);
-         destruir_estado(cola);
+         log_evento(string_from_format("Se desconecta la interfaz %s", interfaz->nombre_interfaz));
+         destruir_io_queue(interfaz);
          return NULL;
       }
    }
