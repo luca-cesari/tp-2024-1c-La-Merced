@@ -9,6 +9,7 @@ char *fetch()
    parametro.program_counter = pcb->program_counter;
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(FETCH_INSTRUCCION, pcb->pid, parametro);
    enviar_mem_request(mem_request);
+
    char *instruccion = recibir_instruccion();
    log_fetch_instruccion(pcb->pid, pcb->program_counter);
 
@@ -21,28 +22,25 @@ void (*decode(char *char_instruccion))(char **)
    return dictionary_get(instrucciones, instruc_parametros[0]);
 }
 
-void execute(void (*instruccion)(char **param), char *char_instruccion)
+void execute(void (*instruccion)(char **), char *char_instruccion)
 {
    char **instruc_parametros = string_split(char_instruccion, " ");
    char **parametros = eliminar_primer_elemento(instruc_parametros);
    aumentar_program_counter();
-   if (strcmp(instruc_parametros[0], "EXIT") != 0) // Buscar otra forma de loggear mejor
-      log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], array_a_string(parametros));
-   else
-      log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], "");
+
+   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], array_a_string(parametros));
    instruccion(parametros);
 }
 
 int check_interrupt()
 {
-   if (hay_interrupcion())
+   switch (get_interrupcion())
    {
-      if (tipo_interrupcion())
-      {
-         pcb->motivo_desalojo = QUANTUM;
-         return 1;
-      }
+   case 0:
       pcb->motivo_desalojo = KILL;
+      return 1;
+   case 1:
+      pcb->motivo_desalojo = QUANTUM;
       return 1;
    }
    return 0;
@@ -51,20 +49,13 @@ int check_interrupt()
 int check_desalojo()
 {
    if (pcb->motivo_desalojo == TERMINATED)
-   {
       return 1;
-   }
 
    if (pcb->motivo_desalojo == ERROR)
-   {
       return 1;
-   }
 
-   if (strcmp(pcb->io_request->interface_name, "")) // es muy asqueroso (fix a futuro)
-   {
-      pcb->motivo_desalojo = IO;
+   if (pcb->motivo_desalojo == IO)
       return 1;
-   }
 
    return 0;
 }
@@ -78,19 +69,16 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
    {
       char *char_instruccion = fetch();
 
-      void (*instruccion)(char **param) = decode(char_instruccion);
+      void (*instruccion)(char **) = decode(char_instruccion);
 
       execute(instruccion, char_instruccion);
 
+      // si ocurren simultaneamente pesa mas I/O
       if (check_desalojo())
-      {
          return NULL;
-      } // si ocurren simultaneamente pesa mas I/O
 
       if (check_interrupt())
-      {
          return NULL;
-      }
    }
 }
 

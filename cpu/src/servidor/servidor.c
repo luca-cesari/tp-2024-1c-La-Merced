@@ -35,9 +35,9 @@ void *atender_kernel_dispatch(void *fd_ptr)
    while (1)
    {
       t_pcb *pcb = recibir_pcb(fd_dispatch);
+      reset_interrupcion();
       ciclo_instruccion(pcb);
       enviar_pcb(fd_dispatch, pcb);
-      reset_interrupcion();
    }
 
    sem_post(&fin_de_proceso);

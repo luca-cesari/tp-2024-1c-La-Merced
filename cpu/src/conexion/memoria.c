@@ -16,7 +16,6 @@ int8_t conectar_con_memoria()
    }
 
    tamanio_pagina = recibir_senial(fd_memoria);
-
    return 0;
 }
 
@@ -28,7 +27,6 @@ void enviar_mem_request(t_cpu_mem_req *mem_request)
 char *recibir_instruccion()
 {
    char *instruccion = recibir_mensaje(fd_memoria);
-
    return instruccion;
 }
 
