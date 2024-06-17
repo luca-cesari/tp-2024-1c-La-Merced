@@ -44,7 +44,9 @@ static void execute(void (*instruccion)(char **), char *char_instruccion)
    // array_a_string es un nuevo string y no se esta liberando en ningun lado
 
    string_array_destroy(instruc_parametros);
-   string_array_destroy(parametros);
+   free(parametros);
+   // free unicamente porque los elementos (strings) que contiene son
+   // la misma referencia que instruc_parametros
 }
 
 static int check_interrupt()
@@ -70,7 +72,7 @@ static int check_desalojo()
 void *ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
-   inicializar_diccionario_registros();
+   set_registros();
 
    while (1)
    {

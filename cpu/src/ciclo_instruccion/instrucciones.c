@@ -8,6 +8,7 @@ extern t_pcb *pcb;
 void inicializar_instrucciones(void)
 {
    instrucciones = dictionary_create();
+   registros = dictionary_create();
 
    dictionary_put(instrucciones, "SET", &set);
    dictionary_put(instrucciones, "SUM", &sum);
@@ -223,11 +224,8 @@ void exit_instruction(char **parametros)
    set_motivo_desalojo(pcb, TERMINATED);
 }
 
-//////////////// AUXILIARES ////////////////////
-void inicializar_diccionario_registros()
+void set_registros()
 {
-   registros = dictionary_create();
-
    dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
    dictionary_put(registros, "BX", &(pcb->cpu_registers.BX));
    dictionary_put(registros, "CX", &(pcb->cpu_registers.CX));
@@ -266,6 +264,7 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
 
    return direcciones_fisicas;
 }
+
 parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor)
 {
    parametros parametros_leer;
@@ -273,6 +272,7 @@ parametros crearParametrosLeer(char *direccion_fisica, u_int32_t tamanio_valor)
    parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
    return parametros_leer;
 }
+
 parametros crearParametrosEscribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor)
 {
    parametros parametros_escribir;

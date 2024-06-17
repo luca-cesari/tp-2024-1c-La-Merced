@@ -64,9 +64,14 @@ void io_stdin_read(char **parametros);
 void io_stdout_write(char **parametros);
 void exit_instruction(char **parametros);
 
-///////FUNCINES OBTENER PARAMETROS //
-void set_diccionario_registros(t_dictionary *);
-void inicializar_diccionario_registros();
+/**
+ * @brief Setea el diccionario de registros con los
+ *        registros de la PCB de turno.
+ *
+ * @note Se debe llamar antes de ejecutar cualquier instrucción.
+ * @note No hace falta destruir o crear el diccionario de nuevo.
+ */
+void set_registros();
 
 /**
  * @brief Obtiene todas las direcciones físicas necesarias para la instrucción.
@@ -76,7 +81,7 @@ void inicializar_diccionario_registros();
  * @param direccion_logica Dirección lógica donde se arranca a operar.
  * @param tamanio_registro Tamaño del en bytes del contenido a operar.
  *
- * @return `char*` en caso de ser varias, será del formato "14 34 56", 
+ * @return `char*` en caso de ser varias, será del formato "14 34 56",
  *         siendo cada número una dirección física.
  */
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_registro);
