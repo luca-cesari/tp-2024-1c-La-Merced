@@ -1,6 +1,5 @@
 #include "ciclo.h"
 
-t_dictionary *instrucciones;
 t_pcb *pcb;
 
 static char *fetch(void);
@@ -28,7 +27,8 @@ static char *fetch()
 static void (*decode(char *char_instruccion))(char **)
 {
    char **instruc_parametros = string_split(char_instruccion, " ");
-   void (*instruccion)(char **) = dictionary_get(instrucciones, instruc_parametros[0]);
+   void (*instruccion)(char **) = get_instruccion(instruc_parametros[0]);
+
    string_array_destroy(instruc_parametros);
    return instruccion;
 }
@@ -85,24 +85,6 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
       if (check_interrupt())
          return NULL;
    }
-}
-
-void inicializar_diccionario_instrucciones()
-{
-   instrucciones = dictionary_create();
-
-   dictionary_put(instrucciones, "SET", &set);
-   dictionary_put(instrucciones, "SUM", &sum);
-   dictionary_put(instrucciones, "SUB", &sub);
-   dictionary_put(instrucciones, "JNZ", &jnz);
-   dictionary_put(instrucciones, "RESIZE", &resize);
-   dictionary_put(instrucciones, "MOV_IN", &mov_in);
-   dictionary_put(instrucciones, "MOV_OUT", &mov_out);
-   dictionary_put(instrucciones, "COPY_STRING", &copy_string);
-   dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
-   dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
-   dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
-   dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
 
 void aumentar_program_counter() /// VER SI VA  ACA

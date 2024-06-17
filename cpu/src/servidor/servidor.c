@@ -33,7 +33,6 @@ void *atender_kernel_dispatch(void *fd_ptr)
    }
 
    log_evento("Kernel conectado por dispatch");
-   inicializar_diccionario_instrucciones(); // cambiar a main??
 
    while (1)
    {
@@ -60,7 +59,7 @@ void *atender_kernel_interrupt(void *fd_ptr)
       return NULL;
    }
 
-   printf("Kernel conectado por interrupt \n");
+   log_evento("Kernel conectado por interrupt");
 
    while (1)
    {

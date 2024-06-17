@@ -1,11 +1,32 @@
 
 #include "instrucciones.h"
 
+t_dictionary *instrucciones;
 t_dictionary *registros;
 extern t_pcb *pcb;
 
+void inicializar_instrucciones(void)
+{
+   instrucciones = dictionary_create();
 
+   dictionary_put(instrucciones, "SET", &set);
+   dictionary_put(instrucciones, "SUM", &sum);
+   dictionary_put(instrucciones, "SUB", &sub);
+   dictionary_put(instrucciones, "JNZ", &jnz);
+   dictionary_put(instrucciones, "RESIZE", &resize);
+   dictionary_put(instrucciones, "MOV_IN", &mov_in);
+   dictionary_put(instrucciones, "MOV_OUT", &mov_out);
+   dictionary_put(instrucciones, "COPY_STRING", &copy_string);
+   dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
+   dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
+   dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
+   dictionary_put(instrucciones, "EXIT", &exit_instruction);
+}
 
+void (*get_instruccion(char *instruccion))(char **)
+{
+   return dictionary_get(instrucciones, instruccion);
+}
 
 void set(char **parametros)
 {

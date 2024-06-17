@@ -11,6 +11,7 @@ int main(void)
 
     inicializar_interrupcion();
     inicializar_mmu();
+    inicializar_instrucciones();
 
     // Capaz es un poco confuso la expresion del condicional
     // pero básicamente falla en caso de -1 (o sea, true)
