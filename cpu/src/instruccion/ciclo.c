@@ -37,10 +37,10 @@ int check_interrupt()
    switch (get_interrupcion())
    {
    case 0:
-      pcb->motivo_desalojo = KILL;
+      set_motivo_desalojo(pcb, KILL);
       return 1;
    case 1:
-      pcb->motivo_desalojo = QUANTUM;
+      set_motivo_desalojo(pcb, QUANTUM);
       return 1;
    }
    return 0;
@@ -48,7 +48,8 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   return pcb->motivo_desalojo; // el unico caso false es NONE (0)
+   // el unico caso false es NONE (0)
+   return pcb->motivo_desalojo;
 }
 
 void *ciclo_instruccion(t_pcb *pcb_kernel)
@@ -59,9 +60,7 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
    while (1)
    {
       char *char_instruccion = fetch();
-
       void (*instruccion)(char **) = decode(char_instruccion);
-
       execute(instruccion, char_instruccion);
 
       // si ocurren simultaneamente pesa mas I/O
