@@ -16,7 +16,7 @@ void destruir_logger(void)
 
 void log_evento(char *evento)
 {
-   log_info(kernel_logger, evento);
+   log_info(kernel_logger, "%s", evento);
 }
 
 void log_creacion_proceso(u_int32_t pid)
