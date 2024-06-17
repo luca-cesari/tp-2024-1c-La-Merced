@@ -48,16 +48,7 @@ int check_interrupt()
 
 int check_desalojo()
 {
-   if (pcb->motivo_desalojo == TERMINATED)
-      return 1;
-
-   if (pcb->motivo_desalojo == ERROR)
-      return 1;
-
-   if (pcb->motivo_desalojo == IO)
-      return 1;
-
-   return 0;
+   return pcb->motivo_desalojo; // el unico caso false es NONE (0)
 }
 
 void *ciclo_instruccion(t_pcb *pcb_kernel)
