@@ -51,8 +51,30 @@ void inicializar_instrucciones(void);
  */
 void (*get_instruccion(char *instruccion))(char **);
 
+/**
+ * @brief Guarda el valor en el registro.
+ *
+ * @param instruccion [ Registro | Valor ].
+ * @note Ejemplo: "AX 10". (AX = 10)
+ */
 void set(char **parametros);
+
+/**
+ * @brief Suma el valor del registro origen al valor del registro destino.
+ *        El resultado se guarda en el registro destino.
+ *
+ * @param parametros [ Registro Destino | Registro Origen ].
+ * @note Ejemplo: "AX BX". (AX = AX + BX)
+ */
 void sum(char **parametros);
+
+/**
+ * @brief Resta el valor del registro origen al valor del registro destino.
+ *        El resultado se guarda en el registro destino
+ *
+ * @param parametros [ Registro Destino | Registro Origen ].
+ * @note Ejemplo: "AX BX". (AX = AX - BX)
+ */
 void sub(char **parametros);
 void jnz(char **parametros);
 void resize(char **parametros);
