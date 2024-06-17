@@ -4,6 +4,9 @@
 t_dictionary *registros;
 extern t_pcb *pcb;
 
+
+
+
 void set(char **parametros)
 {
    int valor = atoi(parametros[1]);
