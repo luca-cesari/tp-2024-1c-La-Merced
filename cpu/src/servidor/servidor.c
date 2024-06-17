@@ -1,5 +1,8 @@
 #include "servidor.h"
 
+int32_t fd_dispatch;
+int32_t fd_interrupt;
+
 sem_t fin_de_proceso;
 
 void iniciar_servidor()
@@ -9,8 +12,8 @@ void iniciar_servidor()
    char *puerto_escucha_dispatch = get_puerto_escucha_dispatch();
    char *puerto_escucha_interrupt = get_puerto_escucha_interrupt();
 
-   int32_t fd_dispatch = crear_servidor(puerto_escucha_dispatch);
-   int32_t fd_interrupt = crear_servidor(puerto_escucha_interrupt);
+   fd_dispatch = crear_servidor(puerto_escucha_dispatch);
+   fd_interrupt = crear_servidor(puerto_escucha_interrupt);
 
    esperar_cliente(fd_dispatch, &atender_kernel_dispatch);
    esperar_cliente(fd_interrupt, &atender_kernel_interrupt);
@@ -29,8 +32,8 @@ void *atender_kernel_dispatch(void *fd_ptr)
       return NULL;
    }
 
-   printf("Kernel conectado por dispatch \n");
-   inicializar_diccionario_instrucciones();
+   log_evento("Kernel conectado por dispatch");
+   inicializar_diccionario_instrucciones(); // cambiar a main??
 
    while (1)
    {
@@ -67,4 +70,11 @@ void *atender_kernel_interrupt(void *fd_ptr)
 
    sem_post(&fin_de_proceso);
    return NULL;
+}
+
+void finalizar_servidor()
+{
+   sem_destroy(&fin_de_proceso);
+   liberar_conexion(fd_dispatch);
+   liberar_conexion(fd_interrupt);
 }

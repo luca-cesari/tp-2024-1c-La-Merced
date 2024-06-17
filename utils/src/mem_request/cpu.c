@@ -25,8 +25,6 @@ t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid,
    case RESIZE:
       mem_request->parametros.tamanio_nuevo = parametro.tamanio_nuevo;
       break;
-   default:
-      break;
    }
 
    return mem_request;

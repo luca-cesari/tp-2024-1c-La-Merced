@@ -21,6 +21,7 @@ int main(void)
 
     liberar_conexion_memoria();
     destruir_mmu();
+    finalizar_servidor();
     destruir_config();
     destruir_logger();
 
