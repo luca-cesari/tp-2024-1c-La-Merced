@@ -16,12 +16,6 @@
 #include "mmu/mmu.h"
 #include "registros/registros.h"
 
-typedef enum
-{
-   REGISTER_SIZE,
-   REGISTER_CONTENT,
-} size_flag;
-
 /**
  * @brief Guarda el valor en el registro.
  *
