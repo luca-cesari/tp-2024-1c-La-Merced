@@ -81,7 +81,7 @@ void jnz(char **parametros) // clean
       pcb->program_counter = atoi(parametros[1]);
 }
 
-void resize(char **parametros_char)
+void resize(char **parametros_char) // clean
 {
    parametros parametro;
    parametro.tamanio_nuevo = atoi(parametros_char[0]);
@@ -136,7 +136,7 @@ void copy_string(char **param)
    destruir_buffer_response(response);
 }
 
-void io_gen_sleep(char **parametros)
+void io_gen_sleep(char **parametros) // clean
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_GEN_SLEEP", parametros[1]);
    set_io_request(pcb, io_request);
@@ -145,7 +145,7 @@ void io_gen_sleep(char **parametros)
    // destruir_io_request(io_request);
 }
 
-void io_stdin_read(char **parametros)
+void io_stdin_read(char **parametros) // clean
 {
    char *direcciones_tamanio = get_direccion_tamanio(eliminar_primer_elemento(parametros));
 
@@ -156,7 +156,7 @@ void io_stdin_read(char **parametros)
    // destruir_io_request(io_request);
 }
 
-void io_stdout_write(char **parametros)
+void io_stdout_write(char **parametros) // clean
 {
    char *direcciones_tamanio = get_direccion_tamanio(eliminar_primer_elemento(parametros));
 

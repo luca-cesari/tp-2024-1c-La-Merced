@@ -89,7 +89,7 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
    }
 }
 
-void aumentar_program_counter() /// VER SI VA  ACA
+void aumentar_program_counter() // VER SI VA ACA
 {
    pcb->program_counter += 1;
 }

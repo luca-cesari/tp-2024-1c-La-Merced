@@ -16,25 +16,6 @@
 #include "mmu/mmu.h"
 #include "registros/registros.h"
 
-typedef union
-{
-   u_int32_t *_32_bit;
-   u_int8_t *_8_bit;
-} direccion_logica;
-
-typedef union
-{
-   u_int32_t *_32_bit;
-   u_int8_t *_8_bit;
-} registro_datos;
-
-typedef struct
-{
-   direccion_logica direccion_logica;
-   registro_datos registro_datos;
-   char *direcciones_fisicas;
-} operandos;
-
 typedef enum
 {
    REGISTER_SIZE,
@@ -107,16 +88,6 @@ void (*get_instruccion(char *instruccion))(char **);
  */
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_dato);
 
-// /**
-//  * @brief
-//  *
-//  * @param parametros [ direccion | dato ]
-//  * @param flag
-//  * @return operandos
-//  */
-// operandos obtener_operandos(char **parametros, size_flag flag);
-// u_int32_t set_direccion_logica(operandos *operandos, char *registro_direccion);
-// u_int32_t set_registro_datos(operandos *operandos, char *registro_datos);
 char *get_direccion_tamanio(char **parametros);
 
 // parametros es algo de mem_request, los constructores no tienen que ir aca
