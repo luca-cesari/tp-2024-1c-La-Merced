@@ -14,6 +14,7 @@
 #include "conexion/memoria.h"
 #include "logger/logger.h"
 #include "mmu/mmu.h"
+#include "registros/registros.h"
 
 typedef union
 {
@@ -94,17 +95,6 @@ void inicializar_instrucciones(void);
 void (*get_instruccion(char *instruccion))(char **);
 
 /**
- * @brief Setea el diccionario de registros con los
- *        registros de la PCB de turno.
- *
- * @note Se debe llamar antes de ejecutar cualquier instrucción.
- * @note No hace falta destruir o crear el diccionario de nuevo.
- */
-void set_registros();
-
-u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
-
-/**
  * @brief Obtiene todas las direcciones físicas necesarias para la instrucción.
  *        Es necesario para el caso donde el contrnido a leer o escribir no cabe
  *        en un sóla página, o que simplemente fue dividido en dos páginas.
@@ -117,16 +107,16 @@ u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
  */
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_dato);
 
-/**
- * @brief
- *
- * @param parametros [ direccion | dato ]
- * @param flag
- * @return operandos
- */
-operandos obtener_operandos(char **parametros, size_flag flag);
-u_int32_t set_direccion_logica(operandos *operandos, char *registro_direccion);
-u_int32_t set_registro_datos(operandos *operandos, char *registro_datos);
+// /**
+//  * @brief
+//  *
+//  * @param parametros [ direccion | dato ]
+//  * @param flag
+//  * @return operandos
+//  */
+// operandos obtener_operandos(char **parametros, size_flag flag);
+// u_int32_t set_direccion_logica(operandos *operandos, char *registro_direccion);
+// u_int32_t set_registro_datos(operandos *operandos, char *registro_datos);
 char *get_direccion_tamanio(char **parametros);
 
 // parametros es algo de mem_request, los constructores no tienen que ir aca

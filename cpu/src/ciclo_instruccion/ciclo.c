@@ -72,7 +72,7 @@ static int check_desalojo()
 void *ciclo_instruccion(t_pcb *pcb_kernel)
 {
    pcb = pcb_kernel;
-   set_registros();
+   set_registros(pcb_kernel); // pcb o pcb_kernel, funca igual
 
    while (1)
    {

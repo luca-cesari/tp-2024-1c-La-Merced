@@ -22,6 +22,11 @@ void set_registros(t_pcb *pcb)
    dictionary_put(registros, "PC", &(pcb->program_counter));
 }
 
+void *get_puntero_registro(char *registro)
+{
+   return dictionary_get(registros, registro);
+}
+
 int32_t get_valor_registro(char *registro)
 {
    u_int8_t tamanio = get_tamanio_registro(registro);

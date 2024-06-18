@@ -1,117 +1,84 @@
 #include "instrucciones.h"
 
 t_dictionary *instrucciones;
-t_dictionary *registros;
 extern t_pcb *pcb;
 
-void set(char **parametros)
+void set(char **parametros) // clean
 {
-   int valor = atoi(parametros[1]);
-   if (string_starts_with(parametros[0], "E"))
-   {
-      u_int32_t *registro = dictionary_get(registros, parametros[0]);
-      *registro = valor;
-   }
-   else
-   {
-      u_int8_t *registro = dictionary_get(registros, parametros[0]);
-      *registro = valor;
-   }
+   int32_t valor = atoi(parametros[1]);
+   set_valor_registro(parametros[0], valor);
 }
 
-void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Dirección)
+void mov_in(char **parametros_recibidos) // clean
 {
-   // se podria abstarer en alguna funcion de reverse
-   char *primer_parametro = parametros_recibidos[0];  // Registro Datos
-   char *segundo_parametro = parametros_recibidos[1]; // Registro Dirección
-   char **parametros_aux = string_array_new();
-   string_array_push(&parametros_aux, segundo_parametro);
-   string_array_push(&parametros_aux, primer_parametro);
+   u_int32_t direccion_logica = get_valor_registro(parametros_recibidos[1]);
+   u_int32_t tamanio_registro_dato = get_tamanio_registro(parametros_recibidos[0]);
+   char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_registro_dato);
 
-   operandos _operandos = obtener_operandos(parametros_aux, REGISTER_SIZE);
-   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[0]);
+   parametros parametros_leer = crear_parametros_leer(direcciones_fisicas, tamanio_registro_dato);
 
-   parametros parametros_leer = crear_parametros_leer(_operandos.direcciones_fisicas, tamanio_registro);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
    enviar_mem_request(mem_request);
 
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
-   if (response->tamanio_buffer == tamanio_registro)
+   if (response->resultado == OPERATION_SUCCEED)
    {
-      char *direccion_fisica = (string_split(_operandos.direcciones_fisicas, " "))[0];
-      if (tamanio_registro == 1)
-      {
-         *(_operandos.registro_datos._8_bit) = *(u_int8_t *)response->buffer;
-         log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*_operandos.registro_datos._8_bit));
-      }
+      char *direccion_fisica = (string_split(direcciones_fisicas, " "))[0];
+      u_int32_t valor_a_guardar = 0;
+      if (response->tamanio_buffer == 1)
+         valor_a_guardar = *(u_int8_t *)response->buffer;
       else
-      {
-         *(_operandos.registro_datos._32_bit) = *(u_int32_t *)(response->buffer);
-         log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(*_operandos.registro_datos._32_bit));
-      }
+         valor_a_guardar = *(u_int32_t *)(response->buffer);
+
+      set_valor_registro(parametros_recibidos[0], valor_a_guardar);
+      log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(valor_a_guardar));
    }
    else
       perror("Error al leer en memoria\n");
 
    destruir_buffer_response(response);
+   // destruir_cpu_mem_request(mem_request);
 }
 
-void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Registro Datos)
+void mov_out(char **parametros_recibidos) // clean
 {
-   operandos _operandos = obtener_operandos(parametros_recibidos, REGISTER_SIZE);
-   u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[1]);
+   u_int32_t direccion_logica = get_valor_registro(parametros_recibidos[0]);
+   void *dato = get_puntero_registro(parametros_recibidos[1]);
+   u_int32_t tamanio_registro_dato = get_tamanio_registro(parametros_recibidos[1]);
+   char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_registro_dato);
 
-   void *buffer = malloc(tamanio_registro); // ESTO NO VA, REPENSAR
-   if (tamanio_registro == 1)
-      memcpy(buffer, _operandos.registro_datos._8_bit, tamanio_registro);
-   else
-      memcpy(buffer, _operandos.registro_datos._32_bit, tamanio_registro);
-
-   parametros parametros_escribir = crear_parametros_escribir(_operandos.direcciones_fisicas, buffer, tamanio_registro);
+   parametros parametros_escribir = crear_parametros_escribir(direcciones_fisicas, dato, tamanio_registro_dato);
    t_cpu_mem_req *mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
    enviar_mem_request(mem_request);
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
    {
-      char *direccion_fisica = (string_split(_operandos.direcciones_fisicas, " "))[0];
-      if (tamanio_registro == 1)
-         log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*_operandos.registro_datos._8_bit));
-      else
-         log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(*_operandos.registro_datos._32_bit));
+      char *direccion_fisica = (string_split(direcciones_fisicas, " "))[0];
+      int32_t valor_escrito = get_valor_registro(parametros_recibidos[1]);
+      log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(valor_escrito));
    }
    else
       perror("Error al escribir en memoria\n");
+
+   // destruir_cpu_mem_request(mem_request);
 }
 
-void sum(char **parametros)
+void sum(char **parametros) // clean
 {
-   void *registro1 = dictionary_get(registros, parametros[0]);
-   void *registro2 = dictionary_get(registros, parametros[1]);
-
-   if (string_starts_with(parametros[0], "E"))
-      *(u_int32_t *)registro1 += *(u_int32_t *)registro2;
-   else
-      *(u_int8_t *)registro1 += *(u_int8_t *)registro2;
+   int32_t valor = get_valor_registro(parametros[0]) + get_valor_registro(parametros[1]);
+   set_valor_registro(parametros[0], valor);
 }
 
-void sub(char **parametros)
+void sub(char **parametros) // clean
 {
-   void *registro1 = dictionary_get(registros, parametros[0]);
-   void *registro2 = dictionary_get(registros, parametros[1]);
-
-   if (string_starts_with(parametros[0], "E"))
-      *(u_int32_t *)registro1 -= *(u_int32_t *)registro2;
-   else
-      *(u_int8_t *)registro1 -= *(u_int8_t *)registro2;
+   int32_t valor = get_valor_registro(parametros[0]) - get_valor_registro(parametros[1]);
+   set_valor_registro(parametros[0], valor);
 }
 
-void jnz(char **parametros)
+void jnz(char **parametros) // clean
 {
-   if (dictionary_get(registros, parametros[0]) != 0)
-   {
-      int valor = atoi(parametros[1]);
-      pcb->program_counter = valor;
-   }
+   if (get_valor_registro(parametros[0]) != 0)
+      pcb->program_counter = atoi(parametros[1]);
 }
 
 void resize(char **parametros_char)
@@ -126,6 +93,8 @@ void resize(char **parametros_char)
       set_motivo_desalojo(pcb, ERROR);
       set_motivo_finalizacion(pcb, OUT_OF_MEMORY);
    }
+
+   // destruir_cpu_mem_request(mem_request);
 }
 
 void copy_string(char **param)
@@ -172,6 +141,8 @@ void io_gen_sleep(char **parametros)
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_GEN_SLEEP", parametros[1]);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
 }
 
 void io_stdin_read(char **parametros)
@@ -181,6 +152,8 @@ void io_stdin_read(char **parametros)
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDIN_READ", direcciones_tamanio);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
 }
 
 void io_stdout_write(char **parametros)
@@ -190,6 +163,8 @@ void io_stdout_write(char **parametros)
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_STDOUT_WRITE", direcciones_tamanio);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
 }
 
 void exit_instruction(char **parametros)
@@ -200,7 +175,7 @@ void exit_instruction(char **parametros)
 void inicializar_instrucciones(void)
 {
    instrucciones = dictionary_create();
-   registros = dictionary_create();
+   inicializar_registros();
 
    dictionary_put(instrucciones, "SET", &set);
    dictionary_put(instrucciones, "SUM", &sum);
@@ -221,26 +196,7 @@ void (*get_instruccion(char *instruccion))(char **)
    return dictionary_get(instrucciones, instruccion);
 }
 
-void set_registros()
-{
-   dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
-   dictionary_put(registros, "BX", &(pcb->cpu_registers.BX));
-   dictionary_put(registros, "CX", &(pcb->cpu_registers.CX));
-   dictionary_put(registros, "DX", &(pcb->cpu_registers.DX));
-   dictionary_put(registros, "EAX", &(pcb->cpu_registers.EAX));
-   dictionary_put(registros, "EBX", &(pcb->cpu_registers.EBX));
-   dictionary_put(registros, "ECX", &(pcb->cpu_registers.ECX));
-   dictionary_put(registros, "EDX", &(pcb->cpu_registers.EDX));
-   dictionary_put(registros, "SI", &(pcb->cpu_registers.SI));
-   dictionary_put(registros, "DI", &(pcb->cpu_registers.DI));
-   dictionary_put(registros, "PC", &(pcb->program_counter));
-}
-
-u_int32_t obtener_tamanio_registro(char *parametros_recibidos)
-{
-   return string_starts_with(parametros_recibidos, "E") ? 4 : 1;
-}
-
+// TODO refactorizar
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_dato)
 {
    int32_t tamanio_pagina = get_tamanio_pagina();
@@ -267,62 +223,15 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
    return direcciones_fisicas;
 }
 
-operandos obtener_operandos(char **parametros, size_flag flag)
-{
-   operandos operandos;
-   u_int32_t direccion_logica = set_direccion_logica(&operandos, parametros[0]);
-   u_int32_t tamanio_dato = set_registro_datos(&operandos, parametros[1]);
-
-   if (flag == REGISTER_SIZE)
-      tamanio_dato = obtener_tamanio_registro(parametros[1]);
-
-   operandos.direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_dato);
-   return operandos;
-}
-
-u_int32_t set_direccion_logica(operandos *operandos, char *registro_direccion)
-{
-   u_int32_t valor = 0;
-   if (obtener_tamanio_registro(registro_direccion) == 1)
-   {
-      operandos->direccion_logica._8_bit = (u_int8_t *)dictionary_get(registros, registro_direccion);
-      valor = *(operandos->direccion_logica._8_bit);
-   }
-   else
-   {
-      operandos->direccion_logica._32_bit = (u_int32_t *)dictionary_get(registros, registro_direccion);
-      valor = *(operandos->direccion_logica._32_bit);
-   }
-   return valor;
-}
-
-u_int32_t set_registro_datos(operandos *operandos, char *registro_datos)
-{
-   u_int32_t valor = 0;
-   if (obtener_tamanio_registro(registro_datos) == 1)
-   {
-      operandos->registro_datos._8_bit = (u_int8_t *)dictionary_get(registros, registro_datos);
-      valor = *(operandos->registro_datos._8_bit);
-   }
-   else
-   {
-      operandos->registro_datos._32_bit = (u_int32_t *)dictionary_get(registros, registro_datos);
-      valor = *(operandos->registro_datos._32_bit);
-   }
-   return valor;
-}
-
 char *get_direccion_tamanio(char **parametros)
 {
-   operandos operandos = obtener_operandos(parametros, REGISTER_CONTENT);
-   // no es muy limpio hacer doble llama a set_registro_datos
-   char *tamanio_valor = string_itoa(set_registro_datos(&operandos, parametros[1]));
+   int32_t valor_registro_dato = get_valor_registro(parametros[1]);
+   char *direcciones_fisicas = obtener_direcciones_fisicas(get_valor_registro(parametros[0]), valor_registro_dato);
    char *direcciones_tamanio = string_new();
 
-   // concatenar tamanio con direcciones fisicas
-   string_append(&direcciones_tamanio, operandos.direcciones_fisicas);
+   string_append(&direcciones_tamanio, direcciones_fisicas);
    string_append(&direcciones_tamanio, " ");
-   string_append(&direcciones_tamanio, tamanio_valor);
+   string_append(&direcciones_tamanio, string_itoa(valor_registro_dato));
 
    printf("DIRECCIONES Y TAMANIO: %s\n", direcciones_tamanio);
 

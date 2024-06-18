@@ -8,6 +8,7 @@
 
 void inicializar_registros(void);
 void set_registros(t_pcb *pcb);
+void* get_puntero_registro(char *registro);
 int32_t get_valor_registro(char *registro);
 u_int8_t get_valor_registro_8bit(char *registro);
 u_int32_t get_valor_registro_32bit(char *registro);
