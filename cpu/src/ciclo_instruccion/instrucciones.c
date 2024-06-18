@@ -1,33 +1,8 @@
-
 #include "instrucciones.h"
 
 t_dictionary *instrucciones;
 t_dictionary *registros;
 extern t_pcb *pcb;
-
-void inicializar_instrucciones(void)
-{
-   instrucciones = dictionary_create();
-   registros = dictionary_create();
-
-   dictionary_put(instrucciones, "SET", &set);
-   dictionary_put(instrucciones, "SUM", &sum);
-   dictionary_put(instrucciones, "SUB", &sub);
-   dictionary_put(instrucciones, "JNZ", &jnz);
-   dictionary_put(instrucciones, "RESIZE", &resize);
-   dictionary_put(instrucciones, "MOV_IN", &mov_in);
-   dictionary_put(instrucciones, "MOV_OUT", &mov_out);
-   dictionary_put(instrucciones, "COPY_STRING", &copy_string);
-   dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
-   dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
-   dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
-   dictionary_put(instrucciones, "EXIT", &exit_instruction);
-}
-
-void (*get_instruccion(char *instruccion))(char **)
-{
-   return dictionary_get(instrucciones, instruccion);
-}
 
 void set(char **parametros)
 {
@@ -46,6 +21,7 @@ void set(char **parametros)
 
 void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Dirección)
 {
+   // se podria abstarer en alguna funcion de reverse
    char *primer_parametro = parametros_recibidos[0];  // Registro Datos
    char *segundo_parametro = parametros_recibidos[1]; // Registro Dirección
    char **parametros_aux = string_array_new();
@@ -55,11 +31,8 @@ void mov_in(char **parametros_recibidos) //  MOV_IN (Registro Datos, Registro Di
    operandos _operandos = obtener_operandos(parametros_aux, REGISTER_SIZE);
    u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[0]);
 
-   t_cpu_mem_req *mem_request;
-   parametros parametros_leer;
-
-   parametros_leer = crear_parametros_leer(_operandos.direcciones_fisicas, tamanio_registro);
-   mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
+   parametros parametros_leer = crear_parametros_leer(_operandos.direcciones_fisicas, tamanio_registro);
+   t_cpu_mem_req *mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
    enviar_mem_request(mem_request);
 
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
@@ -88,17 +61,14 @@ void mov_out(char **parametros_recibidos) //  MOV_OUT (Registro Dirección, Regi
    operandos _operandos = obtener_operandos(parametros_recibidos, REGISTER_SIZE);
    u_int32_t tamanio_registro = obtener_tamanio_registro(parametros_recibidos[1]);
 
-   t_cpu_mem_req *mem_request;
-   parametros parametros_escribir;
-
    void *buffer = malloc(tamanio_registro); // ESTO NO VA, REPENSAR
    if (tamanio_registro == 1)
       memcpy(buffer, _operandos.registro_datos._8_bit, tamanio_registro);
    else
       memcpy(buffer, _operandos.registro_datos._32_bit, tamanio_registro);
 
-   parametros_escribir = crear_parametros_escribir(_operandos.direcciones_fisicas, buffer, tamanio_registro);
-   mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
+   parametros parametros_escribir = crear_parametros_escribir(_operandos.direcciones_fisicas, buffer, tamanio_registro);
+   t_cpu_mem_req *mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
 
    enviar_mem_request(mem_request);
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
@@ -227,6 +197,30 @@ void exit_instruction(char **parametros)
    set_motivo_desalojo(pcb, TERMINATED);
 }
 
+void inicializar_instrucciones(void)
+{
+   instrucciones = dictionary_create();
+   registros = dictionary_create();
+
+   dictionary_put(instrucciones, "SET", &set);
+   dictionary_put(instrucciones, "SUM", &sum);
+   dictionary_put(instrucciones, "SUB", &sub);
+   dictionary_put(instrucciones, "JNZ", &jnz);
+   dictionary_put(instrucciones, "RESIZE", &resize);
+   dictionary_put(instrucciones, "MOV_IN", &mov_in);
+   dictionary_put(instrucciones, "MOV_OUT", &mov_out);
+   dictionary_put(instrucciones, "COPY_STRING", &copy_string);
+   dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
+   dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
+   dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
+   dictionary_put(instrucciones, "EXIT", &exit_instruction);
+}
+
+void (*get_instruccion(char *instruccion))(char **)
+{
+   return dictionary_get(instrucciones, instruccion);
+}
+
 void set_registros()
 {
    dictionary_put(registros, "AX", &(pcb->cpu_registers.AX));
@@ -240,6 +234,11 @@ void set_registros()
    dictionary_put(registros, "SI", &(pcb->cpu_registers.SI));
    dictionary_put(registros, "DI", &(pcb->cpu_registers.DI));
    dictionary_put(registros, "PC", &(pcb->program_counter));
+}
+
+u_int32_t obtener_tamanio_registro(char *parametros_recibidos)
+{
+   return string_starts_with(parametros_recibidos, "E") ? 4 : 1;
 }
 
 char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_dato)
@@ -260,7 +259,7 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
    for (u_int32_t pagina = pagina_inicial; pagina < pagina_final; pagina++) // Recorre las páginas necesarias para leer el registro
    {
       u_int32_t pagina_siguiente = pagina + 1;
-      direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, pagina_siguiente * tamanio_pagina)); // Esto debería devolver la dirección física de la página nueva que se necesita
+      direccion_fisica_actual_str = string_itoa(get_direccion_fisica(pcb->pid, pagina_siguiente * tamanio_pagina));
       string_append(&direcciones_fisicas, " ");
       string_append(&direcciones_fisicas, direccion_fisica_actual_str);
    }
@@ -345,9 +344,4 @@ parametros crear_parametros_escribir(char *direccion_fisica, void *buffer, u_int
    parametros_escribir.param_escribir.tamanio_buffer = tamanio_valor;
    parametros_escribir.param_escribir.buffer = buffer;
    return parametros_escribir;
-}
-
-u_int32_t obtener_tamanio_registro(char *parametros_recibidos)
-{
-   return string_starts_with(parametros_recibidos, "E") ? 4 : 1;
 }

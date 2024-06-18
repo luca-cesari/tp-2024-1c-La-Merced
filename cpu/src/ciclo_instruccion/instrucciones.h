@@ -40,23 +40,6 @@ typedef enum
    REGISTER_CONTENT,
 } size_flag;
 
-void inicializar_instrucciones(void);
-
-/**
- * @brief Devuelve una función instrucción según la instrucción recibida.
- *
- * @param instruccion Ejemplo:
- *        "SET", "SUM", "JNZ", "RESIZE",
- *        "COPY_STRING", "IO_GEN_SLEEP",
- *        "IO_STDIN_READ", "IO_STDOUT_WRITE", "EXIT".
- *
- * @return `void (*)(char **)` Función instrucción.
- *
- * @note Las funciones instrucción reciben un array de strings de la commons.
- *       Ejemplo: [ "AX", "10", NULL ].
- */
-void (*get_instruccion(char *instruccion))(char **);
-
 /**
  * @brief Guarda el valor en el registro.
  *
@@ -64,6 +47,9 @@ void (*get_instruccion(char *instruccion))(char **);
  * @note Ejemplo: "AX 10". (AX = 10)
  */
 void set(char **parametros);
+
+void mov_in(char **parametros);
+void mov_out(char **parametros);
 
 /**
  * @brief Suma el valor del registro origen al valor del registro destino.
@@ -84,13 +70,28 @@ void sum(char **parametros);
 void sub(char **parametros);
 void jnz(char **parametros);
 void resize(char **parametros);
-void mov_in(char **parametros);
-void mov_out(char **parametros);
 void copy_string(char **parametros);
 void io_gen_sleep(char **parametros);
 void io_stdin_read(char **parametros);
 void io_stdout_write(char **parametros);
 void exit_instruction(char **parametros);
+
+void inicializar_instrucciones(void);
+
+/**
+ * @brief Devuelve una función instrucción según la instrucción recibida.
+ *
+ * @param instruccion Ejemplo:
+ *        "SET", "SUM", "JNZ", "RESIZE",
+ *        "COPY_STRING", "IO_GEN_SLEEP",
+ *        "IO_STDIN_READ", "IO_STDOUT_WRITE", "EXIT".
+ *
+ * @return `void (*)(char **)` Función instrucción.
+ *
+ * @note Las funciones instrucción reciben un array de strings de la commons.
+ *       Ejemplo: [ "AX", "10", NULL ].
+ */
+void (*get_instruccion(char *instruccion))(char **);
 
 /**
  * @brief Setea el diccionario de registros con los
@@ -100,6 +101,8 @@ void exit_instruction(char **parametros);
  * @note No hace falta destruir o crear el diccionario de nuevo.
  */
 void set_registros();
+
+u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
 
 /**
  * @brief Obtiene todas las direcciones físicas necesarias para la instrucción.
@@ -117,20 +120,18 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
 /**
  * @brief
  *
- * @param parametros
+ * @param parametros [ direccion | dato ]
  * @param flag
  * @return operandos
- *
- * @note [ direccion | dato ]
  */
 operandos obtener_operandos(char **parametros, size_flag flag);
 u_int32_t set_direccion_logica(operandos *operandos, char *registro_direccion);
 u_int32_t set_registro_datos(operandos *operandos, char *registro_datos);
 char *get_direccion_tamanio(char **parametros);
 
+// parametros es algo de mem_request, los constructores no tienen que ir aca
 parametros crear_parametros_leer(char *direccion_fisica, u_int32_t tamanio_valor);
 parametros crear_parametros_escribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);
-u_int32_t obtener_tamanio_registro(char *parametros_recibidos);
 
 // Instrucciones
 
