@@ -6,7 +6,7 @@
 #include <commons/collections/list.h>
 #include <commons/log.h>
 
-#define LOG_FILE "io.log"
+#define LOG_FILE ".log"
 
 void iniciar_logger(char *nombre_interfaz);
 void destruir_logger(void);

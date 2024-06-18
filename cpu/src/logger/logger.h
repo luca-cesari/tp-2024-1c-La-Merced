@@ -23,6 +23,7 @@ typedef enum
 void iniciar_logger(void);
 void destruir_logger(void);
 
+void log_evento(char *);
 void log_fetch_instruccion(u_int32_t, u_int32_t);
 void log_instruccion_ejecutada(u_int32_t pid, char *instruccion, char *parametros);
 void log_tlb_hit(u_int32_t, int);

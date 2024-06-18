@@ -12,6 +12,11 @@ void destruir_logger(void)
    log_destroy(cpu_logger);
 }
 
+void log_evento(char *evento)
+{
+   log_info(cpu_logger, "%s", evento);
+}
+
 void log_fetch_instruccion(u_int32_t pid, u_int32_t pc)
 {
    log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pid, pc);
