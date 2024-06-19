@@ -28,7 +28,7 @@ char *eliminar_salto_linea(char *linea)
    return string_replace(linea, "\n", "");
 }
 
-u_int32_t string_full_lenght(char *string)
+u_int32_t string_full_length(char *string)
 {
    return strlen(string) + 1;
 }

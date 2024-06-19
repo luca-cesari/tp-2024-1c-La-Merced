@@ -82,11 +82,11 @@ void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request)
       agregar_a_paquete(paquete, &(mem_request->nro_pag), sizeof(u_int32_t));
       break;
    case LEER:
-      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_lenght(mem_request->direcciones_fisicas));
+      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_length(mem_request->direcciones_fisicas));
       agregar_a_paquete(paquete, &(mem_request->tamanio_buffer), sizeof(u_int32_t));
       break;
    case ESCRIBIR:
-      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_lenght(mem_request->direcciones_fisicas));
+      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_length(mem_request->direcciones_fisicas));
       agregar_a_paquete(paquete, &(mem_request->tamanio_buffer), sizeof(u_int32_t));
       agregar_a_paquete(paquete, mem_request->buffer, mem_request->tamanio_buffer);
       break;

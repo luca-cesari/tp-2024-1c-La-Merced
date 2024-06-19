@@ -27,11 +27,11 @@ void enviar_io_mem_request(int32_t fd_memoria, t_io_mem_req *mem_request)
    switch (mem_request->operacion)
    {
    case LEER_IO:
-      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, strlen(mem_request->direcciones_fisicas) + 1);
+      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_length(mem_request->direcciones_fisicas));
       agregar_a_paquete(paquete, &(mem_request->tamanio_buffer), sizeof(u_int32_t));
       break;
    case ESCRIBIR_IO:
-      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, strlen(mem_request->direcciones_fisicas) + 1);
+      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_length(mem_request->direcciones_fisicas));
       agregar_a_paquete(paquete, &(mem_request->tamanio_buffer), sizeof(u_int32_t));
       agregar_a_paquete(paquete, mem_request->buffer, mem_request->tamanio_buffer);
       break;

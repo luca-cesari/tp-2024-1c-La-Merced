@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <protocol/protocol.h>
+#include <extended/string.h>
+
 #include "mem_response.h"
 
 typedef enum
