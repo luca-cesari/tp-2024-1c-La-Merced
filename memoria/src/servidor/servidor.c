@@ -91,33 +91,33 @@ void escuchar_cpu(int32_t fd_cpu)
         {
         case FETCH_INSTRUCCION:
             printf("FETCH_INSTRUCCION \n");
-            char *instruccion = proxima_instruccion(mem_request->pid, mem_request->parametros.program_counter);
+            char *instruccion = proxima_instruccion(mem_request->pid, mem_request->program_counter);
             enviar_mensaje(instruccion, fd_cpu);
             break;
 
         case OBTENER_MARCO:
             printf("OBTENER_MARCO \n");
-            u_int32_t marco = obtener_marco(mem_request->pid, mem_request->parametros.nro_pag);
+            u_int32_t marco = obtener_marco(mem_request->pid, mem_request->nro_pag);
             enviar_senial(marco, fd_cpu); // ver si es con senial por tema del unsigned
             break;
 
         case LEER:
             printf("LEER \n");
-            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            void *buffer_response = leer_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
-            responder_lectura(buffer_response, mem_request->parametros.param_leer.tamanio_buffer, fd_cpu);
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->direcciones_fisicas);
+            void *buffer_response = leer_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->tamanio_buffer, fd_cpu);
+            responder_lectura(buffer_response, mem_request->tamanio_buffer, fd_cpu);
             break;
 
         case ESCRIBIR:
             printf("ESCRIBIR \n");
-            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->parametros.param_leer.direcciones_fisicas);
-            t_mem_response response = escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->parametros.param_escribir.buffer, mem_request->parametros.param_escribir.tamanio_buffer, fd_cpu);
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(mem_request->direcciones_fisicas);
+            t_mem_response response = escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->buffer, mem_request->tamanio_buffer, fd_cpu);
             enviar_senial(response, fd_cpu);
             break;
 
         case RESIZE:
             printf("RESIZE \n");
-            t_mem_response resultado = ajustar_memoria_para_proceso(mem_request->pid, mem_request->parametros.tamanio_nuevo);
+            t_mem_response resultado = ajustar_memoria_para_proceso(mem_request->pid, mem_request->tamanio_nuevo);
             enviar_senial(resultado, fd_cpu);
             break;
 

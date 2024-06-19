@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <commons/string.h>
 #include <protocol/protocol.h>
+#include <extended/string.h>
+
 #include "mem_response.h"
 
 typedef enum
@@ -17,35 +19,22 @@ typedef enum
 
 typedef struct
 {
-   char *direcciones_fisicas;
-   u_int32_t tamanio_buffer;
-} param_leer;
-
-typedef struct
-{
-   char *direcciones_fisicas;
-   u_int32_t tamanio_buffer;
-   void *buffer;
-} param_escribir;
-
-typedef union
-{
-   int32_t program_counter; // Presente solo para FETCH_INSTRUCCION
-   u_int32_t nro_pag;       // Presente solo para OBTENER_MARCO
-   u_int32_t tamanio_nuevo; // Presente solo para RESIZE
-   param_leer param_leer;
-   param_escribir param_escribir;
-
-} parametros;
-typedef struct
-{
    cpu_req_operation operacion;
    u_int32_t pid;
-   parametros parametros;
-
+   u_int32_t program_counter; // Presente solo para FETCH_INSTRUCCION
+   u_int32_t nro_pag;         // Presente solo para OBTENER_MARCO
+   u_int32_t tamanio_nuevo;   // Presente solo para RESIZE
+   char *direcciones_fisicas; // Presente para LEER y ESCRIBIR
+   u_int32_t tamanio_buffer;  // Presente para LEER y ESCRIBIR
+   void *buffer;              // Presente solo para ESCRIBIR
 } t_cpu_mem_req;
 
-t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion, u_int32_t pid, parametros parametro);
+t_cpu_mem_req *crear_instruccion_request(u_int32_t pid, u_int32_t program_counter);
+t_cpu_mem_req *crear_nro_frame_request(u_int32_t pid, u_int32_t nro_pag);
+t_cpu_mem_req *crear_resize_request(u_int32_t pid, u_int32_t tamanio_nuevo);
+t_cpu_mem_req *crear_cpu_read_request(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer);
+t_cpu_mem_req *crear_cpu_write_request(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer, void *buffer);
+
 void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request);
 t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu);
 void destruir_cpu_mem_request(t_cpu_mem_req *mem_request);

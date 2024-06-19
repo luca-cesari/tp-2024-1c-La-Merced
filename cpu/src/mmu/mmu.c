@@ -41,9 +41,8 @@ void destruir_mmu()
 
 static u_int32_t buscar_en_memoria(u_int32_t pid, u_int32_t numero_pagina)
 {
-   parametros parametro;
-   parametro.nro_pag = numero_pagina;
-   t_cpu_mem_req *mem_request = crear_cpu_mem_request(OBTENER_MARCO, pid, parametro);
+   t_cpu_mem_req *mem_request = crear_nro_frame_request(pid, numero_pagina);
    enviar_mem_request(mem_request);
+   destruir_cpu_mem_request(mem_request);
    return recibir_marco();
 }

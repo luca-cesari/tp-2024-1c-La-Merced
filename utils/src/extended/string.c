@@ -27,3 +27,13 @@ char *eliminar_salto_linea(char *linea)
 {
    return string_replace(linea, "\n", "");
 }
+
+u_int32_t string_full_lenght(char *string)
+{
+   return strlen(string) + 1;
+}
+
+u_int8_t string_is_equal(char *string1, char *string2)
+{
+   return strcmp(string1, string2) == 0 ? 1 : 0;
+}

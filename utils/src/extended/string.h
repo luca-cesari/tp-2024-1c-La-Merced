@@ -8,5 +8,7 @@
 char *array_a_string(char **array);
 char **eliminar_primer_elemento(char **array);
 char *eliminar_salto_linea(char *linea);
+u_int32_t string_full_lenght(char *string);
+u_int8_t string_is_equal(char *string1, char *string2);
 
 #endif // UTILS_STRING_H
