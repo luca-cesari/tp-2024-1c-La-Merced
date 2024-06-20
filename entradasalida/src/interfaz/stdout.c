@@ -36,12 +36,10 @@ int8_t io_stdout_write(char *argumentos, u_int32_t pid)
     enviar_mem_request(mem_request);
     destruir_io_mem_request(mem_request);
 
-    t_mem_buffer_response *response = recibir_mem_buffer_response();
-    printf("%d\n", response->tamanio_buffer);
-
-    if (response->buffer == NULL)
+    char *respuesta = (char *)recibir_mem_buffer();
+    if (respuesta == NULL)
         return -1;
 
-    printf("%s\n", (char *)response->buffer);
+    printf("%s\n", respuesta);
     return 0;
 }

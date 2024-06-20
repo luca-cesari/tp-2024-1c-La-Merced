@@ -21,7 +21,7 @@ void enviar_mem_request(t_io_mem_req *mem_request);
 
 int32_t recibir_valor();
 
-t_mem_buffer_response *recibir_mem_buffer_response();
+void *recibir_mem_buffer();
 
 /**
  * @brief Libera la conexion con el módulo Memoria

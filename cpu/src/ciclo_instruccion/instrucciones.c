@@ -106,10 +106,7 @@ void copy_string(char **parametros) // clean
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
 
    if (response->resultado == OPERATION_SUCCEED)
-   {
-      string_escribir = malloc(response->tamanio_buffer);
-      memcpy(string_escribir, response->buffer, response->tamanio_buffer);
-   }
+      string_escribir = (char *)response->buffer;
    else
       perror("Error al leer en memoria\n");
 

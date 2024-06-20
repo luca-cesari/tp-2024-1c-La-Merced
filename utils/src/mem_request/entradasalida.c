@@ -51,7 +51,6 @@ t_io_mem_req *recibir_io_mem_request(int32_t fd_io)
 
    mem_request->operacion = *(io_req_operation *)list_get(paquete, 0);
    mem_request->pid = *(u_int32_t *)list_get(paquete, 1);
-   mem_request->buffer = NULL;
 
    switch (mem_request->operacion)
    {
