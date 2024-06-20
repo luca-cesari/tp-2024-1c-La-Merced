@@ -6,17 +6,24 @@ void iniciar_rutina_interfaz_stdin()
     {
         t_io_request *peticion_io = esperar_instruccion();
 
-        if (strcmp(peticion_io->instruction, "IO_STDIN_READ") != 0)
+        if (!string_is_equal(peticion_io->instruction, "IO_STDIN_READ"))
+        {
             enviar_respuesta(INVALID_INSTRUCTION);
+            destruir_io_request(peticion_io);
+            continue;
+        }
 
         int8_t io_result = io_stdin_read(peticion_io->arguments, peticion_io->pid);
         if (io_result == -1)
         {
             enviar_respuesta(FAILED);
+            destruir_io_request(peticion_io);
             continue;
         }
+
         log_operacion(peticion_io->pid, peticion_io->instruction);
         enviar_respuesta(EXECUTED);
+        destruir_io_request(peticion_io);
     }
 }
 
