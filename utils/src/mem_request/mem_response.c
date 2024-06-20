@@ -22,8 +22,8 @@ t_packet *serializar_buffer_response(t_mem_buffer_response *buffer_response)
    agregar_a_paquete(paquete, &(buffer_response->resultado), sizeof(t_mem_response));
    if (buffer_response->buffer != NULL)
    {
-      agregar_a_paquete(paquete, buffer_response->buffer, buffer_response->tamanio_buffer);
       agregar_a_paquete(paquete, &(buffer_response->tamanio_buffer), sizeof(u_int32_t));
+      agregar_a_paquete(paquete, buffer_response->buffer, buffer_response->tamanio_buffer);
    }
 
    return paquete;
@@ -45,9 +45,9 @@ t_mem_buffer_response *recibir_buffer_response(int32_t fd_conexion)
 
    if (buffer_response->resultado == OPERATION_SUCCEED)
    {
-      buffer_response->tamanio_buffer = *(u_int32_t *)list_get(paquete, 2);
+      buffer_response->tamanio_buffer = *(u_int32_t *)list_get(paquete, 1);
       buffer_response->buffer = malloc(buffer_response->tamanio_buffer);
-      memcpy(buffer_response->buffer, list_get(paquete, 1), buffer_response->tamanio_buffer);
+      memcpy(buffer_response->buffer, list_get(paquete, 2), buffer_response->tamanio_buffer);
    }
    else
    {

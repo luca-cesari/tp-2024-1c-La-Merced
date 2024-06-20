@@ -35,5 +35,5 @@ u_int32_t string_full_length(char *string)
 
 u_int8_t string_is_equal(char *string1, char *string2)
 {
-   return strcmp(string1, string2) == 0 ? 1 : 0;
+   return strcmp(string1, string2) == 0;
 }

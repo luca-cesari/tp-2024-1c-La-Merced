@@ -27,10 +27,9 @@ int32_t recibir_valor()
    return recibir_senial(fd_memoria);
 }
 
-void *recibir_mem_buffer()
+t_mem_buffer_response *recibir_mem_buffer_response()
 {
-   t_mem_buffer_response *response = recibir_buffer_response(fd_memoria);
-   return response->buffer;
+   return recibir_buffer_response(fd_memoria);
 }
 
 void liberar_conexion_memoria()
