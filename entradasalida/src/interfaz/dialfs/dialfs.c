@@ -37,29 +37,28 @@ RETRASO_COMPACTACION
 */
 
 dialfs_config dialfs_cfg;
+t_dictionary *dicc_instrucciones;
 
 void inicializar_interfaz_dialfs()
 {
    dialfs_cfg = get_dialfs_config();
 
-   /*
-   El primero va a ser nuestro archivo de bloques (bloques.dat) el cual va a ser un archivo de tamaño definido mediante 2 parámetros del archivo de configuración: BLOCK_SIZE y BLOCK_COUNT, y el tamaño del archivo va a ser BLOCK_SIZE * BLOCK_COUNT. Este archivo no se debe sobreescibir, sino que tiene que quedar persistido.
-El segundo archivo va a ser un archivo que va a contener un bitmap (bitmap.dat) indicando que bloques se encuentran libres y que bloques se encuentran ocupados dentro de nuestro FS, cualquier implementación que no utilice un bitmap será considerada una implementación equivocada y por consiguiente no se aprobará esa entrega del TP. Tambien deberá quedar persistido y no sobreescribirse*/
+   inicializar_dicc_instrucciones(dicc_instrucciones);
    inicializar_archivo_bloques();
    inicializar_archivo_bitmap();
 }
 
-void inicializar_archivo_bloques()
+void inicializar_archivo_bloques() // tener en cuenta que si la carpeta no se encuentra creada tira excepcion
 {
-   char *path_bloques = string_from_format("%s/bloques.dat", dialfs_cfg.PATH_BASE_DIALFS);
+   char *path_bloques = string_from_format("%s/bloques.dat", dialfs_cfg.path_base_dialfs);
    FILE *bloques = fopen(path_bloques, "r");
    if (bloques == NULL)
    {
       bloques = fopen(path_bloques, "w");
-      char *bloque = string_repeat('\0', dialfs_cfg.BLOCK_SIZE);
-      for (int i = 0; i < dialfs_cfg.BLOCK_COUNT; i++)
+      char *bloque = string_repeat('\0', dialfs_cfg.block_size);
+      for (int i = 0; i < dialfs_cfg.block_count; i++)
       {
-         fwrite(bloque, sizeof(char), dialfs_cfg.BLOCK_SIZE, bloques);
+         fwrite(bloque, sizeof(char), dialfs_cfg.block_size, bloques);
       }
       fclose(bloques);
    }
@@ -72,13 +71,13 @@ void inicializar_archivo_bloques()
 
 void inicializar_archivo_bitmap()
 {
-   char *path_bitmap = string_from_format("%s/bitmap.dat", dialfs_cfg.PATH_BASE_DIALFS);
+   char *path_bitmap = string_from_format("%s/bitmap.dat", dialfs_cfg.path_base_dialfs);
    FILE *bitmap = fopen(path_bitmap, "r");
    if (bitmap == NULL)
    {
       bitmap = fopen(path_bitmap, "w");
-      char *bitmap_vacio = string_repeat('0', dialfs_cfg.BLOCK_COUNT);
-      fwrite(bitmap_vacio, sizeof(char), dialfs_cfg.BLOCK_COUNT, bitmap);
+      char *bitmap_vacio = string_repeat('0', dialfs_cfg.block_count);
+      fwrite(bitmap_vacio, sizeof(char), dialfs_cfg.block_count, bitmap);
       fclose(bitmap);
    }
    else
