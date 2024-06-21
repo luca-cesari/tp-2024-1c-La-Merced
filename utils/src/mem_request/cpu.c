@@ -14,6 +14,8 @@ static t_cpu_mem_req *crear_cpu_mem_request(cpu_req_operation operacion,
    t_cpu_mem_req *mem_request = malloc(sizeof(t_cpu_mem_req));
    mem_request->operacion = operacion;
    mem_request->pid = pid;
+   mem_request->direcciones_fisicas = NULL;
+   mem_request->buffer = NULL;
 
    switch (operacion)
    {

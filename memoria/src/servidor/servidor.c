@@ -110,7 +110,6 @@ void escuchar_cpu(int32_t fd_cpu)
             responder_lectura(buffer_response, mem_request->tamanio_buffer, fd_cpu);
             free(buffer_response);
             list_destroy_and_destroy_elements(direcciones_fisicas, &free);
-
             break;
 
         case ESCRIBIR:
@@ -119,18 +118,12 @@ void escuchar_cpu(int32_t fd_cpu)
             t_mem_response response = escribir_memoria_usuario(mem_request->pid, direcciones_fisicas, mem_request->buffer, mem_request->tamanio_buffer, fd_cpu);
             enviar_senial(response, fd_cpu);
             list_destroy_and_destroy_elements(direcciones_fisicas, &free);
-
             break;
 
         case RESIZE:
             printf("RESIZE \n");
             t_mem_response resultado = ajustar_memoria_para_proceso(mem_request->pid, mem_request->tamanio_nuevo);
             enviar_senial(resultado, fd_cpu);
-            break;
-
-        default:
-            printf("Error de instruccion \n");
-            // ...
             break;
         }
 

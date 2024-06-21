@@ -56,19 +56,13 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
 
-    u_int32_t frame;
-    u_int32_t limite_de_frame;
     u_int32_t tamanio_guardado = 0;
-    u_int32_t direccion_fisica_a_recorrer;
-    char *direccion_fisica_a_recorrer_str;
-    int i = 0;
 
-    while (tamanio_guardado < tamanio_buffer)
+    for (int i = 0; tamanio_guardado < tamanio_buffer; i++)
     {
-        direccion_fisica_a_recorrer_str = (char *)list_get(direcciones_fisicas, i); // Aca obtengo una direccion fisica que esta mal
-        direccion_fisica_a_recorrer = atoi(direccion_fisica_a_recorrer_str);
-        frame = get_numero_de_frame(direccion_fisica_a_recorrer);
-        limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+        u_int32_t direccion_fisica_a_recorrer = atoi((char *)list_get(direcciones_fisicas, i));
+        u_int32_t frame = get_numero_de_frame(direccion_fisica_a_recorrer);
+        u_int32_t limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
 
         while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_guardado < tamanio_buffer))
         {
@@ -80,13 +74,15 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
             buffer++;
             tamanio_guardado++;
         }
-        i++;
     }
 
     if (tamanio_guardado == tamanio_buffer)
+    {
         log_acceso_espacio_usuario(pid, "ESCRIBIR", atoi(list_get(direcciones_fisicas, 0)), tamanio_buffer);
+        return OPERATION_SUCCEED;
+    }
 
-    return tamanio_guardado == tamanio_buffer ? OPERATION_SUCCEED : OPERATION_FAILED;
+    return OPERATION_FAILED;
 }
 
 void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer, int32_t fd)
@@ -94,22 +90,17 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
 
-    u_int32_t frame;
-    u_int32_t limite_de_frame;
-    u_int32_t tamanio_leido = 0;
-    u_int32_t direccion_fisica_a_recorrer;
-    char *direccion_fisica_a_recorrer_str;
     void *buffer = malloc(tamanio_buffer);
-    // void *buffer_inicial = buffer;
-    int i = 0;
-    int32_t offset = 0;
+    u_int32_t tamanio_leido = 0;
+    u_int32_t offset = 0;
 
-    while (tamanio_leido < tamanio_buffer)
+    printf("Empty Buffer: %s\n", (char *)buffer);
+
+    for (int i = 0; tamanio_leido < tamanio_buffer; i++)
     {
-        direccion_fisica_a_recorrer_str = (char *)list_get(direcciones_fisicas, i);
-        direccion_fisica_a_recorrer = atoi(direccion_fisica_a_recorrer_str);
-        frame = get_numero_de_frame(direccion_fisica_a_recorrer);
-        limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
+        u_int32_t direccion_fisica_a_recorrer = atoi((char *)list_get(direcciones_fisicas, i));
+        u_int32_t frame = get_numero_de_frame(direccion_fisica_a_recorrer);
+        u_int32_t limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
 
         while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido < tamanio_buffer))
         {
@@ -120,14 +111,20 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
             direccion_fisica_a_recorrer++;
             offset++;
             tamanio_leido++;
+
+            printf("[+] Buffer: %s\n", (char *)buffer);
         }
-        i++;
     }
 
+    printf("Loaded Buffer: %s\n", (char *)buffer);
     if (tamanio_leido == tamanio_buffer)
+    {
         log_acceso_espacio_usuario(pid, "LEER", atoi(list_get(direcciones_fisicas, 0)), tamanio_buffer);
+        return buffer;
+    }
 
-    return tamanio_leido == tamanio_buffer ? buffer : NULL;
+    free(buffer);
+    return NULL;
 }
 
 void destruir_memoria_usuario()

@@ -32,6 +32,9 @@ t_packet *serializar_buffer_response(t_mem_buffer_response *buffer_response)
 void enviar_buffer_response(int32_t fd_conexion, t_mem_buffer_response *buffer_response)
 {
    t_packet *paquete = serializar_buffer_response(buffer_response);
+   printf("Buffer sent: %s\n", (char *)buffer_response->buffer);
+   printf("Buffer size: %d\n", buffer_response->tamanio_buffer);
+
    enviar_paquete(paquete, fd_conexion);
    eliminar_paquete(paquete);
 }
