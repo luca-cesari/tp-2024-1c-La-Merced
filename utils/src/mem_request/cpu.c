@@ -69,8 +69,8 @@ t_cpu_mem_req *crear_cpu_write_request(u_int32_t pid, char *direcciones_fisicas,
 void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request)
 {
    t_packet *paquete = crear_paquete();
-   crear_buffer(paquete);
-   agregar_a_paquete(paquete, &(mem_request->operacion), sizeof(t_cpu_mem_req));
+
+   agregar_a_paquete(paquete, &(mem_request->operacion), sizeof(cpu_req_operation));
    agregar_a_paquete(paquete, &(mem_request->pid), sizeof(u_int32_t));
 
    switch (mem_request->operacion)
@@ -82,11 +82,11 @@ void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request)
       agregar_a_paquete(paquete, &(mem_request->nro_pag), sizeof(u_int32_t));
       break;
    case LEER:
-      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_length(mem_request->direcciones_fisicas));
+      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, strlen(mem_request->direcciones_fisicas) + 1);
       agregar_a_paquete(paquete, &(mem_request->tamanio_buffer), sizeof(u_int32_t));
       break;
    case ESCRIBIR:
-      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, string_full_length(mem_request->direcciones_fisicas));
+      agregar_a_paquete(paquete, mem_request->direcciones_fisicas, strlen(mem_request->direcciones_fisicas) + 1);
       agregar_a_paquete(paquete, &(mem_request->tamanio_buffer), sizeof(u_int32_t));
       agregar_a_paquete(paquete, mem_request->buffer, mem_request->tamanio_buffer);
       break;
@@ -109,7 +109,7 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
    switch (mem_request->operacion)
    {
    case FETCH_INSTRUCCION:
-      mem_request->program_counter = *(int32_t *)list_get(paquete, 2);
+      mem_request->program_counter = *(u_int32_t *)list_get(paquete, 2);
       break;
    case OBTENER_MARCO:
       mem_request->nro_pag = *(u_int32_t *)list_get(paquete, 2);
@@ -126,8 +126,6 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
       break;
    case RESIZE:
       mem_request->tamanio_nuevo = *(u_int32_t *)list_get(paquete, 2);
-      break;
-   default:
       break;
    }
 

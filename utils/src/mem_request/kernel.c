@@ -13,7 +13,7 @@ t_kernel_mem_req *crear_kernel_mem_request(kernel_req_operation operacion, u_int
 void enviar_kernel_mem_request(int32_t fd_memoria, t_kernel_mem_req *mem_request)
 {
    t_packet *paquete = crear_paquete();
-   crear_buffer(paquete);
+
    agregar_a_paquete(paquete, &(mem_request->operacion), sizeof(t_kernel_mem_req));
    agregar_a_paquete(paquete, &(mem_request->pid), sizeof(u_int32_t));
    if (mem_request->path != NULL)
@@ -41,7 +41,6 @@ t_kernel_mem_req *recibir_kernel_mem_request(int32_t fd_kernel)
 
 void destruir_kernel_mem_request(t_kernel_mem_req *mem_request)
 {
-   if (mem_request->path != NULL)
-      free(mem_request->path);
+   free(mem_request->path);
    free(mem_request);
 }

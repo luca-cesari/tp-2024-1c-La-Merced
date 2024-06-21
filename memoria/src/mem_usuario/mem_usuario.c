@@ -65,7 +65,7 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
 
     while (tamanio_guardado < tamanio_buffer)
     {
-        direccion_fisica_a_recorrer_str = strdup(list_get(direcciones_fisicas, i)); // Aca obtengo una direccion fisica que esta mal
+        direccion_fisica_a_recorrer_str = (char *)list_get(direcciones_fisicas, i); // Aca obtengo una direccion fisica que esta mal
         direccion_fisica_a_recorrer = atoi(direccion_fisica_a_recorrer_str);
         frame = get_numero_de_frame(direccion_fisica_a_recorrer);
         limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
@@ -100,12 +100,13 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     u_int32_t direccion_fisica_a_recorrer;
     char *direccion_fisica_a_recorrer_str;
     void *buffer = malloc(tamanio_buffer);
-    void *buffer_inicial = buffer;
+    // void *buffer_inicial = buffer;
     int i = 0;
+    int32_t offset = 0;
 
     while (tamanio_leido < tamanio_buffer)
     {
-        direccion_fisica_a_recorrer_str = strdup(list_get(direcciones_fisicas, i));
+        direccion_fisica_a_recorrer_str = (char *)list_get(direcciones_fisicas, i);
         direccion_fisica_a_recorrer = atoi(direccion_fisica_a_recorrer_str);
         frame = get_numero_de_frame(direccion_fisica_a_recorrer);
         limite_de_frame = frame * get_tamanio_pagina() + get_tamanio_pagina();
@@ -113,11 +114,11 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
         while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido < tamanio_buffer))
         {
             pthread_mutex_lock(&memoria_usuario_mutex);
-            memcpy(buffer, memoria_usuario + direccion_fisica_a_recorrer, 1); // Va copiando byte por byte del buffer a la memoria
+            memcpy(buffer + offset, memoria_usuario + direccion_fisica_a_recorrer, 1); // Va copiando byte por byte del buffer a la memoria
             pthread_mutex_unlock(&memoria_usuario_mutex);
 
             direccion_fisica_a_recorrer++;
-            buffer++;
+            offset++;
             tamanio_leido++;
         }
         i++;
@@ -126,7 +127,7 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
     if (tamanio_leido == tamanio_buffer)
         log_acceso_espacio_usuario(pid, "LEER", atoi(list_get(direcciones_fisicas, 0)), tamanio_buffer);
 
-    return tamanio_leido == tamanio_buffer ? buffer_inicial : NULL;
+    return tamanio_leido == tamanio_buffer ? buffer : NULL;
 }
 
 void destruir_memoria_usuario()

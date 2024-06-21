@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <extended/string.h>
+#include <mem_request/entradasalida.h>
 
 #include "logger/logger.h"
 #include "conexion/kernel.h"
-#include "mem_request/entradasalida.h"
 #include "conexion/memoria.h"
 
 void inicializar_interfaz_stdout(void);

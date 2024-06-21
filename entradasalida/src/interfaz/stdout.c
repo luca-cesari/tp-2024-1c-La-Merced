@@ -33,18 +33,15 @@ int8_t io_stdout_write(char *argumentos, u_int32_t pid)
     u_int32_t tamanio_valor = atoi(string_array_pop(parametros));
     char *direcciones_fisicas = array_a_string(parametros);
 
-    parametros_io parametros_leer;
-    parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
-    parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
-
-    t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, parametros_leer);
+    t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, direcciones_fisicas, tamanio_valor, NULL);
     enviar_mem_request(mem_request);
     destruir_io_mem_request(mem_request);
 
-    char *respuesta = (char *)recibir_mem_buffer();
-    if (respuesta == NULL)
+    t_mem_buffer_response *respuesta = recibir_mem_buffer();
+    if (respuesta->resultado == OPERATION_FAILED)
         return -1;
 
-    printf("%s\n", respuesta);
+    printf("%s\n", (char *)respuesta->buffer);
+    destruir_buffer_response(respuesta);
     return 0;
 }
