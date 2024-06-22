@@ -40,4 +40,6 @@ void io_fs_create(char *argumentos, u_int32_t pid)
     fclose(archivo);
     free(path_archivo);
     // enviar_respuesta(pid, FILE_CREATED); VER PARA MANDAR AL KERNEL
+    modificar_bitmap(get_siguiente_bloque_libre(), OCUPADO);
+    // TODO: falta agregar al archivo de metadata el bloque inicial, y tamaño del archivo = 0
 }

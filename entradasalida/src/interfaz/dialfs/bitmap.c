@@ -42,7 +42,7 @@ void inicializar_archivo_bitmap()
     free(path_bitmap);
 }
 
-void modificar_bitmap(int bloque, estado estado_bloque)
+void modificar_bitmap(u_int32_t bloque, estado estado_bloque)
 {
     char *path_bitmap = string_from_format("%s/bitmap.dat", get_path_base_dialfs());
     int fd = open(path_bitmap, O_RDWR);
@@ -75,4 +75,42 @@ void modificar_bitmap(int bloque, estado estado_bloque)
     munmap(map, get_block_count() / 8);
     close(fd);
     free(path_bitmap);
+}
+
+u_int32_t get_siguiente_bloque_libre()
+{
+    char *path_bitmap = string_from_format("%s/bitmap.dat", get_path_base_dialfs());
+    int fd = open(path_bitmap, O_RDWR);
+    if (fd == -1)
+    {
+        // Handle error
+        perror("Error al abrir el archivo bitmap.dat");
+        return -1;
+    }
+
+    char *map = mmap(0, get_block_count() / 8, PROT_WRITE, MAP_SHARED, fd, 0);
+    if (map == MAP_FAILED)
+    {
+        close(fd);
+        // Handle error
+        perror("Error al mapear el archivo bitmap.dat");
+        return -1;
+    }
+
+    t_bitarray *bitmap = bitarray_create_with_mode(map, get_block_count(), MSB_FIRST);
+    for (int i = 0; i < get_block_count(); i++)
+    {
+        if (!bitarray_test_bit(bitmap, i))
+        {
+            munmap(map, get_block_count() / 8);
+            close(fd);
+            free(path_bitmap);
+            return i;
+        }
+    }
+
+    munmap(map, get_block_count() / 8);
+    close(fd);
+    free(path_bitmap);
+    return -1;
 }

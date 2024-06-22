@@ -20,6 +20,7 @@ typedef enum
 } estado;
 
 void inicializar_archivo_bitmap(void);
-void modificar_bitmap(int nro_bloque, estado estado);
+void modificar_bitmap(u_int32_t nro_bloque, estado estado);
+u_int32_t get_siguiente_bloque_libre();
 
 #endif
