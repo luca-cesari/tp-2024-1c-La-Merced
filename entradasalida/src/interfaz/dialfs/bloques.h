@@ -1,5 +1,5 @@
-#ifndef DIALFS_H
-#define DIALFS_H
+#ifndef BLOQUES_H
+#define BLQOUES_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,9 +13,6 @@
 #include <errno.h>
 #include <conexion/kernel.h>
 
-#include "instrucciones.h"
-#include "bloques.h"
+void inicializar_archivo_bloques(void);
 
-void inicializar_interfaz_dialfs(void);
-
-#endif // DIALFS_H
+#endif
