@@ -20,3 +20,19 @@ void crear_archivo_metadata(char *path_archivo, u_int32_t bloque_inicial, u_int3
     config_save(archivo_metadata);
     config_destroy(archivo_metadata);
 }
+
+u_int32_t get_bloque_inicial(char *path_archivo)
+{
+    t_config *archivo_metadata = config_create(path_archivo);
+    u_int32_t bloque_inicial = config_get_int_value(archivo_metadata, "BLOQUE_INICIAL");
+    config_destroy(archivo_metadata);
+    return bloque_inicial;
+}
+
+u_int32_t get_cantidad_bloques_ocupados(char *path_archivo)
+{
+    t_config *archivo_metadata = config_create(path_archivo);
+    u_int32_t tamanio_archivo = config_get_int_value(archivo_metadata, "TAMANIO_ARCHIVO");
+    config_destroy(archivo_metadata);
+    return tamanio_archivo / get_block_size() + (tamanio_archivo % get_block_size() != 0);
+}
