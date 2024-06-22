@@ -9,8 +9,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
       "args": [
-        "SLP1",
-        "SLP1.config"
+        "DIALFS",
+        "DIALFS.config"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
