@@ -47,8 +47,8 @@ void inicializar_interfaz_dialfs()
    inicializar_archivo_bloques();
    inicializar_archivo_bitmap();
 
-   modificar_bitmap(1, OCUPADO);
-   modificar_bitmap(5, OCUPADO);
+   // modificar_bitmap(1, OCUPADO);
+   // modificar_bitmap(5, OCUPADO);
 }
 
 void inicializar_archivo_bloques() // tener en cuenta que si la carpeta no se encuentra creada tira excepcion, esta bien igual
