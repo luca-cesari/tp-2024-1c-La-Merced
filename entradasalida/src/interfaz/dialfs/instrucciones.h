@@ -8,6 +8,8 @@
 #include <sockets/sockets.h>
 #include <config/config.h>
 
+#include "bitmap.h"
+
 void inicializar_dicc_instrucciones(t_dictionary *dicc_instrucciones);
 void io_fs_create(char *argumentos, u_int32_t pid);
 // void io_fs_delete(char *argumentos, u_int32_t pid);

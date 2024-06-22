@@ -1,5 +1,5 @@
-#ifndef DIALFS_H
-#define DIALFS_H
+#ifndef BITMAP_H
+#define BITMAP_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,9 +13,13 @@
 #include <errno.h>
 #include <conexion/kernel.h>
 
-#include "instrucciones.h"
+typedef enum
+{
+    LIBRE,
+    OCUPADO
+} estado;
 
-void inicializar_interfaz_dialfs(void);
-void inicializar_archivo_bloques(void);
+void inicializar_archivo_bitmap(void);
+void modificar_bitmap(int nro_bloque, estado estado);
 
-#endif // DIALFS_H
+#endif

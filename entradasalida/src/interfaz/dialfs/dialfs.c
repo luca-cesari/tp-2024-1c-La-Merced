@@ -35,31 +35,38 @@ BLOCK_COUNT
 RETRASO_COMPACTACION
 
 */
-
-dialfs_config dialfs_cfg;
 t_dictionary *dicc_instrucciones;
 
 void inicializar_interfaz_dialfs()
 {
-   dialfs_cfg = get_dialfs_config();
-
    inicializar_dicc_instrucciones(dicc_instrucciones);
    inicializar_archivo_bloques();
    inicializar_archivo_bitmap();
 
-   // modificar_bitmap(1, OCUPADO);
-   // modificar_bitmap(5, OCUPADO);
+   while (1)
+   {
+      t_io_request *peticion_io = esperar_instruccion();
+
+      void (*funcion)(char *, u_int32_t) = dictionary_get(dicc_instrucciones, peticion_io->instruction);
+      if (funcion == NULL)
+      {
+         enviar_respuesta(INVALID_INSTRUCTION);
+         continue;
+      }
+
+      funcion(peticion_io->arguments, peticion_io->pid);
+   }
 }
 
 void inicializar_archivo_bloques() // tener en cuenta que si la carpeta no se encuentra creada tira excepcion, esta bien igual
 {
 
-   char *path_bloques = string_from_format("%s/bloques.dat", dialfs_cfg.path_base_dialfs);
+   char *path_bloques = string_from_format("%s/bloques.dat", get_path_base_dialfs());
    FILE *bloques = fopen(path_bloques, "r");
    if (bloques == NULL)
    {
       bloques = fopen(path_bloques, "w");
-      ftruncate(fileno(bloques), dialfs_cfg.block_size * dialfs_cfg.block_count);
+      ftruncate(fileno(bloques), get_block_size() * get_block_count());
       fclose(bloques);
    }
    else
@@ -67,80 +74,4 @@ void inicializar_archivo_bloques() // tener en cuenta que si la carpeta no se en
       fclose(bloques);
    }
    free(path_bloques);
-}
-
-void inicializar_archivo_bitmap()
-{
-   char *path_bitmap = string_from_format("%s/bitmap.dat", dialfs_cfg.path_base_dialfs);
-   int fd = open(path_bitmap, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-   if (fd == -1)
-   {
-      if (errno == EEXIST)
-      {
-         // El archivo ya existe, no hacer nada
-         free(path_bitmap);
-         return;
-      }
-      else
-      {
-         // Otro error ocurrió
-         perror("Error al abrir el archivo bitmap.dat");
-         free(path_bitmap);
-         return;
-      }
-   }
-
-   ftruncate(fd, dialfs_cfg.block_count / 8); // Ajustar el tamaño del archivo
-
-   char *map = mmap(0, dialfs_cfg.block_count / 8, PROT_WRITE, MAP_SHARED, fd, 0);
-   if (map == MAP_FAILED)
-   {
-      close(fd);
-      // Handle error
-   }
-
-   t_bitarray *bitmap = bitarray_create_with_mode(map, dialfs_cfg.block_count, MSB_FIRST);
-   for (int i = 0; i < dialfs_cfg.block_count; i++)
-   {
-      bitarray_clean_bit(bitmap, i);
-   }
-
-   munmap(map, dialfs_cfg.block_count / 8);
-   close(fd);
-   free(path_bitmap);
-}
-
-void modificar_bitmap(int bloque, estado estado_bloque)
-{
-   char *path_bitmap = string_from_format("%s/bitmap.dat", dialfs_cfg.path_base_dialfs);
-   int fd = open(path_bitmap, O_RDWR);
-   if (fd == -1)
-   {
-      // Handle error
-      perror("Error al abrir el archivo bitmap.dat");
-      return;
-   }
-
-   char *map = mmap(0, dialfs_cfg.block_count / 8, PROT_WRITE, MAP_SHARED, fd, 0);
-   if (map == MAP_FAILED)
-   {
-      close(fd);
-      // Handle error
-      perror("Error al mapear el archivo bitmap.dat");
-      return;
-   }
-
-   t_bitarray *bitmap = bitarray_create_with_mode(map, dialfs_cfg.block_count, MSB_FIRST);
-   if (estado_bloque == OCUPADO)
-   {
-      bitarray_set_bit(bitmap, bloque);
-   }
-   else
-   {
-      bitarray_clean_bit(bitmap, bloque);
-   }
-
-   munmap(map, dialfs_cfg.block_count / 8);
-   close(fd);
-   free(path_bitmap);
 }

@@ -51,17 +51,24 @@ u_int32_t get_tiempo_unidad_trabajo(void)
    return config_get_int_value(entradasalida_config, "TIEMPO_UNIDAD_TRABAJO");
 }
 
-dialfs_config get_dialfs_config()
+u_int32_t get_retraso_compactacion(void)
 {
-   dialfs_config dialfs_cfg;
+   return config_get_int_value(entradasalida_config, "RETRASO_COMPACTACION");
+}
 
-   dialfs_cfg.tiempo_unidad_trabajo = get_tiempo_unidad_trabajo();
-   dialfs_cfg.path_base_dialfs = config_get_string_value(entradasalida_config, "PATH_BASE_DIALFS");
-   dialfs_cfg.block_size = config_get_int_value(entradasalida_config, "BLOCK_SIZE");
-   dialfs_cfg.block_count = config_get_int_value(entradasalida_config, "BLOCK_COUNT");
-   dialfs_cfg.retraso_compactacion = config_get_int_value(entradasalida_config, "RETRASO_COMPACTACION");
+u_int32_t get_block_size(void)
+{
+   return config_get_int_value(entradasalida_config, "BLOCK_SIZE");
+}
 
-   return dialfs_cfg;
+u_int32_t get_block_count(void)
+{
+   return config_get_int_value(entradasalida_config, "BLOCK_COUNT");
+}
+
+char *get_path_base_dialfs(void)
+{
+   return config_get_string_value(entradasalida_config, "PATH_BASE_DIALFS");
 }
 
 void destruir_config(void)
