@@ -8,6 +8,7 @@
 #include <sockets/sockets.h>
 #include <config/config.h>
 
+#include "metadata.h"
 #include "bitmap.h"
 
 void inicializar_dicc_instrucciones(t_dictionary *dicc_instrucciones);
