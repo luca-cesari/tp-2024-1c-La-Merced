@@ -49,9 +49,11 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     //  enviar_respuesta(pid, FILE_DELETED); VER PARA MANDAR AL KERNEL
 }
 
-void io_fs_truncate(char **argumentos, u_int32_t pid)
+void io_fs_truncate(char *argumentos, u_int32_t pid)
 {
-    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos[0]); // Pensando que es el único argumento que viene
+    char **parametros = string_split(argumentos, " ");
+    u_int32_t tamanio = atoi(parametros[1]);
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
     t_config *archivo_metadata = config_create(path_archivo);
     if (archivo_metadata == NULL)
     {
@@ -60,7 +62,7 @@ void io_fs_truncate(char **argumentos, u_int32_t pid)
         return;
     }
     u_int32_t tamanio_archivo = config_get_int_value(archivo_metadata, "TAMANIO_ARCHIVO");
-    u_int32_t cantidad_bloques_necesarios = tamanio_archivo / get_block_size() + (tamanio_archivo % get_block_size() != 0);
+    u_int32_t cantidad_bloques_necesarios = tamanio / get_block_size() + (tamanio_archivo % get_block_size() != 0);
     u_int32_t bloques_ocupados = get_cantidad_bloques_ocupados(path_archivo);
     u_int32_t bloques_faltantes = cantidad_bloques_necesarios - bloques_ocupados;
 
@@ -72,14 +74,39 @@ void io_fs_truncate(char **argumentos, u_int32_t pid)
         }
     }
 
-    config_set_value(archivo_metadata, "TAMANIO_ARCHIVO", argumentos[1]);
+    config_set_value(archivo_metadata, "TAMANIO_ARCHIVO", parametros[1]);
     config_save(archivo_metadata);
     config_destroy(archivo_metadata);
 }
-
+/*
 void io_fs_write(char *argumentos, u_int32_t pid)
 {
+    char **parametros = string_split(argumentos, " ");
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
+    FILE *archivo = fopen(path_archivo, "w");
+    if (archivo == NULL)
+    {
+        free(path_archivo);
+        // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
+        return;
+    }
+    u_int32_t tamanio_valor = atoi(parametros[2]);
+    char *direcciones_fisicas = array_a_string(parametros[1]);
+
+    parametros_io parametros_escribir;
+    parametros_escribir.param_escribir.direcciones_fisicas = direcciones_fisicas;
+    parametros_escribir.param_escribir.buffer = *parametros[3];
+    parametros_escribir.param_escribir.tamanio_buffer = tamanio_valor;
+
+    t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, parametros_escribir);
+
+    enviar_mem_request(mem_request);
+
+    t_mem_response response = recibir_valor();
+    fclose(archivo);
+    return response == OPERATION_SUCCEED ? 0 : -1;
 }
 void io_fs_read(char *argumentos, u_int32_t pid)
 {
 }
+*/

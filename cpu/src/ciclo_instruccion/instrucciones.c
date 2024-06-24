@@ -176,7 +176,6 @@ void io_fs_create(char **parametros) // clean
 }
 void io_fs_delete(char **parametros) // clean
 {
-   char *direcciones_tamanio = get_direccion_tamanio(eliminar_primer_elemento(parametros));
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_DELETE", parametros[1]);
    set_io_request(pcb, io_request);
@@ -187,7 +186,7 @@ void io_fs_delete(char **parametros) // clean
 
 void io_fs_truncate(char **parametros) // clean
 {
-   char **parametros_nuevos = eliminar_primer_elemento(parametros);
+   char *parametros_nuevos = array_a_string(eliminar_primer_elemento(parametros));
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_TRUNCATE", parametros_nuevos);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
@@ -216,11 +215,10 @@ void inicializar_instrucciones(void)
    dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
    dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
    dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
-   /*
    dictionary_put(instrucciones, "IO_FS_CREATE", &io_fs_create);
    dictionary_put(instrucciones, "IO_FS_DELETE", &io_fs_delete);
    dictionary_put(instrucciones, "IO_FS_TRUNCATE", &io_fs_truncate);
-   */
+
    dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
 
