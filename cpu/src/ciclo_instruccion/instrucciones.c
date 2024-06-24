@@ -194,6 +194,25 @@ void io_fs_truncate(char **parametros) // clean
    // destruir_io_request(io_request);
 }
 
+/*
+void io_fs_write(char **parametros) // clean
+{
+   char **acomodar_parametros = (char **)malloc(4 * sizeof(char *));
+   acomodar_parametros[3] = string_array_pop(parametros);
+   char *direccion_tamanio = get_direccion_tamanio((eliminar_primer_elemento(eliminar_primer_elemento(parametros)))); // se podria mejorar
+   char **fisica_tamanio = string_split(direccion_tamanio, " ");
+   acomodar_parametros[0] = parametros[1];
+   acomodar_parametros[1] = fisica_tamanio[0]; //direccion_fisica
+   acomodar_parametros[2] = fisica_tamanio[1]; //tamanio_valor
+
+   char *parametros_nuevos = array_a_string(acomodar_parametros);
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_WRITE", parametros_nuevos);
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
+}
+*/
 void exit_instruction(char **parametros)
 {
    set_motivo_desalojo(pcb, TERMINATED);
