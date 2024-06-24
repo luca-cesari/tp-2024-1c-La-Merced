@@ -92,7 +92,6 @@ void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
    void *buffer;
 
    recv(fd_conexion, tamanio, sizeof(int32_t), MSG_WAITALL);
-   printf("tamanio leido %d\n", *tamanio);
    buffer = malloc(*tamanio);
    recv(fd_conexion, buffer, *tamanio, MSG_WAITALL);
 
