@@ -1,6 +1,8 @@
 #include "instrucciones.h"
 
-void inicializar_dicc_instrucciones(t_dictionary *dicc_instrucciones)
+t_dictionary *dicc_instrucciones;
+
+void inicializar_dicc_instrucciones()
 {
     dicc_instrucciones = dictionary_create();
     dictionary_put(dicc_instrucciones, "IO_FS_CREATE", &io_fs_create);
@@ -8,6 +10,14 @@ void inicializar_dicc_instrucciones(t_dictionary *dicc_instrucciones)
     dictionary_put(dicc_instrucciones, "IO_FS_TRUNCATE", &io_fs_truncate);
     // dictionary_put(dicc_instrucciones, "IO_FS_WRITE", &io_fs_write);
     // dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
+}
+
+void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
+{
+    if (!dictionary_has_key(dicc_instrucciones, instruccion))
+        return NULL;
+
+    return dictionary_get(dicc_instrucciones, instruccion);
 }
 
 void io_fs_create(char *argumentos, u_int32_t pid)
@@ -39,12 +49,13 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
         return;
     }
 
-    free(path_archivo);
     get_cantidad_bloques_ocupados(path_archivo);
     for (int i = 0; i < get_cantidad_bloques_ocupados(path_archivo); i++) // Va recorriendo los bloques ocupados y los va liberando ya que son contiguos
     {
         modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE);
     }
+    // free(path_archivo);
+
     // Supongo que el archivo de bloques no hay que liberarlo sino que simplemente se pierde la referencia
     //  enviar_respuesta(pid, FILE_DELETED); VER PARA MANDAR AL KERNEL
 }
@@ -91,6 +102,7 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
     config_save(archivo_metadata);
     config_destroy(archivo_metadata);
 }
+
 /*
 void io_fs_write(char *argumentos, u_int32_t pid)
 {

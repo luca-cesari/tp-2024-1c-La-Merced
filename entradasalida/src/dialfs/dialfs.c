@@ -1,10 +1,8 @@
 #include "dialfs.h"
 
-t_dictionary *dicc_instrucciones;
-
 void inicializar_interfaz_dialfs()
 {
-   inicializar_dicc_instrucciones(dicc_instrucciones);
+   inicializar_dicc_instrucciones();
    inicializar_archivo_bloques();
    inicializar_archivo_bitmap();
 
@@ -12,15 +10,19 @@ void inicializar_interfaz_dialfs()
    {
       t_io_request *peticion_io = esperar_instruccion();
 
-      sleep(get_tiempo_unidad_trabajo() / 1000);
+      usleep(get_tiempo_unidad_trabajo() * 1000);
 
-      void (*funcion)(char *, u_int32_t) = dictionary_get(dicc_instrucciones, peticion_io->instruction);
+      void (*funcion)(char *, u_int32_t) = get_funcion_instruccion(peticion_io->instruction);
       if (funcion == NULL)
       {
          enviar_respuesta(INVALID_INSTRUCTION);
+         destruir_io_request(peticion_io);
          continue;
       }
 
       funcion(peticion_io->arguments, peticion_io->pid);
+      // log_operacion(peticion_io->pid, peticion_io->instruction);
+      // enviar_respuesta(EXECUTED);
+      destruir_io_request(peticion_io);
    }
 }

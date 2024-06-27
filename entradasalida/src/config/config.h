@@ -26,29 +26,6 @@ typedef struct
    char *puerto;
 } mem_config;
 
-// typedef struct
-// {
-//    u_int32_t tiempo_unidad_trabajo;
-// } generica_config;
-
-// typedef struct
-// {
-// } stdin_config;
-
-// typedef struct
-// {
-//    u_int32_t tiempo_unidad_trabajo;
-// } stdout_config;
-
-typedef struct
-{
-   u_int32_t tiempo_unidad_trabajo;
-   char *path_base_dialfs;
-   u_int32_t block_size;
-   u_int32_t block_count;
-   u_int32_t retraso_compactacion;
-} dialfs_config;
-
 void iniciar_config(char *);
 tipo_interfaz get_tipo_interfaz(void);
 kernel_config get_kernel_config(void);

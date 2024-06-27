@@ -4,10 +4,10 @@
 #include "conexion/kernel.h"
 #include "conexion/memoria.h"
 
-#include "interfaz/generica.h"
-#include "interfaz/stdin.h"
-#include "interfaz/stdout.h"
-#include "interfaz/dialfs/dialfs.h"
+#include "generica/generica.h"
+#include "stdin/stdin.h"
+#include "stdout/stdout.h"
+#include "dialfs/dialfs.h"
 
 int main(int argc, char **argv)
 {
