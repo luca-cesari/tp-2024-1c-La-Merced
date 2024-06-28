@@ -158,7 +158,53 @@ void io_stdout_write(char **parametros) // clean
 
    destruir_io_request(io_request);
 }
+void io_fs_create(char **parametros) // clean
+{
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_CREATE", parametros[1]);
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
 
+   // destruir_io_request(io_request);
+}
+void io_fs_delete(char **parametros) // clean
+{
+
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_DELETE", parametros[1]);
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
+}
+
+void io_fs_truncate(char **parametros) // clean
+{
+   char *parametros_nuevos = array_a_string(eliminar_primer_elemento(parametros));
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_TRUNCATE", parametros_nuevos);
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
+}
+
+/*
+void io_fs_write(char **parametros) // clean
+{
+   char **acomodar_parametros = (char **)malloc(4 * sizeof(char *));
+   acomodar_parametros[3] = string_array_pop(parametros);
+   char *direccion_tamanio = get_direccion_tamanio((eliminar_primer_elemento(eliminar_primer_elemento(parametros)))); // se podria mejorar
+   char **fisica_tamanio = string_split(direccion_tamanio, " ");
+   acomodar_parametros[0] = parametros[1];
+   acomodar_parametros[1] = fisica_tamanio[0]; //direccion_fisica
+   acomodar_parametros[2] = fisica_tamanio[1]; //tamanio_valor
+
+   char *parametros_nuevos = array_a_string(acomodar_parametros);
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_WRITE", parametros_nuevos);
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
+
+   // destruir_io_request(io_request);
+}
+*/
 void exit_instruction(char **parametros)
 {
    set_motivo_desalojo(pcb, TERMINATED);
@@ -180,6 +226,10 @@ void inicializar_instrucciones(void)
    dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
    dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
    dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
+   dictionary_put(instrucciones, "IO_FS_CREATE", &io_fs_create);
+   dictionary_put(instrucciones, "IO_FS_DELETE", &io_fs_delete);
+   dictionary_put(instrucciones, "IO_FS_TRUNCATE", &io_fs_truncate);
+
    dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
 

@@ -54,10 +54,10 @@ tipo_interfaz get_tipo_interfaz(void);
 kernel_config get_kernel_config(void);
 mem_config get_memoria_config(void);
 u_int32_t get_tiempo_unidad_trabajo(void);
-// generica_config get_generica_config();
-// stdin_config get_stdin_config();
-// stdout_config get_stdout_config();
-dialfs_config get_dialfs_config();
+char *get_path_base_dialfs(void);
+u_int32_t get_block_size(void);
+u_int32_t get_block_count(void);
+u_int32_t get_retraso_compactacion(void);
 void destruir_config(void);
 
 #endif // IO_CONFIG_H
