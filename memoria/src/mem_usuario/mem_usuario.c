@@ -51,7 +51,7 @@ t_mem_response reducir_memoria_para_proceso(t_proceso_tabla *tabla_paginas, u_in
     return OPERATION_SUCCEED;
 }
 
-t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer, int32_t fd)
+t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer)
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
@@ -85,12 +85,12 @@ t_mem_response escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisic
     return OPERATION_FAILED;
 }
 
-void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer, int32_t fd)
+void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer)
 {
     /*Se tiene en cuenta que se puede pedir escribir más de una página, por lo que esta función recibe más de una dirección fisica
     ya que antes se obtuvieron los marcos correspondientes*/
 
-    void *buffer = malloc(tamanio_buffer);
+    void *buffer = calloc(tamanio_buffer, sizeof(char));
     u_int32_t tamanio_leido = 0;
     u_int32_t offset = 0;
 
@@ -105,7 +105,7 @@ void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t
         while ((direccion_fisica_a_recorrer < limite_de_frame) && (tamanio_leido < tamanio_buffer))
         {
             pthread_mutex_lock(&memoria_usuario_mutex);
-            memcpy(buffer + offset, memoria_usuario + direccion_fisica_a_recorrer, 1); // Va copiando byte por byte del buffer a la memoria
+            memcpy(buffer + offset, memoria_usuario + direccion_fisica_a_recorrer, sizeof(char)); // Va copiando byte por byte del buffer a la memoria
             pthread_mutex_unlock(&memoria_usuario_mutex);
 
             direccion_fisica_a_recorrer++;
