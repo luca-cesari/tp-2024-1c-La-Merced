@@ -12,6 +12,11 @@ void destruir_logger(void)
     log_destroy(memoria_logger);
 }
 
+void log_evento(char *evento)
+{
+    log_info(memoria_logger, "%s", evento);
+}
+
 void log_creacion_tabla_paginas(u_int32_t pid, u_int32_t cantidad_paginas)
 {
     log_info(memoria_logger, "PID: %d - Tamaño: %d", pid, cantidad_paginas);

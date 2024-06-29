@@ -12,9 +12,7 @@ void aumentar_program_counter();
 
 static char *fetch()
 {
-   parametros parametro;
-   parametro.program_counter = pcb->program_counter;
-   t_cpu_mem_req *mem_request = crear_cpu_mem_request(FETCH_INSTRUCCION, pcb->pid, parametro);
+   t_cpu_mem_req *mem_request = crear_instruccion_request(pcb->pid, pcb->program_counter);
    enviar_mem_request(mem_request);
 
    char *instruccion = recibir_instruccion();

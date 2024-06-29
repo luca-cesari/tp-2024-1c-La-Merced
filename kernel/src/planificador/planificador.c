@@ -194,8 +194,8 @@ static void *consumir_io(void *cola_io)
       // principalmente para EXECUTED,
       // así no afectaría cuando vuelva a la CPU.
       // en otros casos no debería ser relevante
-      t_io_request *empty_io_req = crear_io_request(pcb->pid, "", "", "");
-      set_io_request(pcb, empty_io_req);
+      // t_io_request *empty_io_req = crear_io_request(pcb->pid, "", "", "");
+      // set_io_request(pcb, empty_io_req);
 
       pcb = remove_proceso(interfaz->cola_procesos, pcb->pid);
       if (pcb->motivo_finalizacion == INTERRUPTED_BY_USER)

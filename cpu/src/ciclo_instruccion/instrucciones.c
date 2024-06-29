@@ -9,15 +9,13 @@ void set(char **parametros) // clean
    set_valor_registro(parametros[0], valor);
 }
 
-void mov_in(char **parametros_recibidos) // clean
+void mov_in(char **parametros) // clean
 {
-   u_int32_t direccion_logica = get_valor_registro(parametros_recibidos[1]);
-   u_int32_t tamanio_registro_dato = get_tamanio_registro(parametros_recibidos[0]);
+   u_int32_t direccion_logica = get_valor_registro(parametros[1]);
+   u_int32_t tamanio_registro_dato = get_tamanio_registro(parametros[0]);
    char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_registro_dato);
 
-   parametros parametros_leer = crear_parametros_leer(direcciones_fisicas, tamanio_registro_dato);
-
-   t_cpu_mem_req *mem_request = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
+   t_cpu_mem_req *mem_request = crear_cpu_read_request(pcb->pid, direcciones_fisicas, tamanio_registro_dato);
    enviar_mem_request(mem_request);
 
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
@@ -30,37 +28,36 @@ void mov_in(char **parametros_recibidos) // clean
       else
          valor_a_guardar = *(u_int32_t *)(response->buffer);
 
-      set_valor_registro(parametros_recibidos[0], valor_a_guardar);
+      set_valor_registro(parametros[0], valor_a_guardar);
       log_escritura_lectura_memoria(pcb->pid, READ, atoi(direccion_fisica), string_itoa(valor_a_guardar));
    }
    else
       perror("Error al leer en memoria\n");
 
    destruir_buffer_response(response);
-   // destruir_cpu_mem_request(mem_request);
+   destruir_cpu_mem_request(mem_request);
 }
 
-void mov_out(char **parametros_recibidos) // clean
+void mov_out(char **parametros) // clean
 {
-   u_int32_t direccion_logica = get_valor_registro(parametros_recibidos[0]);
-   void *dato = get_puntero_registro(parametros_recibidos[1]);
-   u_int32_t tamanio_registro_dato = get_tamanio_registro(parametros_recibidos[1]);
+   u_int32_t direccion_logica = get_valor_registro(parametros[0]);
+   void *dato = get_puntero_registro(parametros[1]);
+   u_int32_t tamanio_registro_dato = get_tamanio_registro(parametros[1]);
    char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_registro_dato);
 
-   parametros parametros_escribir = crear_parametros_escribir(direcciones_fisicas, dato, tamanio_registro_dato);
-   t_cpu_mem_req *mem_request = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
-
+   t_cpu_mem_req *mem_request = crear_cpu_write_request(pcb->pid, direcciones_fisicas, tamanio_registro_dato, dato);
    enviar_mem_request(mem_request);
+
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
    {
       char *direccion_fisica = (string_split(direcciones_fisicas, " "))[0];
-      int32_t valor_escrito = get_valor_registro(parametros_recibidos[1]);
+      int32_t valor_escrito = get_valor_registro(parametros[1]);
       log_escritura_lectura_memoria(pcb->pid, WRITE, atoi(direccion_fisica), string_itoa(valor_escrito));
    }
    else
       perror("Error al escribir en memoria\n");
 
-   // destruir_cpu_mem_request(mem_request);
+   destruir_cpu_mem_request(mem_request);
 }
 
 void sum(char **parametros) // clean
@@ -81,11 +78,9 @@ void jnz(char **parametros) // clean
       pcb->program_counter = atoi(parametros[1]);
 }
 
-void resize(char **parametros_char) // clean
+void resize(char **parametros) // clean
 {
-   parametros parametro;
-   parametro.tamanio_nuevo = atoi(parametros_char[0]);
-   t_cpu_mem_req *mem_request = crear_cpu_mem_request(RESIZE, pcb->pid, parametro);
+   t_cpu_mem_req *mem_request = crear_resize_request(pcb->pid, atoi(parametros[0]));
    enviar_mem_request(mem_request);
 
    if (recibir_response_de_memoria() == OPERATION_FAILED)
@@ -94,26 +89,24 @@ void resize(char **parametros_char) // clean
       set_motivo_finalizacion(pcb, OUT_OF_MEMORY);
    }
 
-   // destruir_cpu_mem_request(mem_request);
+   destruir_cpu_mem_request(mem_request);
 }
 
-void copy_string(char **param)
+void copy_string(char **parametros) // clean
 {
-   int tamanio_valor = atoi(param[0]);
+   int tamanio_valor = atoi(parametros[0]);
 
    char *direcciones_fisicas_SI = obtener_direcciones_fisicas(pcb->cpu_registers.SI, tamanio_valor);
    char *direccion_fisica_SI_inicial = string_split(direcciones_fisicas_SI, " ")[0];
 
-   parametros parametros_leer = crear_parametros_leer(direcciones_fisicas_SI, tamanio_valor);
-   t_cpu_mem_req *mem_request_leer = crear_cpu_mem_request(LEER, pcb->pid, parametros_leer);
-
+   t_cpu_mem_req *mem_request_leer = crear_cpu_read_request(pcb->pid, direcciones_fisicas_SI, tamanio_valor);
    enviar_mem_request(mem_request_leer);
 
    char *string_escribir;
    t_mem_buffer_response *response = recibir_buffer_response_de_memoria();
 
-   if (response->tamanio_buffer == tamanio_valor)
-      string_escribir = response->buffer;
+   if (response->resultado == OPERATION_SUCCEED)
+      string_escribir = (char *)response->buffer;
    else
       perror("Error al leer en memoria\n");
 
@@ -122,10 +115,7 @@ void copy_string(char **param)
    char *direcciones_fisicas_DI = obtener_direcciones_fisicas(pcb->cpu_registers.DI, tamanio_valor);
    char *direccion_fisica_DI_inicial = string_split(direcciones_fisicas_DI, " ")[0];
 
-   parametros parametros_escribir = crear_parametros_escribir(direcciones_fisicas_DI, string_escribir, tamanio_valor);
-
-   t_cpu_mem_req *mem_request_escribir = crear_cpu_mem_request(ESCRIBIR, pcb->pid, parametros_escribir);
-
+   t_cpu_mem_req *mem_request_escribir = crear_cpu_write_request(pcb->pid, direcciones_fisicas_DI, tamanio_valor, string_escribir);
    enviar_mem_request(mem_request_escribir);
 
    if (recibir_response_de_memoria() == OPERATION_SUCCEED)
@@ -134,6 +124,8 @@ void copy_string(char **param)
       perror("Error al escribir en memoria\n");
 
    destruir_buffer_response(response);
+   destruir_cpu_mem_request(mem_request_leer);
+   destruir_cpu_mem_request(mem_request_escribir);
 }
 
 void io_gen_sleep(char **parametros) // clean
@@ -142,7 +134,7 @@ void io_gen_sleep(char **parametros) // clean
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
 
 void io_stdin_read(char **parametros) // clean
@@ -153,7 +145,7 @@ void io_stdin_read(char **parametros) // clean
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
 
 void io_stdout_write(char **parametros) // clean
@@ -164,7 +156,7 @@ void io_stdout_write(char **parametros) // clean
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
 void io_fs_create(char **parametros) // clean
 {
@@ -286,21 +278,4 @@ char *get_direccion_tamanio(char **parametros)
    printf("DIRECCIONES Y TAMANIO: %s\n", direcciones_tamanio);
 
    return direcciones_tamanio;
-}
-
-parametros crear_parametros_leer(char *direccion_fisica, u_int32_t tamanio_valor)
-{
-   parametros parametros_leer;
-   parametros_leer.param_leer.direcciones_fisicas = direccion_fisica;
-   parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
-   return parametros_leer;
-}
-
-parametros crear_parametros_escribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor)
-{
-   parametros parametros_escribir;
-   parametros_escribir.param_escribir.direcciones_fisicas = direccion_fisica;
-   parametros_escribir.param_escribir.tamanio_buffer = tamanio_valor;
-   parametros_escribir.param_escribir.buffer = buffer;
-   return parametros_escribir;
 }

@@ -4,13 +4,13 @@ t_mem_buffer_response *crear_buffer_response(t_mem_response resultado, void *buf
 {
    t_mem_buffer_response *mem_buffer_response = malloc(sizeof(t_mem_buffer_response));
    mem_buffer_response->resultado = resultado;
+   mem_buffer_response->tamanio_buffer = tamanio_buffer;
    mem_buffer_response->buffer = NULL;
    if (buffer != NULL)
    {
       mem_buffer_response->buffer = malloc(tamanio_buffer);
       memcpy(mem_buffer_response->buffer, buffer, tamanio_buffer);
    }
-   mem_buffer_response->tamanio_buffer = tamanio_buffer;
 
    return mem_buffer_response;
 }
@@ -22,8 +22,8 @@ t_packet *serializar_buffer_response(t_mem_buffer_response *buffer_response)
    agregar_a_paquete(paquete, &(buffer_response->resultado), sizeof(t_mem_response));
    if (buffer_response->buffer != NULL)
    {
-      agregar_a_paquete(paquete, buffer_response->buffer, buffer_response->tamanio_buffer);
       agregar_a_paquete(paquete, &(buffer_response->tamanio_buffer), sizeof(u_int32_t));
+      agregar_a_paquete(paquete, buffer_response->buffer, buffer_response->tamanio_buffer);
    }
 
    return paquete;
@@ -32,6 +32,9 @@ t_packet *serializar_buffer_response(t_mem_buffer_response *buffer_response)
 void enviar_buffer_response(int32_t fd_conexion, t_mem_buffer_response *buffer_response)
 {
    t_packet *paquete = serializar_buffer_response(buffer_response);
+   printf("Buffer sent: %s\n", (char *)buffer_response->buffer);
+   printf("Buffer size: %d\n", buffer_response->tamanio_buffer);
+
    enviar_paquete(paquete, fd_conexion);
    eliminar_paquete(paquete);
 }
@@ -45,9 +48,18 @@ t_mem_buffer_response *recibir_buffer_response(int32_t fd_conexion)
 
    if (buffer_response->resultado == OPERATION_SUCCEED)
    {
-      buffer_response->tamanio_buffer = *(u_int32_t *)list_get(paquete, 2);
-      buffer_response->buffer = malloc(buffer_response->tamanio_buffer);
-      memcpy(buffer_response->buffer, list_get(paquete, 1), buffer_response->tamanio_buffer);
+      buffer_response->tamanio_buffer = *(u_int32_t *)list_get(paquete, 1);
+      buffer_response->buffer = calloc(buffer_response->tamanio_buffer, sizeof(char));
+
+      printf("Raw data: %s\n", (char *)list_get(paquete, 2));
+      const void *data = list_get(paquete, 2);
+      memcpy(buffer_response->buffer, data, buffer_response->tamanio_buffer);
+
+      u_int32_t size = strlen((char *)buffer_response->buffer);
+
+      printf("Buffer recived: %s\n", (char *)buffer_response->buffer);
+      printf("Buffer size: %d\n", buffer_response->tamanio_buffer);
+      printf("Buffer len (as string): %d\n", size);
    }
    else
    {

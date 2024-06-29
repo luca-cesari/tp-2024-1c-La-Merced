@@ -13,6 +13,7 @@ void iniciar_logger(void);
 void destruir_logger(void);
 
 // Funciones de log
+void log_evento(char *evento);
 void log_creacion_tabla_paginas(u_int32_t pid, u_int32_t cantidad_paginas);
 void log_destruccion_tabla_paginas(u_int32_t pid, u_int32_t cantidad_paginas);
 void log_acceso_tabla_paginas(u_int32_t pid, u_int32_t pagina, u_int32_t marco);
