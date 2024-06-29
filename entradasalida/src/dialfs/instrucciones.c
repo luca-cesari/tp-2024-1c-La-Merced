@@ -54,7 +54,7 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     {
         modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE);
     }
-    // free(path_archivo);
+    free(path_archivo);
 
     // Supongo que el archivo de bloques no hay que liberarlo sino que simplemente se pierde la referencia
     //  enviar_respuesta(pid, FILE_DELETED); VER PARA MANDAR AL KERNEL
