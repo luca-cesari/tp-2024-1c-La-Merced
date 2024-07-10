@@ -83,7 +83,7 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
         // aca se podria hacer compactacion, y llevarlo al  final asi queda contiguo
         for (int i = 0; i < bloques_faltantes; i++)
         {
-            if (get_siguiente_bloque_libre() != -1)
+            if (get_siguiente_bloque_libre() != -1) // Revisar si esta bien. Creo que lo que se quería usar era el get_siguiente_bloque_libre_a_partir_de o algo asi.
             {
                 modificar_bitmap(get_bloque_inicial(path_archivo) + get_siguiente_bloque_libre(), OCUPADO);
             }
@@ -93,9 +93,8 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
     {
         for (int i = get_cantidad_bloques_ocupados(path_archivo); i > cantidad_bloques_necesarios; i--) // Va recorriendo los bloques ocupados y los va liberando ya que son contiguos
         {
-            modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE);
+            modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE); // Revisar si esta bien. No sería ir liberando desde el bloque final?
         }
-        // aca se podria hacer compactacion
     }
 
     config_set_value(archivo_metadata, "TAMANIO_ARCHIVO", parametros[1]);

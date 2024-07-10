@@ -20,7 +20,17 @@ typedef enum
 } estado;
 
 void inicializar_archivo_bitmap(void);
+/**
+ * @brief Modifica el estado de un bloque en el bitmap
+ *
+ * @note Se puede setear el estado en LIBRE u OCUPADO
+ */
 void modificar_bitmap(u_int32_t nro_bloque, estado estado);
+/**
+ * @brief Obtiene el indice del primer bloque libre que encuentra en el bitmap
+ *
+ * @note Es el primero que encuentra, no el siguiente a partir de una posicion
+ */
 u_int32_t get_siguiente_bloque_libre();
 
 #endif
