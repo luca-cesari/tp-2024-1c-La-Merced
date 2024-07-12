@@ -35,4 +35,11 @@ void io_fs_truncate(char *argumentos, u_int32_t pid);
 // void io_fs_write(char *argumentos, u_int32_t pid);
 // void io_fs_read(char *argumentos, u_int32_t pid);
 
+/**
+ * @brief Mueve un archivo a la primera posicion donde encuentre espacio contiguo disponible
+ *
+ * @note Recibe como argumentos el path del archivo a mover
+ */
+void compactar(char *path);
+
 #endif // DIALFS_H

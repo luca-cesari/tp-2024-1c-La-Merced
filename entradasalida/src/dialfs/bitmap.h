@@ -33,4 +33,6 @@ void modificar_bitmap(u_int32_t nro_bloque, estado estado);
  */
 u_int32_t get_siguiente_bloque_libre();
 
+u_int32_t hay_bloques_libres_contiguos(u_int32_t bloque_inicial, u_int32_t cantidad_bloques);
+
 #endif

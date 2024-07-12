@@ -65,14 +65,7 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
     char **parametros = string_split(argumentos, " ");
     u_int32_t nuevo_tamanio = atoi(parametros[1]);
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
-    t_config *archivo_metadata = config_create(path_archivo);
-    if (archivo_metadata == NULL)
-    {
-        // Manejo de error si no se puede abrir el archivo de metadatos
-        perror("Error al abrir el archivo de metadatos");
-        return;
-    }
-    u_int32_t tamanio_archivo = config_get_int_value(archivo_metadata, "TAMANIO_ARCHIVO");
+    u_int32_t tamanio_archivo = get_cantidad_bloques_ocupados(path_archivo) * get_block_size();
 
     u_int32_t cantidad_bloques_necesarios = nuevo_tamanio / get_block_size() + (nuevo_tamanio % get_block_size() != 0);
     u_int32_t bloques_ocupados = get_cantidad_bloques_ocupados(path_archivo);
@@ -81,25 +74,29 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
     {
         u_int32_t bloques_faltantes = cantidad_bloques_necesarios - bloques_ocupados;
         // aca se podria hacer compactacion, y llevarlo al  final asi queda contiguo
-        for (int i = 0; i < bloques_faltantes; i++)
+        if (!hay_bloques_libres_contiguos(get_bloque_inicial(path_archivo) + bloques_ocupados, bloques_faltantes))
         {
-            if (get_siguiente_bloque_libre() != -1) // Revisar si esta bien. Creo que lo que se quería usar era el get_siguiente_bloque_libre_a_partir_de o algo asi.
+            compactar(path_archivo);
+        }
+
+        for (int i = 1; i <= bloques_faltantes; i++)
+        {
+            if (get_siguiente_bloque_libre() != -1)
             {
-                modificar_bitmap(get_bloque_inicial(path_archivo) + get_siguiente_bloque_libre(), OCUPADO);
+                modificar_bitmap(get_bloque_inicial(path_archivo) + bloques_ocupados + i, OCUPADO);
             }
         }
     }
     else
     {
-        for (int i = get_cantidad_bloques_ocupados(path_archivo); i > cantidad_bloques_necesarios; i--) // Va recorriendo los bloques ocupados y los va liberando ya que son contiguos
+        for (int i = bloques_ocupados; i > cantidad_bloques_necesarios; i--) // Va recorriendo los bloques ocupados y los va liberando ya que son contiguos
         {
-            modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE); // Revisar si esta bien. No sería ir liberando desde el bloque final?
+            modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE);
         }
     }
 
-    config_set_value(archivo_metadata, "TAMANIO_ARCHIVO", parametros[1]);
-    config_save(archivo_metadata);
-    config_destroy(archivo_metadata);
+    set_tamanio_archivo(path_archivo, nuevo_tamanio);
+    free(path_archivo);
 }
 
 /*
@@ -138,3 +135,17 @@ void io_fs_read(char *argumentos, u_int32_t pid)
 {
 }
 */
+
+/*
+
+Compactación
+Puede darse la situación que al momento de querer ampliar un archivo, dispongamos del espacio disponible pero el mismo no se encuentre contiguo,
+por lo que vamos a tener que compactar nuestro FS para agrupar los bloques de los archivos de manera tal que quede todo el espacio libre contiguo para
+el archivo que se desea truncar. Luego de compactar el FS, se deberá esperar un tiempo determinado por el valor de configuración de RETRASO_COMPACTACION
+para luego continuar con la operación de ampliación del archivo.
+
+*/
+
+void compactar(char *path)
+{
+}

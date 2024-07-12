@@ -114,3 +114,50 @@ u_int32_t get_siguiente_bloque_libre()
     free(path_bitmap);
     return free_block;
 }
+
+u_int32_t hay_bloques_libres_contiguos(u_int32_t bloque_inicial, u_int32_t cantidad_bloques_necesarios)
+{
+    char *path_bitmap = string_from_format("%s/bitmap.dat", get_path_base_dialfs());
+    int fd = open(path_bitmap, O_RDWR);
+    if (fd == -1)
+    {
+        // Handle error
+        perror("Error al abrir el archivo bitmap.dat");
+        return -1;
+    }
+
+    char *map = mmap(0, get_block_count() / 8, PROT_WRITE, MAP_SHARED, fd, 0);
+    if (map == MAP_FAILED)
+    {
+        close(fd);
+        // Handle error
+        perror("Error al mapear el archivo bitmap.dat");
+        return -1;
+    }
+
+    t_bitarray *bitmap = bitarray_create_with_mode(map, get_block_count(), MSB_FIRST);
+    int bloques_libres = 0;
+    for (int i = bloque_inicial; i < get_block_count() - 1; i++)
+    {
+        if (!bitarray_test_bit(bitmap, i))
+        {
+            bloques_libres++;
+            if (bloques_libres == cantidad_bloques_necesarios)
+            {
+                munmap(map, get_block_count() / 8);
+                close(fd);
+                free(path_bitmap);
+                return 1;
+            }
+        }
+        else
+        {
+            bloques_libres = 0;
+        }
+    }
+
+    munmap(map, get_block_count() / 8);
+    close(fd);
+    free(path_bitmap);
+    return 0;
+}
