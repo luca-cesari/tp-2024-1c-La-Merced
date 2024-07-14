@@ -14,5 +14,6 @@
 #include <conexion/kernel.h>
 
 void inicializar_archivo_bloques(void);
+void copiar_de_bloque_datos(char *buffer, u_int32_t bloque_inicial, u_int32_t tamanio_archivo);
 
 #endif

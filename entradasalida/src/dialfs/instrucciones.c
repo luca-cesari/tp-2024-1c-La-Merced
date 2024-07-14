@@ -41,23 +41,14 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     }
 
     fclose(archivo);
-    if (remove(path_archivo) != 0)
-    {
-        perror("Error al borrar el archivo");
-        free(path_archivo);
-        // enviar_respuesta(pid, FILE_DELETION_ERROR); VER PARA MANDAR AL KERNEL
-        return;
-    }
 
     get_cantidad_bloques_ocupados(path_archivo);
     for (int i = 0; i < get_cantidad_bloques_ocupados(path_archivo); i++) // Va recorriendo los bloques ocupados y los va liberando ya que son contiguos
     {
         modificar_bitmap(get_bloque_inicial(path_archivo) + i, LIBRE);
     }
+    eliminar_archivo_metadata(path_archivo);
     free(path_archivo);
-
-    // Supongo que el archivo de bloques no hay que liberarlo sino que simplemente se pierde la referencia
-    //  enviar_respuesta(pid, FILE_DELETED); VER PARA MANDAR AL KERNEL
 }
 
 void io_fs_truncate(char *argumentos, u_int32_t pid)
@@ -73,10 +64,10 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
     if (nuevo_tamanio > tamanio_archivo)
     {
         u_int32_t bloques_faltantes = cantidad_bloques_necesarios - bloques_ocupados;
-        // aca se podria hacer compactacion, y llevarlo al  final asi queda contiguo
+
         if (!hay_bloques_libres_contiguos(get_bloque_inicial(path_archivo) + bloques_ocupados, bloques_faltantes))
         {
-            compactar(path_archivo);
+            compactar(path_archivo, tamanio_archivo, bloques_ocupados);
         }
 
         for (int i = 1; i <= bloques_faltantes; i++)
@@ -146,6 +137,18 @@ para luego continuar con la operación de ampliación del archivo.
 
 */
 
-void compactar(char *path)
+/*Pasos a seguir para compactar
+1) Copiar el archivo a truncar en un buffer
+2) Mover todos los archivos siguientes a la posición del archivo a truncar a la primera posición donde se encontraba el archivo a truncar
+3) Poner el archivo al final de los archivos que se movieron en el paso 2
+*/
+
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados)
 {
+
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), path);
+    u_int32_t bloque_inicial = get_bloque_inicial(path_archivo);
+
+    char *buffer = malloc(tamanio_archivo);
+    copiar_de_bloque_datos(buffer, bloque_inicial, tamanio_archivo); // Se copia en un buffer el archivo a truncar
 }
