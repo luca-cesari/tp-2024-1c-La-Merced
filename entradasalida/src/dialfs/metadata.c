@@ -135,3 +135,21 @@ bool tiene_mismo_path(void *archivo)
     metadata *archivo_cast = (metadata *)archivo;
     return strcmp(archivo_cast->path_archivo, path_archivo_comparar) == 0;
 }
+
+u_int32_t obtener_indice_archivo(char *path_archivo)
+{
+    for (int i = 0; i < list_size(lista_archivos); i++)
+    {
+        metadata *archivo = list_get(lista_archivos, i);
+        if (strcmp(archivo->path_archivo, path_archivo) == 0)
+        {
+            return i;
+        }
+    }
+    return NULL;
+}
+
+u_int32_t obtener_tamanio_lista_archivos()
+{
+    return list_size(lista_archivos);
+}

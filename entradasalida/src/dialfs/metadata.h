@@ -43,4 +43,7 @@ void eliminar_archivo_metadata(char *path_archivo);
 
 bool tiene_mismo_path(void *);
 
+u_int32_t obtener_indice_archivo(char *path_archivo);
+u_int32_t obtener_tamanio_lista_archivos();
+
 #endif

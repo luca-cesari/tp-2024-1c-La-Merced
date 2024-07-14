@@ -151,4 +151,14 @@ void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques
 
     char *buffer = malloc(tamanio_archivo);
     copiar_de_bloque_datos(buffer, bloque_inicial, tamanio_archivo); // Se copia en un buffer el archivo a truncar
+
+    // u_int32_t bloques_totales_desplazados;
+
+    // Quiero obtener el indice de el archivo
+    u_int32_t indice_primer_archivo = obtener_indice_archivo(path_archivo);
+
+    for (int i = indice_primer_archivo; i < obtener_tamanio_lista_archivos(); i++)
+    {
+        // desplazar_archivo();
+    }
 }
