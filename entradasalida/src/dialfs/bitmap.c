@@ -161,3 +161,11 @@ u_int32_t hay_bloques_libres_contiguos(u_int32_t bloque_inicial, u_int32_t canti
     free(path_bitmap);
     return 0;
 }
+
+void liberar_bitmap_a_partir_de(u_int32_t indice)
+{
+    for (int i = indice; i < get_block_count(); i++)
+    {
+        modificar_bitmap(i, LIBRE);
+    }
+}
