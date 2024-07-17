@@ -128,6 +128,18 @@ void copy_string(char **parametros) // clean
    destruir_cpu_mem_request(mem_request_escribir);
 }
 
+void wait(char **parametros)
+{
+   set_recurso_pcb(pcb, parametros[0]);
+   set_motivo_desalojo(pcb, WAIT);
+}
+
+void signal(char **parametros)
+{
+   set_recurso_pcb(pcb, parametros[0]);
+   set_motivo_desalojo(pcb, SIGNAL);
+}
+
 void io_gen_sleep(char **parametros) // clean
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_GEN_SLEEP", parametros[1]);
@@ -223,6 +235,8 @@ void inicializar_instrucciones(void)
    dictionary_put(instrucciones, "MOV_IN", &mov_in);
    dictionary_put(instrucciones, "MOV_OUT", &mov_out);
    dictionary_put(instrucciones, "COPY_STRING", &copy_string);
+   dictionary_put(instrucciones, "WAIT", &wait);
+   dictionary_put(instrucciones, "SIGNAL", &signal);
    dictionary_put(instrucciones, "IO_GEN_SLEEP", &io_gen_sleep);
    dictionary_put(instrucciones, "IO_STDIN_READ", &io_stdin_read);
    dictionary_put(instrucciones, "IO_STDOUT_WRITE", &io_stdout_write);
