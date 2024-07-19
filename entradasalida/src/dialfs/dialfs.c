@@ -5,6 +5,7 @@ void inicializar_interfaz_dialfs()
    inicializar_dicc_instrucciones();
    inicializar_archivo_bloques();
    inicializar_archivo_bitmap();
+   actualizar_lista_archivos_metadata();
 
    while (1)
    {
@@ -22,13 +23,13 @@ void inicializar_interfaz_dialfs()
 
       int8_t io_result = funcion(peticion_io->arguments, peticion_io->pid);
       if (io_result == -1)
-        {
-            enviar_respuesta(FAILED);
-            destruir_io_request(peticion_io);
-            continue;
-        }
-      // log_operacion(peticion_io->pid, peticion_io->instruction);
-      // enviar_respuesta(EXECUTED);
+      {
+         enviar_respuesta(FAILED);
+         destruir_io_request(peticion_io);
+         continue;
+      }
+      log_operacion(peticion_io->pid, peticion_io->instruction);
+      enviar_respuesta(EXECUTED);
       destruir_io_request(peticion_io);
    }
 }

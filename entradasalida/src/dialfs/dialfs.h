@@ -11,6 +11,7 @@
 #include <commons/bitarray.h>
 #include <sockets/sockets.h>
 
+#include "logger/logger.h"
 #include "config/config.h"
 #include "conexion/kernel.h"
 #include "instrucciones.h"
