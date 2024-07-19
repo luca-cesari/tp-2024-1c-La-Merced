@@ -91,38 +91,39 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
 }
 
 /*
-IO_FS_WRITE (Interfaz, Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo):
+IO_FS_WRITE (Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo):
 Esta instrucción solicita al Kernel que mediante la interfaz seleccionada, se lea desde Memoria la cantidad
 de bytes indicadas por el Registro Tamaño a partir de la dirección lógica que se encuentra en el Registro
 Dirección y se escriban en el archivo a partir del valor del Registro Puntero Archivo.*/
 
-void io_fs_write(char *argumentos, u_int32_t pid)
+int8_t io_fs_write(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
-    u_int32_t tamanio_valor = atoi(parametros[2]);
+
     char *direcciones_fisicas = parametros[1];
+    u_int32_t tamanio_valor = atoi(parametros[2]);
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
+    u_int32_t offset = atoi(parametros[3]);
 
     t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, direcciones_fisicas, tamanio_valor, NULL);
     enviar_mem_request(mem_request);
-    destruir_io_mem_request(mem_request);
 
     t_mem_buffer_response *respuesta = recibir_mem_buffer();
 
-    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
-    FILE *archivo = fopen(path_archivo, "w");
-    if (archivo == NULL)
+    if (respuesta == NULL)
     {
+        free(direcciones_fisicas);
         free(path_archivo);
-        // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
-        return;
+        return -1; // Error al recibir respuesta de memoria
     }
-    char *direccion = get_bloque_inicial(path_archivo) * get_block_size() + parametros[3];
-    t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, direccion, tamanio_valor, respuesta);
-    enviar_mem_request(mem_request);
-    destruir_io_mem_request(mem_request);
+    pegar_bloque_datos_con_offset(respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
 
-    t_mem_response response = recibir_valor();
-    return response == OPERATION_SUCCEED ? 0 : -1;
+    free(direcciones_fisicas);
+    free(path_archivo);
+    destruir_io_mem_request(mem_request);
+    destruir_mem_buffer_response(respuesta);
+
+    return 0;
 }
 
 void io_fs_read(char *argumentos, u_int32_t pid)
