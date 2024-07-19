@@ -305,17 +305,17 @@ char *get_direccion_tamanio(char **parametros)
 
 char *obtener_parametros_fs_read_write(char **parametros)
 {
-   int32_t direccion_logica = atoi(parametros[2]);
-   int32_t tamanio_dato = get_valor_registro(parametros[3]);
-   char* direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_dato);
+   int32_t direccion_logica = atoi(parametros[1]);
+   int32_t tamanio_dato = get_valor_registro(parametros[2]);
+   char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_dato);
    char *parametros_nuevos = string_new();
-   string_append(&parametros_nuevos, parametros[1]); // nombre archivo
+   string_append(&parametros_nuevos, parametros[0]); // nombre archivo
    string_append(&parametros_nuevos, " ");
    string_append(&parametros_nuevos, direcciones_fisicas);
    string_append(&parametros_nuevos, " ");
    string_append(&parametros_nuevos, string_itoa(tamanio_dato));
    string_append(&parametros_nuevos, " ");
-   string_append(&parametros_nuevos, parametros[4]); // registro puntero archivo
+   string_append(&parametros_nuevos, parametros[3]); // registro puntero archivo
 
    return parametros_nuevos;
 }
