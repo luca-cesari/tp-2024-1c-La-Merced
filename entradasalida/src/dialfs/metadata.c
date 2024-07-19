@@ -34,7 +34,7 @@ void crear_archivo_metadata(char *path_archivo, u_int32_t bloque_inicial, u_int3
     config_save(archivo_metadata);
 
     metadata *archivo = malloc(sizeof(metadata));
-    archivo->path_archivo = path_archivo;
+    archivo->path_archivo = strdup(path_archivo);
     archivo->bloque_inicial = bloque_inicial;
     archivo->tamanio_archivo = tamanio_archivo;
 
