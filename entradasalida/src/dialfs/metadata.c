@@ -72,6 +72,11 @@ u_int32_t get_cantidad_bloques_ocupados(char *path_archivo)
 {
     t_config *archivo_metadata = config_create(path_archivo);
     u_int32_t tamanio_archivo = config_get_int_value(archivo_metadata, "TAMANIO_ARCHIVO");
+    if (tamanio_archivo == 0)
+    {
+        config_destroy(archivo_metadata);
+        return 1;
+    }
     config_destroy(archivo_metadata);
     return tamanio_archivo / get_block_size() + (tamanio_archivo % get_block_size() != 0);
 }
