@@ -100,7 +100,7 @@ void desbloquear_estado(q_estado *estado);
 /**
  * @brief Destruye un estado.
  *        Limpia la cola de procesos y libera la memoria,
- *        si había algún proceso encolado, lo destruye.
+ *        no libera los procesos (*pcb) contenidos.
  *
  * @param estado
  */
