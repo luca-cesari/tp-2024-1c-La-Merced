@@ -8,11 +8,11 @@ void inicializar_dicc_instrucciones()
     dictionary_put(dicc_instrucciones, "IO_FS_CREATE", &io_fs_create);
     dictionary_put(dicc_instrucciones, "IO_FS_DELETE", &io_fs_delete);
     dictionary_put(dicc_instrucciones, "IO_FS_TRUNCATE", &io_fs_truncate);
-    // dictionary_put(dicc_instrucciones, "IO_FS_WRITE", &io_fs_write);
-    // dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
+    dictionary_put(dicc_instrucciones, "IO_FS_WRITE", &io_fs_write);
+    dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
 }
 
-void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
+int8_t (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
 {
     if (!dictionary_has_key(dicc_instrucciones, instruccion))
         return NULL;
@@ -20,16 +20,17 @@ void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
     return dictionary_get(dicc_instrucciones, instruccion);
 }
 
-void io_fs_create(char *argumentos, u_int32_t pid)
+int8_t io_fs_create(char *argumentos, u_int32_t pid)
 {
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos); // Pensando que es el único argumento que viene
     modificar_bitmap(get_siguiente_bloque_libre(), OCUPADO);
     crear_archivo_metadata(path_archivo, get_siguiente_bloque_libre(), 0);
     free(path_archivo);
     // enviar_respuesta(pid, FILE_CREATED); VER PARA MANDAR AL KERNEL
+    return 0;
 }
 
-void io_fs_delete(char *argumentos, u_int32_t pid)
+int8_t io_fs_delete(char *argumentos, u_int32_t pid)
 {
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos); // Pensando que es el único argumento que viene
     FILE *archivo = fopen(path_archivo, "r");
@@ -37,7 +38,7 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     {
         free(path_archivo);
         // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
-        return;
+        return -1;
     }
 
     fclose(archivo);
@@ -49,9 +50,10 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     }
     eliminar_archivo_metadata(path_archivo);
     free(path_archivo);
+    return 0;
 }
 
-void io_fs_truncate(char *argumentos, u_int32_t pid)
+int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
     u_int32_t nuevo_tamanio = atoi(parametros[1]);
@@ -88,53 +90,79 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
 
     set_tamanio_archivo(path_archivo, nuevo_tamanio);
     free(path_archivo);
+    return 0;
 }
 
 /*
-void io_fs_write(char *argumentos, u_int32_t pid)
+IO_FS_WRITE (Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo):
+Esta instrucción solicita al Kernel que mediante la interfaz seleccionada, se lea desde Memoria la cantidad
+de bytes indicadas por el Registro Tamaño a partir de la dirección lógica que se encuentra en el Registro
+Dirección y se escriban en el archivo a partir del valor del Registro Puntero Archivo.*/
+
+int8_t io_fs_write(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
+
+    char *direcciones_fisicas = parametros[1];
     u_int32_t tamanio_valor = atoi(parametros[2]);
-    char *direcciones_fisicas = array_a_string(parametros[1]);
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
+    u_int32_t offset = atoi(parametros[3]);
 
-    parametros_io parametros_leer;
-    parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
-    parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
-
-    t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, parametros_leer);
+    t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, direcciones_fisicas, tamanio_valor, NULL);
     enviar_mem_request(mem_request);
-    destruir_io_mem_request(mem_request);
 
-    char *respuesta = (char *)recibir_mem_buffer();
+    t_mem_buffer_response *respuesta = recibir_mem_buffer();
+
     if (respuesta == NULL)
-        return -1;
+    {
+        free(direcciones_fisicas);
+        free(path_archivo);
+        return -1; // Error al recibir respuesta de memoria
+    }
+    pegar_bloque_datos_con_offset(respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
 
-    printf("%s\n", respuesta);
+    free(direcciones_fisicas);
+    free(path_archivo);
+    destruir_io_mem_request(mem_request);
+    destruir_buffer_response(respuesta);
+
+    return 0;
+}
+
+int8_t io_fs_read(char *argumentos, u_int32_t pid)
+{
+    char **parametros = string_split(argumentos, " ");
 
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
-    FILE *archivo = fopen(path_archivo, "w");
-    if (archivo == NULL)
-    {
-        free(path_archivo);
-        // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
-        return;
-    }
-    //escribir respuesta en el archivo desde el bloque inicial + paramtros[3] (desplazamiento)
- }
+    u_int32_t offset = atoi(parametros[3]);
+    u_int32_t bloque_inicial = get_bloque_inicial(path_archivo);
+    u_int32_t tamanio = atoi(parametros[2]);
 
-void io_fs_read(char *argumentos, u_int32_t pid)
-{
+    char *buffer_archivo = malloc(tamanio);
+    copiar_de_bloque_datos_con_offset(buffer_archivo, bloque_inicial, offset, tamanio);
+    
+    char *direccion_escribir = parametros[1];
+
+    t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, direccion_escribir, tamanio, buffer_archivo);
+    enviar_mem_request(mem_request);
+    destruir_io_mem_request(mem_request);
+   
+    t_mem_response response = recibir_valor();
+
+    free(path_archivo);
+    free(buffer_archivo);
+    free(direccion_escribir);
+//ver como liberar parametros**
+    return response == OPERATION_SUCCEED ? 0 : -1;
+    
 }
-*/
 
 /*
-
 Compactación
 Puede darse la situación que al momento de querer ampliar un archivo, dispongamos del espacio disponible pero el mismo no se encuentre contiguo,
 por lo que vamos a tener que compactar nuestro FS para agrupar los bloques de los archivos de manera tal que quede todo el espacio libre contiguo para
 el archivo que se desea truncar. Luego de compactar el FS, se deberá esperar un tiempo determinado por el valor de configuración de RETRASO_COMPACTACION
 para luego continuar con la operación de ampliación del archivo.
-
 */
 
 /*Pasos a seguir para compactar
