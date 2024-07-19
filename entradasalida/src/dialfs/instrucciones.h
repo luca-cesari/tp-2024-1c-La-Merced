@@ -35,8 +35,8 @@ int8_t io_fs_delete(char *argumentos, u_int32_t pid);
  * @note Recibe como argumentos el path del archivo a truncar y el nuevo tamaño
  */
 int8_t io_fs_truncate(char *argumentos, u_int32_t pid);
-// void io_fs_write(char *argumentos, u_int32_t pid);
-// void io_fs_read(char *argumentos, u_int32_t pid);
+int8_t io_fs_write(char *argumentos, u_int32_t pid);
+int8_t io_fs_read(char *argumentos, u_int32_t pid);
 
 /**
  * @brief Mueve un archivo a la primera posicion donde encuentre espacio contiguo disponible

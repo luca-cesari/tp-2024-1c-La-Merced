@@ -8,8 +8,8 @@ void inicializar_dicc_instrucciones()
     dictionary_put(dicc_instrucciones, "IO_FS_CREATE", &io_fs_create);
     dictionary_put(dicc_instrucciones, "IO_FS_DELETE", &io_fs_delete);
     dictionary_put(dicc_instrucciones, "IO_FS_TRUNCATE", &io_fs_truncate);
-    // dictionary_put(dicc_instrucciones, "IO_FS_WRITE", &io_fs_write);
-    // dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
+    dictionary_put(dicc_instrucciones, "IO_FS_WRITE", &io_fs_write);
+    dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
 }
 
 int8_t (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
@@ -124,13 +124,11 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid)
     free(direcciones_fisicas);
     free(path_archivo);
     destruir_io_mem_request(mem_request);
-    destruir_mem_buffer_response(respuesta);
+    destruir_buffer_response(respuesta);
 
     return 0;
 }
 
-
-*/
 int8_t io_fs_read(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
