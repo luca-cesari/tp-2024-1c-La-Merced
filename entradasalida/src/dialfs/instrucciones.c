@@ -94,36 +94,40 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 }
 
 /*
-void io_fs_write(char *argumentos, u_int32_t pid)
+IO_FS_WRITE (Nombre Archivo, Registro Dirección, Registro Tamaño, Registro Puntero Archivo):
+Esta instrucción solicita al Kernel que mediante la interfaz seleccionada, se lea desde Memoria la cantidad
+de bytes indicadas por el Registro Tamaño a partir de la dirección lógica que se encuentra en el Registro
+Dirección y se escriban en el archivo a partir del valor del Registro Puntero Archivo.*/
+
+int8_t io_fs_write(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
+
+    char *direcciones_fisicas = parametros[1];
     u_int32_t tamanio_valor = atoi(parametros[2]);
-    char *direcciones_fisicas = array_a_string(parametros[1]);
-
-    parametros_io parametros_leer;
-    parametros_leer.param_leer.direcciones_fisicas = direcciones_fisicas;
-    parametros_leer.param_leer.tamanio_buffer = tamanio_valor;
-
-    t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, parametros_leer);
-    enviar_mem_request(mem_request);
-    destruir_io_mem_request(mem_request);
-
-    char *respuesta = (char *)recibir_mem_buffer();
-    if (respuesta == NULL)
-        return -1;
-
-    printf("%s\n", respuesta);
-
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
-    FILE *archivo = fopen(path_archivo, "w");
-    if (archivo == NULL)
+    u_int32_t offset = atoi(parametros[3]);
+
+    t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, direcciones_fisicas, tamanio_valor, NULL);
+    enviar_mem_request(mem_request);
+
+    t_mem_buffer_response *respuesta = recibir_mem_buffer();
+
+    if (respuesta == NULL)
     {
+        free(direcciones_fisicas);
         free(path_archivo);
-        // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
-        return;
+        return -1; // Error al recibir respuesta de memoria
     }
-    //escribir respuesta en el archivo desde el bloque inicial + paramtros[3] (desplazamiento)
- }
+    pegar_bloque_datos_con_offset(respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
+
+    free(direcciones_fisicas);
+    free(path_archivo);
+    destruir_io_mem_request(mem_request);
+    destruir_mem_buffer_response(respuesta);
+
+    return 0;
+}
 
 
 */
@@ -156,13 +160,11 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 }
 
 /*
-
 Compactación
 Puede darse la situación que al momento de querer ampliar un archivo, dispongamos del espacio disponible pero el mismo no se encuentre contiguo,
 por lo que vamos a tener que compactar nuestro FS para agrupar los bloques de los archivos de manera tal que quede todo el espacio libre contiguo para
 el archivo que se desea truncar. Luego de compactar el FS, se deberá esperar un tiempo determinado por el valor de configuración de RETRASO_COMPACTACION
 para luego continuar con la operación de ampliación del archivo.
-
 */
 
 /*Pasos a seguir para compactar

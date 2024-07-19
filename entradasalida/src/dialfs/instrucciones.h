@@ -10,6 +10,7 @@
 #include <conexion/memoria.h>
 
 #include "config/config.h"
+#include "conexion/memoria.h"
 #include "metadata.h"
 #include "bitmap.h"
 #include "bloques.h"
