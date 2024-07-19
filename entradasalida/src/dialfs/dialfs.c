@@ -12,7 +12,7 @@ void inicializar_interfaz_dialfs()
 
       usleep(get_tiempo_unidad_trabajo() * 1000);
 
-      void (*funcion)(char *, u_int32_t) = get_funcion_instruccion(peticion_io->instruction);
+      int8_t (*funcion)(char *, u_int32_t) = get_funcion_instruccion(peticion_io->instruction);
       if (funcion == NULL)
       {
          enviar_respuesta(INVALID_INSTRUCTION);
@@ -20,7 +20,13 @@ void inicializar_interfaz_dialfs()
          continue;
       }
 
-      funcion(peticion_io->arguments, peticion_io->pid);
+      int8_t io_result = funcion(peticion_io->arguments, peticion_io->pid);
+      if (io_result == -1)
+        {
+            enviar_respuesta(FAILED);
+            destruir_io_request(peticion_io);
+            continue;
+        }
       // log_operacion(peticion_io->pid, peticion_io->instruction);
       // enviar_respuesta(EXECUTED);
       destruir_io_request(peticion_io);

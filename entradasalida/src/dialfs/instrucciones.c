@@ -12,7 +12,7 @@ void inicializar_dicc_instrucciones()
     // dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
 }
 
-void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
+int8_t (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
 {
     if (!dictionary_has_key(dicc_instrucciones, instruccion))
         return NULL;
@@ -20,16 +20,17 @@ void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
     return dictionary_get(dicc_instrucciones, instruccion);
 }
 
-void io_fs_create(char *argumentos, u_int32_t pid)
+int8_t io_fs_create(char *argumentos, u_int32_t pid)
 {
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos); // Pensando que es el único argumento que viene
     modificar_bitmap(get_siguiente_bloque_libre(), OCUPADO);
     crear_archivo_metadata(path_archivo, get_siguiente_bloque_libre(), 0);
     free(path_archivo);
     // enviar_respuesta(pid, FILE_CREATED); VER PARA MANDAR AL KERNEL
+    return 0;
 }
 
-void io_fs_delete(char *argumentos, u_int32_t pid)
+int8_t io_fs_delete(char *argumentos, u_int32_t pid)
 {
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos); // Pensando que es el único argumento que viene
     FILE *archivo = fopen(path_archivo, "r");
@@ -37,7 +38,7 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     {
         free(path_archivo);
         // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
-        return;
+        return -1;
     }
 
     fclose(archivo);
@@ -49,9 +50,10 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     }
     eliminar_archivo_metadata(path_archivo);
     free(path_archivo);
+    return 0;
 }
 
-void io_fs_truncate(char *argumentos, u_int32_t pid)
+int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
     u_int32_t nuevo_tamanio = atoi(parametros[1]);
@@ -88,6 +90,7 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
 
     set_tamanio_archivo(path_archivo, nuevo_tamanio);
     free(path_archivo);
+    return 0;
 }
 
 /*
