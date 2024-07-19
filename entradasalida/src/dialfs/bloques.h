@@ -17,8 +17,10 @@
 
 void inicializar_archivo_bloques(void);
 void copiar_de_bloque_datos(char *buffer, u_int32_t bloque_inicial, u_int32_t tamanio_archivo);
+void copiar_de_bloque_datos_con_offset(char *buffer, u_int32_t bloque_inicial, u_int32_t offset ,u_int32_t tamanio_archivo);
 void pegar_bloque_datos(char *buffer, u_int32_t bloque_inicial, u_int32_t tamanio_archivo);
 void pegar_bloque_datos_con_offset(char *buffer, u_int32_t bloque_inicial, u_int32_t offset, u_int32_t tamanio_archivo);
 void desplazar_archivo_en_bloques(char *path_archivo_a_desplazar, u_int32_t bloque_inicial_a_desplazar);
+
 
 #endif

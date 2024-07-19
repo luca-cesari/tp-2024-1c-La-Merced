@@ -12,7 +12,7 @@ void inicializar_dicc_instrucciones()
     // dictionary_put(dicc_instrucciones, "IO_FS_READ", &io_fs_read);
 }
 
-void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
+int8_t (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
 {
     if (!dictionary_has_key(dicc_instrucciones, instruccion))
         return NULL;
@@ -20,16 +20,17 @@ void (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t)
     return dictionary_get(dicc_instrucciones, instruccion);
 }
 
-void io_fs_create(char *argumentos, u_int32_t pid)
+int8_t io_fs_create(char *argumentos, u_int32_t pid)
 {
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos); // Pensando que es el único argumento que viene
     modificar_bitmap(get_siguiente_bloque_libre(), OCUPADO);
     crear_archivo_metadata(path_archivo, get_siguiente_bloque_libre(), 0);
     free(path_archivo);
     // enviar_respuesta(pid, FILE_CREATED); VER PARA MANDAR AL KERNEL
+    return 0;
 }
 
-void io_fs_delete(char *argumentos, u_int32_t pid)
+int8_t io_fs_delete(char *argumentos, u_int32_t pid)
 {
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), argumentos); // Pensando que es el único argumento que viene
     FILE *archivo = fopen(path_archivo, "r");
@@ -37,7 +38,7 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     {
         free(path_archivo);
         // enviar_respuesta(pid, FILE_NOT_FOUND); VER PARA MANDAR AL KERNEL
-        return;
+        return -1;
     }
 
     fclose(archivo);
@@ -49,9 +50,10 @@ void io_fs_delete(char *argumentos, u_int32_t pid)
     }
     eliminar_archivo_metadata(path_archivo);
     free(path_archivo);
+    return 0;
 }
 
-void io_fs_truncate(char *argumentos, u_int32_t pid)
+int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
     u_int32_t nuevo_tamanio = atoi(parametros[1]);
@@ -88,6 +90,7 @@ void io_fs_truncate(char *argumentos, u_int32_t pid)
 
     set_tamanio_archivo(path_archivo, nuevo_tamanio);
     free(path_archivo);
+    return 0;
 }
 
 /*
@@ -126,9 +129,36 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid)
     return 0;
 }
 
-void io_fs_read(char *argumentos, u_int32_t pid)
+
+*/
+int8_t io_fs_read(char *argumentos, u_int32_t pid)
 {
+    char **parametros = string_split(argumentos, " ");
+
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
+    u_int32_t offset = atoi(parametros[3]);
+    u_int32_t bloque_inicial = get_bloque_inicial(path_archivo);
+    u_int32_t tamanio = atoi(parametros[2]);
+
+    char *buffer_archivo = malloc(tamanio);
+    copiar_de_bloque_datos_con_offset(buffer_archivo, bloque_inicial, offset, tamanio);
+    
+    char *direccion_escribir = parametros[1];
+
+    t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, direccion_escribir, tamanio, buffer_archivo);
+    enviar_mem_request(mem_request);
+    destruir_io_mem_request(mem_request);
+   
+    t_mem_response response = recibir_valor();
+
+    free(path_archivo);
+    free(buffer_archivo);
+    free(direccion_escribir);
+//ver como liberar parametros**
+    return response == OPERATION_SUCCEED ? 0 : -1;
+    
 }
+
 /*
 Compactación
 Puede darse la situación que al momento de querer ampliar un archivo, dispongamos del espacio disponible pero el mismo no se encuentre contiguo,
