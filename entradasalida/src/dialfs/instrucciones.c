@@ -122,10 +122,26 @@ void io_fs_write(char *argumentos, u_int32_t pid)
     //escribir respuesta en el archivo desde el bloque inicial + paramtros[3] (desplazamiento)
  }
 
+
+*/
 void io_fs_read(char *argumentos, u_int32_t pid)
 {
+    char **parametros = string_split(argumentos, " ");
+
+    char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
+    char *direccion_archivo = get_bloque_inicial(path_archivo) * get_block_size() + parametros[3];
+    u_int32_t tamanio = atoi(parametros[2]);
+
+    t_io_mem_req *mem_request_lectura = crear_io_mem_request(LEER_IO, pid, direccion_archivo, tamanio, NULL);
+    enviar_mem_request(mem_request_lectura);
+    t_mem_buffer_response * buffer_archivo = recibir_buffer_response();
+
+    char *direccion_escribir = parametros[1];
+
+    t_io_mem_req *mem_request_escritura = crear_io_mem_request(ESCRIBIR_IO, pid, direccion_archivo, tamanio, buffer_archivo);
+    enviar_mem_request(mem_request_escritura);
+    
 }
-*/
 
 /*
 
