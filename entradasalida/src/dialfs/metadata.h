@@ -47,5 +47,6 @@ u_int32_t obtener_indice_archivo(char *path_archivo);
 u_int32_t obtener_tamanio_lista_archivos();
 char *get_path_archivo_por_indice(u_int32_t indice);
 void actualizar_archivo_metadata(char *path_archivo, u_int32_t nuevo_bloque_inicial);
+void ordenar_lista_archivos(u_int32_t indice);
 
 #endif

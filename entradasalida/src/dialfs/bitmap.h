@@ -35,4 +35,6 @@ u_int32_t get_siguiente_bloque_libre();
 
 u_int32_t hay_bloques_libres_contiguos(u_int32_t bloque_inicial, u_int32_t cantidad_bloques);
 
+void liberar_bitmap_a_partir_de(u_int32_t indice);
+
 #endif
