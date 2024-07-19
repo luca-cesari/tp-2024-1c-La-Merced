@@ -176,7 +176,7 @@ void io_fs_create(char **parametros) // clean
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
 void io_fs_delete(char **parametros) // clean
 {
@@ -185,17 +185,21 @@ void io_fs_delete(char **parametros) // clean
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
 
 void io_fs_truncate(char **parametros) // clean
 {
-   char *parametros_nuevos = array_a_string(eliminar_primer_elemento(parametros));
+   char *parametros_nuevos = string_new();
+   string_append(&parametros_nuevos, parametros[1]);
+   string_append(&parametros_nuevos, " ");
+   string_append(&parametros_nuevos, string_itoa(get_valor_registro(parametros[2])));
+
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_TRUNCATE", parametros_nuevos);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
 
 /*
