@@ -38,6 +38,7 @@ int8_t io_stdin_read(char *argumentos, u_int32_t pid)
     t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, direcciones_fisicas, tamanio_valor, valor_consola);
     enviar_mem_request(mem_request);
     destruir_io_mem_request(mem_request);
+    string_array_destroy(parametros);
 
     t_mem_response response = recibir_valor();
     return response == OPERATION_SUCCEED ? 0 : -1;

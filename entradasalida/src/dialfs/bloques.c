@@ -46,6 +46,7 @@ void pegar_bloque_datos(char *buffer, u_int32_t bloque_inicial, u_int32_t tamani
     fwrite(buffer, tamanio_archivo, 1, bloques);
     fclose(bloques);
     free(path_bloques);
+    free(buffer);
 }
 
 void pegar_bloque_datos_con_offset(char *buffer, u_int32_t bloque_inicial, u_int32_t offset, u_int32_t tamanio_archivo)
