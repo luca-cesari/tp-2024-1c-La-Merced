@@ -152,13 +152,12 @@ void matar_proceso(u_int32_t pid)
       return;
    case BLOCKED:
       if (proceso->motivo_desalojo == IO)
-         proceso->motivo_finalizacion = INTERRUPTED_BY_USER;
+         proceso = remove_proceso_cola_io(cola_blocked_interfaces, proceso->io_request->interface_name, pid);
 
       if (proceso->motivo_desalojo == WAIT)
-      {
          proceso = remove_proceso_cola_recurso(cola_blocked_recursos, proceso->resource, pid);
-         pasar_a_exit(proceso, INTERRUPTED_BY_USER);
-      }
+
+      pasar_a_exit(proceso, INTERRUPTED_BY_USER);
       return;
    case EXEC:
       enviar_interrupcion(USER_INT);
@@ -187,22 +186,13 @@ static void *consumir_io(void *cola_io)
    while (1)
    {
       t_pcb *pcb = peek_proceso(interfaz->cola_procesos);
+      u_int32_t pid = pcb->pid;
       enviar_io_request(interfaz->fd_conexion, pcb->io_request);
       int32_t response = recibir_senial(interfaz->fd_conexion);
 
-      // se resetea el campo io_req
-      // principalmente para EXECUTED,
-      // así no afectaría cuando vuelva a la CPU.
-      // en otros casos no debería ser relevante
-      // t_io_request *empty_io_req = crear_io_request(pcb->pid, "", "", "");
-      // set_io_request(pcb, empty_io_req);
-
-      pcb = remove_proceso(interfaz->cola_procesos, pcb->pid);
-      if (pcb->motivo_finalizacion == INTERRUPTED_BY_USER)
-      {
-         pasar_a_exit(pcb, INTERRUPTED_BY_USER);
+      pcb = remove_proceso(interfaz->cola_procesos, pid);
+      if (pcb == NULL)
          continue;
-      }
 
       switch (response)
       {
