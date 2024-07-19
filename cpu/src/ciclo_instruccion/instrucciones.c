@@ -202,25 +202,28 @@ void io_fs_truncate(char **parametros) // clean
    destruir_io_request(io_request);
 }
 
-/*
-void io_fs_write(char **parametros) // clean
+void io_fs_write(char **parametros)
 {
-   char **acomodar_parametros = (char **)malloc(4 * sizeof(char *));
-   acomodar_parametros[3] = string_array_pop(parametros);
-   char *direccion_tamanio = get_direccion_tamanio((eliminar_primer_elemento(eliminar_primer_elemento(parametros)))); // se podria mejorar
-   char **fisica_tamanio = string_split(direccion_tamanio, " ");
-   acomodar_parametros[0] = parametros[1];
-   acomodar_parametros[1] = fisica_tamanio[0]; //direccion_fisica
-   acomodar_parametros[2] = fisica_tamanio[1]; //tamanio_valor
+   char *nuevos_parametros = obtener_parametros_fs_read_write(eliminar_primer_elemento(parametros));
 
-   char *parametros_nuevos = array_a_string(acomodar_parametros);
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_WRITE", parametros_nuevos);
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_ WRITE", nuevos_parametros);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
-   // destruir_io_request(io_request);
+   destruir_io_request(io_request);
 }
-*/
+
+void io_fs_read(char **parametros)
+{
+   char *nuevos_parametros = obtener_parametros_fs_read_write(eliminar_primer_elemento(parametros));
+
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_READ", nuevos_parametros);
+   set_io_request(pcb, io_request);
+   set_motivo_desalojo(pcb, IO);
+
+   destruir_io_request(io_request);
+}
+
 void exit_instruction(char **parametros)
 {
    set_motivo_desalojo(pcb, TERMINATED);
@@ -247,6 +250,8 @@ void inicializar_instrucciones(void)
    dictionary_put(instrucciones, "IO_FS_CREATE", &io_fs_create);
    dictionary_put(instrucciones, "IO_FS_DELETE", &io_fs_delete);
    dictionary_put(instrucciones, "IO_FS_TRUNCATE", &io_fs_truncate);
+   dictionary_put(instrucciones, "IO_FS_WRITE", &io_fs_write);
+   dictionary_put(instrucciones, "IO_FS_READ", &io_fs_read);
 
    dictionary_put(instrucciones, "EXIT", &exit_instruction);
 }
@@ -296,4 +301,21 @@ char *get_direccion_tamanio(char **parametros)
    printf("DIRECCIONES Y TAMANIO: %s\n", direcciones_tamanio);
 
    return direcciones_tamanio;
+}
+
+char *obtener_parametros_fs_read_write(char **parametros)
+{
+   int32_t direccion_logica = atoi(parametros[2]);
+   int32_t tamanio_dato = get_valor_registro(parametros[3]);
+   char* direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_dato);
+   char *parametros_nuevos = string_new();
+   string_append(&parametros_nuevos, parametros[1]); // nombre archivo
+   string_append(&parametros_nuevos, " ");
+   string_append(&parametros_nuevos, direcciones_fisicas);
+   string_append(&parametros_nuevos, " ");
+   string_append(&parametros_nuevos, string_itoa(tamanio_dato));
+   string_append(&parametros_nuevos, " ");
+   string_append(&parametros_nuevos, parametros[4]); // registro puntero archivo
+
+   return parametros_nuevos;
 }
