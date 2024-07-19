@@ -90,6 +90,7 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 
     set_tamanio_archivo(path_archivo, nuevo_tamanio);
     free(path_archivo);
+    string_array_destroy(parametros);
     return 0;
 }
 
@@ -125,6 +126,7 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid)
     free(path_archivo);
     destruir_io_mem_request(mem_request);
     destruir_buffer_response(respuesta);
+    string_array_destroy(parametros);
 
     return 0;
 }
@@ -152,6 +154,7 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
     free(path_archivo);
     free(buffer_archivo);
     free(direccion_escribir);
+    string_array_destroy(parametros);
 //ver como liberar parametros**
     return response == OPERATION_SUCCEED ? 0 : -1;
     

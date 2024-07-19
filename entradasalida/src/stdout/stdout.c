@@ -43,5 +43,7 @@ int8_t io_stdout_write(char *argumentos, u_int32_t pid)
 
     printf("%s\n", (char *)respuesta->buffer);
     destruir_buffer_response(respuesta);
+    string_array_destroy(parametros);
+    
     return 0;
 }
