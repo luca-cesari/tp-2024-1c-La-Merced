@@ -133,33 +133,23 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
     u_int32_t offset = atoi(parametros[3]);
-    char *direccion_archivo = string_itoa(get_bloque_inicial(path_archivo) * get_block_size() + offset);
+    u_int32_t bloque_inicial = get_bloque_inicial(path_archivo);
     u_int32_t tamanio = atoi(parametros[2]);
 
-    t_io_mem_req *mem_request_lectura = crear_io_mem_request(LEER_IO, pid, direccion_archivo, tamanio, NULL);
-
-    FILE *archivo = fopen(path_archivo, "r"); //consultar
-    if (archivo == NULL)
-    {
-        free(path_archivo);
-        return -1; //ver dialfs como tratarlo
-    }
-    enviar_mem_request(mem_request_lectura);
-    destruir_io_mem_request(mem_request_lectura);
-   
-    t_mem_buffer_response * buffer_archivo = recibir_buffer_response();
+    char *buffer_archivo = malloc(tamanio);
+    copiar_de_bloque_datos_con_offset(buffer_archivo, bloque_inicial, offset, tamanio);
     
     char *direccion_escribir = parametros[1];
 
-    t_io_mem_req *mem_request_escritura = crear_io_mem_request(ESCRIBIR_IO, pid, direccion_archivo, tamanio, buffer_archivo);
-    enviar_mem_request(mem_request_escritura);
-    destruir_io_mem_request(mem_request_escritura);
+    t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, direccion_escribir, tamanio, buffer_archivo);
+    enviar_mem_request(mem_request);
+    destruir_io_mem_request(mem_request);
    
     t_mem_response response = recibir_valor();
 
-    // fclose(path_archivo);
     free(path_archivo);
-    free(direccion_archivo);
+    free(buffer_archivo);
+    free(direccion_escribir);
 //ver como liberar parametros**
     return response == OPERATION_SUCCEED ? 0 : -1;
     
