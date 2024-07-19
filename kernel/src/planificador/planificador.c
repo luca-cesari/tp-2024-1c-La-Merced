@@ -257,9 +257,9 @@ static void *finalizar_proceso()
 
       memoria_finalizar_proceso(pcb->pid);
       liberar_recursos(pcb);
-      quitar_proceso_por_pid(pcb->pid); // a chequear
-
       log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
+
+      quitar_proceso_por_pid(pcb->pid); // a chequear
       destruir_pcb(pcb);
    }
 
