@@ -7,6 +7,7 @@
 #include <sockets/sockets.h>
 #include <extended/string.h>
 #include <mem_request/entradasalida.h>
+#include <conexion/memoria.h>
 
 #include "config/config.h"
 #include "metadata.h"
