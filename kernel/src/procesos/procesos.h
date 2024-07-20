@@ -27,6 +27,13 @@ void registrar_proceso(t_pcb *pcb);
 t_pcb *obtener_proceso_por_pid(u_int32_t pid);
 
 /**
+ * @brief Retorna una lista de todos los procesos (t_pcb) en el sistema.
+ *
+ * @return `t_list*`
+ */
+t_list *obtener_procesos();
+
+/**
  * @brief Remueve un proceso de la lista de procesos por su pid.
  *        pero no hace nada con el proceso, tampoco lo retorna.
  *

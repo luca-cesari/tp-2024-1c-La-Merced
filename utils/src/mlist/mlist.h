@@ -113,6 +113,22 @@ t_mutext_list *mlist_map(t_mutext_list *lista_mutex, void *(*conversor)(void *))
  * @brief
  *
  * @param lista_mutex
+ * @return t_mutext_list*
+ */
+t_mutext_list *mlist_duplicate(t_mutext_list *lista_mutex);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
+ * @return t_list*
+ */
+t_list *mlist_to_list(t_mutext_list *lista_mutex);
+
+/**
+ * @brief
+ *
+ * @param lista_mutex
  * @param closure
  */
 void mlist_iterate(t_mutext_list *lista_mutex, void (*closure)(void *));
