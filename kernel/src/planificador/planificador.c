@@ -3,7 +3,7 @@
 u_int32_t pid_count;
 u_int32_t quantum;
 
-sem_t grado_multiprogramacion;
+sem_mp_t *grado_multiprogramacion;
 
 q_estado *cola_new;
 q_estado *cola_ready;
@@ -39,7 +39,7 @@ void inicializar_planificador()
    pid_count = 1;
    quantum = get_quantum();
 
-   sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
+   grado_multiprogramacion = sem_mp_create(get_grado_multiprogramacion());
 
    cola_new = crear_estado(NEW);
    cola_ready = crear_estado(READY);
@@ -88,7 +88,7 @@ void inicializar_planificador()
 
 void destruir_planificador()
 {
-   sem_destroy(&grado_multiprogramacion);
+   sem_mp_destroy(grado_multiprogramacion);
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
@@ -121,7 +121,7 @@ void detener_planificacion()
 
 void modificar_grado_multiprogramacion(u_int32_t nuevo_grado)
 {
-   // TODO
+   sem_mp_set(grado_multiprogramacion, nuevo_grado);
 }
 
 void crear_proceso(char *ruta_ejecutable)
@@ -240,7 +240,7 @@ static void *admitir_proceso()
          continue;
       }
 
-      sem_wait(&grado_multiprogramacion);
+      sem_mp_wait(grado_multiprogramacion);
       pcb = remove_proceso(cola_new, pcb->pid);
       push_proceso(cola_ready, pcb);
       log_ingreso_a_ready(get_pids(cola_ready), NORMAL);
@@ -309,7 +309,7 @@ static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 {
    set_motivo_finalizacion(pcb, motivo);
    push_proceso(cola_exit, pcb);
-   sem_post(&grado_multiprogramacion);
+   sem_mp_post(grado_multiprogramacion);
 }
 
 static void pasar_a_siguiente(t_pcb *pcb)
