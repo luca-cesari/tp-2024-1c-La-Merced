@@ -161,7 +161,7 @@ void set_prioridad(t_pcb *pcb, int8_t priority)
    pcb->priority = priority;
 }
 
-void print_pcb(t_pcb *pcb)
+void debug_pcb(t_pcb *pcb)
 {
    printf("PID: %d\n", pcb->pid);
    printf("Program Counter: %d\n", pcb->program_counter);

@@ -94,6 +94,28 @@ t_mutext_list *mlist_map(t_mutext_list *lista_mutex, void *(*conversor)(void *))
    return nuevo_mlist;
 }
 
+t_mutext_list *mlist_duplicate(t_mutext_list *lista_mutex)
+{
+   t_mutext_list *nuevo_mlist = malloc(sizeof(t_mutext_list));
+
+   pthread_mutex_lock(&(lista_mutex->mutex));
+   t_list *lista = list_duplicate(lista_mutex->list);
+   pthread_mutex_unlock(&(lista_mutex->mutex));
+
+   nuevo_mlist->list = lista;
+   pthread_mutex_init(&(nuevo_mlist->mutex), NULL);
+   return nuevo_mlist;
+}
+
+t_list *mlist_to_list(t_mutext_list *lista_mutex)
+{
+   pthread_mutex_lock(&(lista_mutex->mutex));
+   t_list *lista = list_duplicate(lista_mutex->list);
+   pthread_mutex_unlock(&(lista_mutex->mutex));
+
+   return lista;
+}
+
 void mlist_iterate(t_mutext_list *lista_mutex, void (*closure)(void *))
 {
    pthread_mutex_lock(&(lista_mutex->mutex));

@@ -3,7 +3,7 @@
 u_int32_t pid_count;
 u_int32_t quantum;
 
-sem_t grado_multiprogramacion;
+sem_mp_t *grado_multiprogramacion;
 
 q_estado *cola_new;
 q_estado *cola_ready;
@@ -39,7 +39,7 @@ void inicializar_planificador()
    pid_count = 1;
    quantum = get_quantum();
 
-   sem_init(&grado_multiprogramacion, 0, get_grado_multiprogramacion());
+   grado_multiprogramacion = sem_mp_create(get_grado_multiprogramacion());
 
    cola_new = crear_estado(NEW);
    cola_ready = crear_estado(READY);
@@ -88,7 +88,7 @@ void inicializar_planificador()
 
 void destruir_planificador()
 {
-   sem_destroy(&grado_multiprogramacion);
+   sem_mp_destroy(grado_multiprogramacion);
 
    destruir_estado(cola_new);
    destruir_estado(cola_ready);
@@ -121,7 +121,7 @@ void detener_planificacion()
 
 void modificar_grado_multiprogramacion(u_int32_t nuevo_grado)
 {
-   // TODO
+   sem_mp_set(grado_multiprogramacion, nuevo_grado);
 }
 
 void crear_proceso(char *ruta_ejecutable)
@@ -152,13 +152,12 @@ void matar_proceso(u_int32_t pid)
       return;
    case BLOCKED:
       if (proceso->motivo_desalojo == IO)
-         proceso->motivo_finalizacion = INTERRUPTED_BY_USER;
+         proceso = remove_proceso_cola_io(cola_blocked_interfaces, proceso->io_request->interface_name, pid);
 
       if (proceso->motivo_desalojo == WAIT)
-      {
          proceso = remove_proceso_cola_recurso(cola_blocked_recursos, proceso->resource, pid);
-         pasar_a_exit(proceso, INTERRUPTED_BY_USER);
-      }
+
+      pasar_a_exit(proceso, INTERRUPTED_BY_USER);
       return;
    case EXEC:
       enviar_interrupcion(USER_INT);
@@ -187,22 +186,13 @@ static void *consumir_io(void *cola_io)
    while (1)
    {
       t_pcb *pcb = peek_proceso(interfaz->cola_procesos);
+      u_int32_t pid = pcb->pid;
       enviar_io_request(interfaz->fd_conexion, pcb->io_request);
       int32_t response = recibir_senial(interfaz->fd_conexion);
 
-      // se resetea el campo io_req
-      // principalmente para EXECUTED,
-      // así no afectaría cuando vuelva a la CPU.
-      // en otros casos no debería ser relevante
-      // t_io_request *empty_io_req = crear_io_request(pcb->pid, "", "", "");
-      // set_io_request(pcb, empty_io_req);
-
-      pcb = remove_proceso(interfaz->cola_procesos, pcb->pid);
-      if (pcb->motivo_finalizacion == INTERRUPTED_BY_USER)
-      {
-         pasar_a_exit(pcb, INTERRUPTED_BY_USER);
+      pcb = remove_proceso(interfaz->cola_procesos, pid);
+      if (pcb == NULL)
          continue;
-      }
 
       switch (response)
       {
@@ -250,7 +240,7 @@ static void *admitir_proceso()
          continue;
       }
 
-      sem_wait(&grado_multiprogramacion);
+      sem_mp_wait(grado_multiprogramacion);
       pcb = remove_proceso(cola_new, pcb->pid);
       push_proceso(cola_ready, pcb);
       log_ingreso_a_ready(get_pids(cola_ready), NORMAL);
@@ -267,9 +257,9 @@ static void *finalizar_proceso()
 
       memoria_finalizar_proceso(pcb->pid);
       liberar_recursos(pcb);
-      quitar_proceso_por_pid(pcb->pid); // a chequear
-
       log_finalizacion_proceso(pcb->pid, pcb->motivo_finalizacion);
+
+      quitar_proceso_por_pid(pcb->pid); // a chequear
       destruir_pcb(pcb);
    }
 
@@ -319,7 +309,7 @@ static void pasar_a_exit(t_pcb *pcb, motivo_finalizacion motivo)
 {
    set_motivo_finalizacion(pcb, motivo);
    push_proceso(cola_exit, pcb);
-   sem_post(&grado_multiprogramacion);
+   sem_mp_post(grado_multiprogramacion);
 }
 
 static void pasar_a_siguiente(t_pcb *pcb)

@@ -84,6 +84,8 @@ char *obtener_direcciones_fisicas(u_int32_t direccion_logica, u_int32_t tamanio_
 
 char *get_direccion_tamanio(char **parametros);
 
+char *obtener_parametros_fs_read_write(char **parametros);
+
 // parametros es algo de mem_request, los constructores no tienen que ir aca
 // parametros crear_parametros_leer(char *direccion_fisica, u_int32_t tamanio_valor);
 // parametros crear_parametros_escribir(char *direccion_fisica, void *buffer, u_int32_t tamanio_valor);

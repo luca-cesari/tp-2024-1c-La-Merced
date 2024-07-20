@@ -19,7 +19,5 @@
 #define PROCESO_ESTADO "PROCESO_ESTADO"
 
 void iniciar_consola();
-void leer_script(char *);
-void ejecutar_comando(char *, char *);
 
 #endif // KERNEL_CONSOLA_H

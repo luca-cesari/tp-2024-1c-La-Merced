@@ -9,8 +9,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
       "args": [
-        "DIALFS",
-        "DIALFS.config"
+        "FS",
+        "FS.config"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

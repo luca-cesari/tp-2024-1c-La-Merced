@@ -25,6 +25,11 @@ t_pcb *obtener_proceso_por_pid(u_int32_t pid)
    return (t_pcb *)mlist_find(procesos, &_es_proceso);
 }
 
+t_list *obtener_procesos()
+{
+   return mlist_to_list(procesos);
+}
+
 void quitar_proceso_por_pid(u_int32_t pid)
 {
    int32_t _es_proceso(void *pcb)

@@ -70,6 +70,6 @@ void set_motivo_finalizacion(t_pcb *pcb, motivo_finalizacion motivo);
 void set_io_request(t_pcb *pcb, t_io_request *io_request);
 void set_prioridad(t_pcb *pcb, int8_t prioridad);
 
-void print_pcb(t_pcb *pcb);
+void debug_pcb(t_pcb *pcb);
 
 #endif // UTILS_PCB_H

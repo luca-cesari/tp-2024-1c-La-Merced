@@ -152,7 +152,10 @@ u_int32_t hay_bloques_libres_contiguos(u_int32_t bloque_inicial, u_int32_t canti
         }
         else
         {
-            bloques_libres = 0;
+            munmap(map, get_block_count() / 8);
+            close(fd);
+            free(path_bitmap);
+            return 0;
         }
     }
 

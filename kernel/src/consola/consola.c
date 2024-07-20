@@ -1,5 +1,10 @@
 #include "consola.h"
 
+static void leer_script(char *);
+static void ejecutar_comando(char *, char *);
+static void imprimir_procesos();
+static void destruir_proceso(void *);
+
 void iniciar_consola()
 {
    char *comando = NULL;
@@ -28,7 +33,7 @@ void iniciar_consola()
    }
 }
 
-void leer_script(char *ruta_script)
+static void leer_script(char *ruta_script)
 {
    FILE *script;
    char *linea = NULL;
@@ -59,7 +64,7 @@ void leer_script(char *ruta_script)
    fclose(script);
 }
 
-void ejecutar_comando(char *operacion, char *argumento)
+static void ejecutar_comando(char *operacion, char *argumento)
 {
    if (strcmp(operacion, INICIAR_PLANIFICACION) == 0)
    {
@@ -75,6 +80,7 @@ void ejecutar_comando(char *operacion, char *argumento)
 
    if (strcmp(operacion, PROCESO_ESTADO) == 0)
    {
+      imprimir_procesos();
       return;
    }
 
@@ -105,4 +111,41 @@ void ejecutar_comando(char *operacion, char *argumento)
       modificar_grado_multiprogramacion(atoi(argumento));
       return;
    }
+}
+
+static void imprimir_procesos()
+{
+   t_list *procesos = obtener_procesos();
+   char *estados[5] = {"NEW", "READY", "EXECUTING", "BLOCKED", "EXIT"};
+
+   for (int i = 0; i < 5; i++)
+   {
+      printf("PROCESOS EN %s: \n", estados[i]);
+
+      int8_t _es_proceso(void *pcb)
+      {
+         t_pcb *proceso = (t_pcb *)pcb;
+         return proceso->estado == i;
+      };
+      t_list *procesos_estado = list_filter(procesos, (void *)_es_proceso);
+
+      t_list_iterator *iterador = list_iterator_create(procesos_estado);
+      while (list_iterator_has_next(iterador))
+      {
+         t_pcb *proceso = list_iterator_next(iterador);
+         printf("     %d \n", proceso->pid);
+      }
+      list_iterator_destroy(iterador);
+
+      list_destroy_and_destroy_elements(procesos_estado, &destruir_proceso);
+      printf("\n");
+   }
+
+   list_destroy_and_destroy_elements(procesos, &destruir_proceso);
+}
+
+static void destruir_proceso(void *proceso)
+{
+   t_pcb *pcb = (t_pcb *)proceso;
+   destruir_pcb(pcb);
 }

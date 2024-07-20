@@ -23,6 +23,7 @@ typedef struct
 void actualizar_lista_archivos_metadata();
 
 void crear_archivo_metadata(char *path_archivo, u_int32_t bloque_inicial, u_int32_t tamanio_archivo);
+void crear_archivo_metadata_vacio(char *path_archivo);
 /**
  * @brief Obtiene el bloque inicial de un archivo a partir de su metadata
  */

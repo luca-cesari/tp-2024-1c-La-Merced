@@ -25,19 +25,31 @@ void actualizar_lista_archivos_metadata()
 
 void crear_archivo_metadata(char *path_archivo, u_int32_t bloque_inicial, u_int32_t tamanio_archivo)
 {
+
+    crear_archivo_metadata_vacio(path_archivo);
+
     t_config *archivo_metadata = config_create(path_archivo);
     config_set_value(archivo_metadata, "BLOQUE_INICIAL", string_itoa(bloque_inicial));
     config_set_value(archivo_metadata, "TAMANIO_ARCHIVO", string_itoa(tamanio_archivo));
     config_save(archivo_metadata);
 
     metadata *archivo = malloc(sizeof(metadata));
-    archivo->path_archivo = path_archivo;
+    archivo->path_archivo = strdup(path_archivo);
     archivo->bloque_inicial = bloque_inicial;
     archivo->tamanio_archivo = tamanio_archivo;
 
     list_add_sorted(lista_archivos, archivo, comparar_bloque_inicial);
 
     config_destroy(archivo_metadata);
+}
+
+void crear_archivo_metadata_vacio(char *path_archivo)
+{
+    FILE *archivo_metadata = fopen(path_archivo, "w");
+    fwrite("BLOQUE_INICIAL=0\n", 1, 16, archivo_metadata);
+    fwrite("TAMANIO_ARCHIVO=0\n", 1, 18, archivo_metadata);
+
+    fclose(archivo_metadata);
 }
 
 u_int32_t get_bloque_inicial(char *path_archivo)
@@ -60,6 +72,11 @@ u_int32_t get_cantidad_bloques_ocupados(char *path_archivo)
 {
     t_config *archivo_metadata = config_create(path_archivo);
     u_int32_t tamanio_archivo = config_get_int_value(archivo_metadata, "TAMANIO_ARCHIVO");
+    if (tamanio_archivo == 0)
+    {
+        config_destroy(archivo_metadata);
+        return 1;
+    }
     config_destroy(archivo_metadata);
     return tamanio_archivo / get_block_size() + (tamanio_archivo % get_block_size() != 0);
 }
