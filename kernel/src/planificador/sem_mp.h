@@ -8,14 +8,14 @@
 
 typedef struct
 {
-   sem_t sem;
+   sem_t *sem;
    u_int32_t grado_actual;
 } sem_mp_t;
 
 sem_mp_t *sem_mp_create(u_int32_t grado_inicial);
-void sem_mp_wait(sem_mp_t *sem);
-void sem_mp_post(sem_mp_t *sem);
-void sem_mp_set(sem_mp_t *sem, u_int32_t nuevo_grado);
-void sem_mp_destroy(sem_mp_t *sem);
+void sem_mp_wait(sem_mp_t *sem_mp);
+void sem_mp_post(sem_mp_t *sem_mp);
+void sem_mp_set(sem_mp_t *sem_mp, u_int32_t nuevo_grado);
+void sem_mp_destroy(sem_mp_t *sem_mp);
 
 #endif // PLANIFICADOR_SEM_MP_H
