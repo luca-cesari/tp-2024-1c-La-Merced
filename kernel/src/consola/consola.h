@@ -19,5 +19,7 @@
 #define PROCESO_ESTADO "PROCESO_ESTADO"
 
 void iniciar_consola();
-
+void inicializar_readline();
+char **completar_comando(const char *texto, int inicio, int fin);
+char *generador_comando(const char *texto, int estado);
 #endif // KERNEL_CONSOLA_H
