@@ -4,11 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include <semaphore.h>
 #include <commons/temporal.h>
 #include <pcb/pcb.h>
 
 #include "logger/logger.h"
+#include "sem_mp.h"
 #include "procesos/procesos.h"
 #include "estado/estado.h"
 #include "blocked/interfaces.h"
