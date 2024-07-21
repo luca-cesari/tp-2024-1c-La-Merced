@@ -18,5 +18,6 @@
 void iniciar_servidor();
 void *escuchar_conexiones(void *fd_escucha);
 void *atender_interfaz_es(void *fd_ptr);
+void finalizar_servidor();
 
 #endif // KERNEL_SERVIDOR_H

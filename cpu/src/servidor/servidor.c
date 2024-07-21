@@ -27,7 +27,6 @@ void *atender_kernel_dispatch(void *fd_ptr)
    uint32_t modulo_cliente = recibir_cliente(fd_dispatch);
    if (modulo_cliente != KERNEL)
    {
-      liberar_conexion(fd_dispatch);
       sem_post(&fin_de_proceso);
       return NULL;
    }
@@ -37,6 +36,9 @@ void *atender_kernel_dispatch(void *fd_ptr)
    while (1)
    {
       t_pcb *pcb = recibir_pcb(fd_dispatch);
+      if (pcb == NULL)
+         break;
+
       reset_interrupcion();
       ciclo_instruccion(pcb);
       enviar_pcb(fd_dispatch, pcb);
@@ -64,6 +66,8 @@ void *atender_kernel_interrupt(void *fd_ptr)
    while (1)
    {
       int32_t interrupcion = recibir_senial(fd_interrupt);
+      if (interrupcion == -1)
+         break;
       if (interrupcion == 0 || interrupcion == 1)
          set_interrupcion(interrupcion);
    }

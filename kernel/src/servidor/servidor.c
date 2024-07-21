@@ -1,14 +1,15 @@
 #include "servidor.h"
 
+int32_t fd_escucha;
+
 void iniciar_servidor()
 {
    char *puerto_escucha = get_puerto_escucha();
 
-   int32_t *fd_escucha = malloc(sizeof(int32_t));
-   *fd_escucha = crear_servidor(puerto_escucha);
+   fd_escucha = crear_servidor(puerto_escucha);
 
    pthread_t hilo_escucha;
-   pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, fd_escucha);
+   pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, &fd_escucha);
    pthread_detach(hilo_escucha);
 }
 
@@ -37,4 +38,9 @@ void *atender_interfaz_es(void *fd_ptr)
 
    log_evento(string_from_format("Se conecta la interfaz %s", nombre_interfaz));
    return NULL;
+}
+
+void finalizar_servidor()
+{
+   close(fd_escucha);
 }

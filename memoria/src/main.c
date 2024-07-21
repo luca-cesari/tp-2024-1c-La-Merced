@@ -11,7 +11,7 @@ int main(void)
 
     inicializar_memoria_instrucciones();
     inicializar_memoria_usuario();
-    iniciar_servidor();
+    iniciar_servidor(); //bloqueante
 
     destruir_config();
     destruir_logger();

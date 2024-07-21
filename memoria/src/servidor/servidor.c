@@ -1,16 +1,21 @@
 #include "servidor.h"
 
+int32_t fd_escucha;
+
 static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion);
 static void retardo_respuesta(void);
 
 void iniciar_servidor()
 {
     char *puerto_escucha = get_puerto_escucha();
-    int32_t fd_escucha = crear_servidor(puerto_escucha);
+    fd_escucha = crear_servidor(puerto_escucha);
 
     while (1)
     {
-        esperar_cliente(fd_escucha, &atender_cliente);
+        int8_t error = esperar_cliente(fd_escucha, &atender_cliente);
+        printf("retorno esperar cliente , %d\n", error);
+        if (error)
+            return;
     }
 }
 
@@ -47,6 +52,8 @@ void escuchar_kernel(int32_t fd_kernel)
     while (1)
     {
         t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
+        if (mem_request == NULL)
+            return;
 
         // Dado que es indistinto el momento en que se aplica el retardo,
         // lo aplico antes de procesar la solicitud
@@ -86,6 +93,13 @@ void escuchar_cpu(int32_t fd_cpu)
     while (1)
     {
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
+        if (mem_request == NULL)
+        {
+            printf("deberia cerrar \n");
+            close(fd_escucha);
+            return;
+        }
+
         t_list *direcciones_fisicas;
         retardo_respuesta();
 
@@ -138,6 +152,9 @@ void escuchar_interfaz_es(int32_t fd_es)
     while (1)
     {
         t_io_mem_req *mem_request = recibir_io_mem_request(fd_es);
+        if (mem_request == NULL)
+            return;
+
         t_list *direcciones_fisicas;
 
         retardo_respuesta();

@@ -22,15 +22,25 @@ int32_t crear_servidor(char *puerto)
    return socket_servidor;
 }
 
-void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
+int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 {
    pthread_t thread;
 
    int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
 
+   printf("entrando en accept \n");
+
    *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);
+
+   printf("retorno de accept, %d\n", *fd_conexion_ptr);
+
+   if (*fd_conexion_ptr == -1)
+      return -1;
+
    pthread_create(&thread, NULL, atender_cliente, fd_conexion_ptr);
    pthread_detach(thread);
+
+   return 0;
 }
 
 int32_t recibir_cliente(int32_t fd_conexion)

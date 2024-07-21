@@ -15,7 +15,6 @@ static const char *comandos[] = {
     MULTIPROGRAMACION,
     NULL};
 
-
 void inicializar_readline()
 {
    rl_readline_name = "Consola";
@@ -45,6 +44,12 @@ void iniciar_consola()
          free(comando);
          string_array_destroy(vec_comando);
          continue;
+      }
+      if (strcmp(vec_comando[0], "KILL") == 0)
+      {
+         free(comando);
+         string_array_destroy(vec_comando);
+         return;
       }
 
       operacion = vec_comando[0];

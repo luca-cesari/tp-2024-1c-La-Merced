@@ -20,9 +20,10 @@ int main(void)
 
     iniciar_servidor();
 
-    liberar_conexion_memoria();
-    destruir_mmu();
     finalizar_servidor();
+    liberar_conexion_memoria();
+
+    destruir_mmu();
     destruir_config();
     destruir_logger();
 
