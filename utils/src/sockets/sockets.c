@@ -28,11 +28,7 @@ int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 
    int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
 
-   printf("entrando en accept \n");
-
    *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);
-
-   printf("retorno de accept, %d\n", *fd_conexion_ptr);
 
    if (*fd_conexion_ptr == -1)
       return -1;

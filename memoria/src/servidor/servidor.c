@@ -12,9 +12,7 @@ void iniciar_servidor()
 
     while (1)
     {
-        int8_t error = esperar_cliente(fd_escucha, &atender_cliente);
-        printf("retorno esperar cliente , %d\n", error);
-        if (error)
+        if (esperar_cliente(fd_escucha, &atender_cliente))
             return;
     }
 }
@@ -95,7 +93,6 @@ void escuchar_cpu(int32_t fd_cpu)
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
         if (mem_request == NULL)
         {
-            printf("deberia cerrar \n");
             close(fd_escucha);
             return;
         }
