@@ -14,6 +14,7 @@
 #include "metadata.h"
 #include "bitmap.h"
 #include "bloques.h"
+#include "logger/logger.h"
 
 void inicializar_dicc_instrucciones();
 int8_t (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t);
@@ -43,6 +44,6 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid);
  *
  * @note Recibe como argumentos el path del archivo a mover
  */
-void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados);
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados, u_int32_t pid);
 
 #endif // DIALFS_H

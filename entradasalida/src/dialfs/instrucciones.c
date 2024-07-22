@@ -27,6 +27,7 @@ int8_t io_fs_create(char *argumentos, u_int32_t pid)
     modificar_bitmap(get_siguiente_bloque_libre(), OCUPADO);
     free(path_archivo);
     // enviar_respuesta(pid, FILE_CREATED); VER PARA MANDAR AL KERNEL
+    log_crear_archivo(pid, argumentos);
     return 0;
 }
 
@@ -50,6 +51,7 @@ int8_t io_fs_delete(char *argumentos, u_int32_t pid)
     }
     eliminar_archivo_metadata(path_archivo);
     free(path_archivo);
+    log_eliminar_archivo(pid, argumentos);
     return 0;
 }
 
@@ -69,7 +71,7 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 
         if (!hay_bloques_libres_contiguos(get_bloque_inicial(path_archivo) + bloques_ocupados, bloques_faltantes))
         {
-            compactar(path_archivo, tamanio_archivo, bloques_ocupados);
+            compactar(path_archivo, tamanio_archivo, bloques_ocupados, pid);
         }
 
         for (int i = 0; i < bloques_faltantes; i++)
@@ -86,8 +88,11 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
     }
 
     set_tamanio_archivo(path_archivo, nuevo_tamanio);
+    log_truncar_archivo(pid, parametros[0], nuevo_tamanio);
+
     free(path_archivo);
     string_array_destroy(parametros);
+
     return 0;
 }
 
@@ -121,6 +126,8 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid) // salida.txt tamaño punter
     }
 
     pegar_bloque_datos_con_offset((char *)respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
+
+    log_escribir_archivo(pid, parametros[0], tamanio_valor, offset);
 
     free(direcciones_fisicas);
     free(path_archivo);
@@ -158,6 +165,8 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 
     t_mem_response response = recibir_valor();
 
+    log_leer_archivo(pid, parametros[0], tamanio, offset);
+
     free(path_archivo);
     free(buffer_archivo);
     free(direccion_escribir);
@@ -172,8 +181,10 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 3) Poner el archivo al final de los archivos que se movieron en el paso 2
 */
 
-void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados)
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados, u_int32_t pid)
 {
+
+    log_inicio_compactacion(pid);
 
     u_int32_t bloque_inicial = get_bloque_inicial(path);
 
@@ -210,4 +221,5 @@ void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques
     // free(path); No hay que liberarlo, se hace más adelante.
 
     sleep(get_retraso_compactacion() / 1000);
+    log_fin_compactacion(pid);
 }
