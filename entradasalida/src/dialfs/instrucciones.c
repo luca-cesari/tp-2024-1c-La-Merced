@@ -119,6 +119,7 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid) // salida.txt tamaño punter
         free(path_archivo);
         return -1; // Error al recibir respuesta de memoria
     }
+    printf("Respuesta de memoria: %s\n", (char *)respuesta->buffer);
     pegar_bloque_datos_con_offset((char *)respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
 
     free(direcciones_fisicas);
