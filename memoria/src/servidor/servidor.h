@@ -20,9 +20,10 @@
  */
 void iniciar_servidor();
 void *escuchar_conexiones(void *fd_escucha);
-void escuchar_kernel(int32_t fd_kernel);
-void escuchar_cpu(int32_t fd_cpu);
-void escuchar_interfaz_es(int32_t fd_es);
-void *atender_cliente(void *fd_ptr);
+void *escuchar_interfaces(void *);
+void *atender_cpu(void *fd_ptr);
+void *atender_kernel(void *fd_ptr);
+void *atender_interfaz(void *fd_ptr);
+void finalizar_servidor();
 
 #endif // MEMORIA_SERVIDOR_H

@@ -1,57 +1,55 @@
 #include "servidor.h"
 
 int32_t fd_escucha;
+sem_t fin_de_proceso;
 
 static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion);
 static void retardo_respuesta(void);
 
 void iniciar_servidor()
 {
+    sem_init(&fin_de_proceso, 0, 0);
+
     char *puerto_escucha = get_puerto_escucha();
     fd_escucha = crear_servidor(puerto_escucha);
 
-    while (1)
-    {
-        if (esperar_cliente(fd_escucha, &atender_cliente))
-            return;
-    }
+    esperar_cliente(fd_escucha, &atender_cpu);    // CPU
+    esperar_cliente(fd_escucha, &atender_kernel); // Kernel
+
+    pthread_t atencion_interfaces;
+    pthread_create(&atencion_interfaces, NULL, &escuchar_interfaces, NULL);
+    pthread_detach(atencion_interfaces);
+
+    // semaforo para que no termine el hilo principal
+    sem_wait(&fin_de_proceso);
 }
 
-void *atender_cliente(void *fd_ptr)
+void *escuchar_interfaces(void *)
 {
-    int32_t fd_conexion = *((int32_t *)fd_ptr);
+    while (esperar_cliente(fd_escucha, &atender_interfaz))
+        ;
+    return NULL;
+}
+
+void *atender_kernel(void *fd_ptr)
+{
+    int32_t fd_kernel = *((int32_t *)fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
-    int32_t modulo_cliente = recibir_cliente(fd_conexion);
-
-    switch (modulo_cliente)
+    int32_t modulo_cliente = recibir_cliente(fd_kernel);
+    if (modulo_cliente != KERNEL)
     {
-    case KERNEL:
-        escuchar_kernel(fd_conexion);
-        break;
-    case CPU:
-        escuchar_cpu(fd_conexion);
-        break;
-    case E_S:
-        escuchar_interfaz_es(fd_conexion);
-        break;
-    default:
         printf("Error de Cliente \n");
         return NULL;
     }
 
-    return NULL;
-}
-
-void escuchar_kernel(int32_t fd_kernel)
-{
     printf("Kernel conectado \n");
 
     while (1)
     {
         t_kernel_mem_req *mem_request = recibir_kernel_mem_request(fd_kernel);
         if (mem_request == NULL)
-            return;
+            return NULL;
 
         // Dado que es indistinto el momento en que se aplica el retardo,
         // lo aplico antes de procesar la solicitud
@@ -81,10 +79,22 @@ void escuchar_kernel(int32_t fd_kernel)
 
         destruir_kernel_mem_request(mem_request);
     }
+
+    return NULL;
 }
 
-void escuchar_cpu(int32_t fd_cpu)
+void *atender_cpu(void *fd_ptr)
 {
+    int32_t fd_cpu = *((int32_t *)fd_ptr);
+
+    // atender handsake (para saber quienes el cliente)
+    int32_t modulo_cliente = recibir_cliente(fd_cpu);
+    if (modulo_cliente != CPU)
+    {
+        printf("Error de Cliente \n");
+        return NULL;
+    }
+
     printf("CPU conectado \n");
     enviar_senial(get_tamanio_pagina(), fd_cpu);
 
@@ -93,8 +103,8 @@ void escuchar_cpu(int32_t fd_cpu)
         t_cpu_mem_req *mem_request = recibir_cpu_mem_request(fd_cpu);
         if (mem_request == NULL)
         {
-            close(fd_escucha);
-            return;
+            sem_post(&fin_de_proceso);
+            return NULL;
         }
 
         t_list *direcciones_fisicas;
@@ -140,17 +150,29 @@ void escuchar_cpu(int32_t fd_cpu)
 
         destruir_cpu_mem_request(mem_request);
     }
+
+    return NULL;
 }
 
-void escuchar_interfaz_es(int32_t fd_es)
+void *atender_interfaz(void *fd_ptr)
 {
+    int32_t fd_es = *((int32_t *)fd_ptr);
+
+    // atender handsake (para saber quienes el cliente)
+    int32_t modulo_cliente = recibir_cliente(fd_es);
+    if (modulo_cliente != E_S)
+    {
+        printf("Error de Cliente \n");
+        return NULL;
+    }
+
     printf("Interfaz E/S conectada \n");
 
     while (1)
     {
         t_io_mem_req *mem_request = recibir_io_mem_request(fd_es);
         if (mem_request == NULL)
-            return;
+            return NULL;
 
         t_list *direcciones_fisicas;
 
@@ -176,6 +198,14 @@ void escuchar_interfaz_es(int32_t fd_es)
         destruir_io_mem_request(mem_request);
         list_destroy_and_destroy_elements(direcciones_fisicas, &free);
     }
+
+    return NULL;
+}
+
+void finalizar_servidor()
+{
+    sem_destroy(&fin_de_proceso);
+    liberar_conexion(fd_escucha);
 }
 
 static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion)

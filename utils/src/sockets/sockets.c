@@ -80,6 +80,7 @@ int32_t crear_conexion(char *ip, char *puerto)
       freeaddrinfo(server_info);
       return -1;
    }
+
    if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
    {
       perror("Error al conectar al servidor");
@@ -102,6 +103,7 @@ int32_t handshake(int32_t fd_conexion, int32_t id_modulo)
       perror("Error al enviar el ID del modulo");
       return -1;
    }
+
    if (recv(fd_conexion, &resultado, sizeof(int32_t), MSG_WAITALL) == -1)
    {
       perror("Error al recibir el resultado del handshake");
