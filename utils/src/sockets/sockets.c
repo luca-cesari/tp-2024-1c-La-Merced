@@ -22,15 +22,21 @@ int32_t crear_servidor(char *puerto)
    return socket_servidor;
 }
 
-void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
+int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 {
    pthread_t thread;
 
    int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
 
    *fd_conexion_ptr = accept(fd_escucha, NULL, NULL);
+
+   if (*fd_conexion_ptr == -1)
+      return -1;
+
    pthread_create(&thread, NULL, atender_cliente, fd_conexion_ptr);
    pthread_detach(thread);
+
+   return 0;
 }
 
 int32_t recibir_cliente(int32_t fd_conexion)
@@ -74,6 +80,7 @@ int32_t crear_conexion(char *ip, char *puerto)
       freeaddrinfo(server_info);
       return -1;
    }
+
    if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
    {
       perror("Error al conectar al servidor");
@@ -96,6 +103,7 @@ int32_t handshake(int32_t fd_conexion, int32_t id_modulo)
       perror("Error al enviar el ID del modulo");
       return -1;
    }
+
    if (recv(fd_conexion, &resultado, sizeof(int32_t), MSG_WAITALL) == -1)
    {
       perror("Error al recibir el resultado del handshake");

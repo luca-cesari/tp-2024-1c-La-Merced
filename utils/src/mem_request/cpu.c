@@ -103,6 +103,10 @@ void enviar_cpu_mem_request(int32_t fd_memoria, t_cpu_mem_req *mem_request)
 t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
 {
    t_list *paquete = recibir_paquete(fd_cpu);
+
+   if (paquete == NULL)
+      return NULL;
+
    t_cpu_mem_req *mem_request = malloc(sizeof(t_cpu_mem_req));
 
    mem_request->operacion = *(cpu_req_operation *)list_get(paquete, 0);
@@ -131,7 +135,7 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
       break;
    }
 
-   list_clean_and_destroy_elements(paquete, &free);
+   list_destroy_and_destroy_elements(paquete, &free);
    return mem_request;
 }
 

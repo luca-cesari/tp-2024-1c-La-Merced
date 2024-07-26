@@ -180,7 +180,6 @@ void io_fs_create(char **parametros) // clean
 }
 void io_fs_delete(char **parametros) // clean
 {
-
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_DELETE", parametros[1]);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
@@ -199,6 +198,7 @@ void io_fs_truncate(char **parametros) // clean
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
+   free(parametros_nuevos);
    destruir_io_request(io_request);
 }
 

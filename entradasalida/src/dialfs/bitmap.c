@@ -33,9 +33,8 @@ void inicializar_archivo_bitmap()
 
     t_bitarray *bitmap = bitarray_create_with_mode(map, get_block_count(), MSB_FIRST);
     for (int i = 0; i < get_block_count(); i++)
-    {
         bitarray_clean_bit(bitmap, i);
-    }
+
 
     munmap(map, get_block_count() / 8);
     close(fd);
@@ -64,14 +63,9 @@ void modificar_bitmap(u_int32_t bloque, estado estado_bloque)
 
     t_bitarray *bitmap = bitarray_create_with_mode(map, get_block_count(), MSB_FIRST);
     if (estado_bloque == OCUPADO)
-    {
-
         bitarray_set_bit(bitmap, bloque);
-    }
     else
-    {
         bitarray_clean_bit(bitmap, bloque);
-    }
 
     munmap(map, get_block_count() / 8);
     close(fd);
@@ -168,7 +162,5 @@ u_int32_t hay_bloques_libres_contiguos(u_int32_t bloque_inicial, u_int32_t canti
 void liberar_bitmap_a_partir_de(u_int32_t indice)
 {
     for (int i = indice; i < get_block_count(); i++)
-    {
         modificar_bitmap(i, LIBRE);
-    }
 }

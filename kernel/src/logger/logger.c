@@ -112,8 +112,10 @@ void log_ingreso_a_ready(t_list *lista_pid, tipo_cola_ready tipo)
    void _agregar_pid_a_string(void *ptr_pid)
    {
       u_int32_t pid = *(u_int32_t *)ptr_pid;
-      string_append(&pids_str, string_itoa(pid));
+      char* pid_str = string_itoa(pid);
+      string_append(&pids_str, pid_str);
       string_append(&pids_str, " ");
+      free(pid_str);
    };
    list_iterate(lista_pid, &_agregar_pid_a_string);
    string_append(&pids_str, "]");

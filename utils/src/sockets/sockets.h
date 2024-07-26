@@ -18,7 +18,7 @@ enum modulo
 };
 
 int32_t crear_servidor(char *puerto);
-void esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
+int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
 int32_t recibir_cliente(int32_t fd_conexion);
 int32_t crear_conexion(char *ip, char *puerto);
 int32_t handshake(int32_t fd_conexion, int32_t id_modulo);

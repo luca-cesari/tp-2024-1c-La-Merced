@@ -107,7 +107,10 @@ t_list *recibir_paquete(int32_t fd_conexion)
    int32_t tamanio;
 
    if (recibir_operacion(fd_conexion) != PACKET)
+   {
+      list_destroy(valores);
       return NULL;
+   }
 
    buffer = recibir_buffer(&buffer_size, fd_conexion);
 

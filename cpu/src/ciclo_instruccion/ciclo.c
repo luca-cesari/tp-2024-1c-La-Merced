@@ -38,10 +38,12 @@ static void execute(void (*instruccion)(char **), char *char_instruccion)
    aumentar_program_counter();
 
    instruccion(parametros);
-   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], array_a_string(parametros));
+   char *parametros_str = array_a_string(parametros);
+   log_instruccion_ejecutada(pcb->pid, instruc_parametros[0], parametros_str);
    // array_a_string es un nuevo string y no se esta liberando en ningun lado
 
    string_array_destroy(instruc_parametros);
+   free(parametros_str);
    free(parametros);
    // free unicamente porque los elementos (strings) que contiene son
    // la misma referencia que instruc_parametros
@@ -77,6 +79,8 @@ void *ciclo_instruccion(t_pcb *pcb_kernel)
       char *char_instruccion = fetch();
       void (*instruccion)(char **) = decode(char_instruccion);
       execute(instruccion, char_instruccion);
+
+      free(char_instruccion);
 
       // si ocurren simultaneamente pesa mas I/O
       if (check_desalojo())

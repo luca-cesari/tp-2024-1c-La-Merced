@@ -11,10 +11,13 @@ int main(void)
 
     inicializar_memoria_instrucciones();
     inicializar_memoria_usuario();
-    iniciar_servidor();
+    
+    iniciar_servidor(); //bloqueante
+    finalizar_servidor();
 
     destruir_config();
     destruir_logger();
     destruir_memoria_usuario();
+
     return EXIT_SUCCESS;
 }

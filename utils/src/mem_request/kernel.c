@@ -26,6 +26,10 @@ void enviar_kernel_mem_request(int32_t fd_memoria, t_kernel_mem_req *mem_request
 t_kernel_mem_req *recibir_kernel_mem_request(int32_t fd_kernel)
 {
    t_list *paquete = recibir_paquete(fd_kernel);
+
+   if (paquete == NULL)
+      return NULL;
+
    t_kernel_mem_req *mem_request = malloc(sizeof(t_kernel_mem_req));
 
    mem_request->operacion = *(kernel_req_operation *)list_get(paquete, 0);

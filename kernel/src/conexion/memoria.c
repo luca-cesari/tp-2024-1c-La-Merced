@@ -31,6 +31,8 @@ int8_t memoria_iniciar_proceso(u_int32_t pid, char *path)
    int32_t respuesta = recibir_senial(fd_memoria);
    pthread_mutex_unlock(&mutex_memoria);
 
+   destruir_kernel_mem_request(mem_request);
+
    return respuesta;
 }
 

@@ -45,5 +45,6 @@ int main(int argc, char **argv)
     liberar_conexion_memoria();
 
     destruir_config();
+
     return EXIT_SUCCESS;
 }

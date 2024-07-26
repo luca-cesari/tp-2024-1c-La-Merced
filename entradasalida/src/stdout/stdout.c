@@ -5,6 +5,8 @@ void inicializar_interfaz_stdout()
     while (1)
     {
         t_io_request *peticion_io = esperar_instruccion();
+        if (peticion_io == NULL)
+            return;
 
         if (!string_is_equal(peticion_io->instruction, "IO_STDOUT_WRITE"))
         {
@@ -44,6 +46,6 @@ int8_t io_stdout_write(char *argumentos, u_int32_t pid)
     printf("%s\n", (char *)respuesta->buffer);
     destruir_buffer_response(respuesta);
     string_array_destroy(parametros);
-    
+
     return 0;
 }

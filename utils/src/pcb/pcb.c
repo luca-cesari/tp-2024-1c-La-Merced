@@ -74,6 +74,8 @@ void enviar_pcb(int32_t fd_conexion, t_pcb *pcb)
 t_pcb *recibir_pcb(int32_t fd_conexion)
 {
    t_list *paquete = recibir_paquete(fd_conexion);
+   if (paquete == NULL)
+      return NULL;
    t_pcb *pcb = malloc(sizeof(t_pcb));
 
    pcb->pid = *(u_int32_t *)list_get(paquete, 0);
@@ -96,9 +98,9 @@ t_pcb *recibir_pcb(int32_t fd_conexion)
    pcb->resource = strdup((char *)list_get(paquete, 15));
 
    pcb->io_request = crear_io_request(pcb->pid,
-                                      strdup((char *)list_get(paquete, 16)),
-                                      strdup((char *)list_get(paquete, 17)),
-                                      strdup((char *)list_get(paquete, 18)));
+                                      (char *)list_get(paquete, 16),
+                                      (char *)list_get(paquete, 17),
+                                      (char *)list_get(paquete, 18));
 
    pcb->motivo_desalojo = *(motivo_desalojo *)list_get(paquete, 19);
    pcb->motivo_finalizacion = *(motivo_finalizacion *)list_get(paquete, 20);
@@ -151,9 +153,9 @@ void set_io_request(t_pcb *pcb, t_io_request *io_request)
 {
    destruir_io_request(pcb->io_request);
    pcb->io_request = crear_io_request(io_request->pid,
-                                      strdup(io_request->interface_name),
-                                      strdup(io_request->instruction),
-                                      strdup(io_request->arguments));
+                                      io_request->interface_name,
+                                      io_request->instruction,
+                                      io_request->arguments);
 }
 
 void set_prioridad(t_pcb *pcb, int8_t priority)

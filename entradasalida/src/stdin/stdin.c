@@ -5,6 +5,8 @@ void iniciar_rutina_interfaz_stdin()
     while (1)
     {
         t_io_request *peticion_io = esperar_instruccion();
+        if (peticion_io == NULL)
+            return;
 
         if (!string_is_equal(peticion_io->instruction, "IO_STDIN_READ"))
         {

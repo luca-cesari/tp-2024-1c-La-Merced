@@ -27,7 +27,8 @@ int main(void)
     iniciar_servidor();
 
     iniciar_consola(); // bloqueante (corre sobre este hilo)
-
+    
+    finalizar_servidor();
     liberar_conexion_cpu();
     liberar_conexion_memoria();
 
