@@ -12,10 +12,13 @@ void cargar_proceso_a_memoria(int32_t pid, char *path)
     t_list *instrucciones = list_create();
 
     char *path_completo = string_new();
-    string_append(&path_completo, get_path_instrucciones());
+    char *path_base = get_path_instrucciones();
+    string_append(&path_completo, path_base);
     string_append(&path_completo, path);
 
     instrucciones = leer_instrucciones(path_completo);
+    free(path_base);
+    free(path_completo);
 
     t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
     proceso->pid = pid;
@@ -55,11 +58,14 @@ void eliminar_proceso(u_int32_t pid)
         t_proceso_instrucciones *proceso_instruccion = (t_proceso_instrucciones *)elemento;
         return proceso_instruccion->pid == pid;
     };
-    t_proceso_instrucciones *proceso = list_find(lista_procesos, (void *)es_proceso_buscado);
+    list_remove_and_destroy_all_by_condition(lista_procesos, (void *)es_proceso_buscado, &destruir_proceso_instrucciones);
+}
 
-    list_remove_element(lista_procesos, proceso);
+void destruir_proceso_instrucciones(void *elemento)
+{
+    t_proceso_instrucciones *proceso = (t_proceso_instrucciones *)elemento;
     free(proceso->path);
-    list_destroy_and_destroy_elements(proceso->instrucciones, free);
+    list_destroy_and_destroy_elements(proceso->instrucciones, &free);
     free(proceso);
 }
 

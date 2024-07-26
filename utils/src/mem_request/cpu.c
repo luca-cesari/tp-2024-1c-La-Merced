@@ -144,9 +144,9 @@ t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas)
    t_list *lista_direcciones = list_create();
    char **direcciones = string_split(direcciones_fisicas, " ");
    for (int i = 0; direcciones[i] != NULL; i++)
-   {
       list_add(lista_direcciones, direcciones[i]);
-   }
+
+   free(direcciones);
    return lista_direcciones;
 }
 
