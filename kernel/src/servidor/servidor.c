@@ -25,7 +25,7 @@ void *escuchar_conexiones(void *fd_escucha)
 void *atender_interfaz_es(void *fd_ptr)
 {
    int32_t fd_conexion = *((int32_t *)fd_ptr);
-   free(fd_ptr);
+   // free(fd_ptr);
 
    uint32_t modulo_cliente = recibir_cliente(fd_conexion);
 

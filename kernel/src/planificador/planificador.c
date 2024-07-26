@@ -273,7 +273,6 @@ static void liberar_recursos(t_pcb *proceso)
    // con los recursos que figuran en la configuración
    t_dictionary *recursos = get_recursos();
    t_list *nombres_recursos = dictionary_keys(recursos);
-   dictionary_destroy_and_destroy_elements(recursos, &free);
 
    t_list_iterator *iterador = list_iterator_create(nombres_recursos);
 
@@ -292,7 +291,8 @@ static void liberar_recursos(t_pcb *proceso)
    }
 
    list_iterator_destroy(iterador);
-   list_destroy_and_destroy_elements(nombres_recursos, &free);
+   dictionary_destroy_and_destroy_elements(recursos, &free);
+   list_destroy(nombres_recursos);
 }
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
