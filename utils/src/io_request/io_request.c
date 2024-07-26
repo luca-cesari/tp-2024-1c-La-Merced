@@ -72,7 +72,7 @@ t_io_request *recibir_io_request(int32_t fd_conexion)
    io_request->instruction = strdup(list_get(paquete, 2));
    io_request->arguments = strdup(list_get(paquete, 3));
 
-   list_destroy_and_destroy_elements(paquete, free);
+   list_destroy_and_destroy_elements(paquete, &free);
    return io_request;
 }
 

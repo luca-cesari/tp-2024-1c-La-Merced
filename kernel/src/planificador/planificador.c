@@ -101,7 +101,7 @@ void destruir_planificador()
    destruir_lista_procesos();
 }
 
-void iniciar_planificacion()
+void detener_planificacion()
 {
    bloquear_estado(cola_exec);
    bloquear_estado(cola_ready_prioridad);
@@ -110,7 +110,7 @@ void iniciar_planificacion()
    bloquear_colas_de_recursos(cola_blocked_recursos);
 }
 
-void detener_planificacion()
+void iniciar_planificacion()
 {
    desbloquear_colas_de_recursos(cola_blocked_recursos);
    desbloquear_colas_io(cola_blocked_interfaces);
@@ -273,7 +273,6 @@ static void liberar_recursos(t_pcb *proceso)
    // con los recursos que figuran en la configuración
    t_dictionary *recursos = get_recursos();
    t_list *nombres_recursos = dictionary_keys(recursos);
-   // dictionary_destroy_and_destroy_elements(recursos, &free);
 
    t_list_iterator *iterador = list_iterator_create(nombres_recursos);
 
@@ -292,7 +291,8 @@ static void liberar_recursos(t_pcb *proceso)
    }
 
    list_iterator_destroy(iterador);
-   list_destroy_and_destroy_elements(nombres_recursos, &free);
+   dictionary_destroy_and_destroy_elements(recursos, &free);
+   list_destroy(nombres_recursos);
 }
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)

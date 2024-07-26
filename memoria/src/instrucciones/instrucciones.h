@@ -51,6 +51,13 @@ void eliminar_proceso(u_int32_t pid);
 /**
  * @brief
  *
+ * @param elemento
+ */
+void destruir_proceso_instrucciones(void *elemento);
+
+/**
+ * @brief
+ *
  * @param pid
  * @param program_counter
  * @return `char*`
