@@ -26,15 +26,15 @@ void iniciar_servidor()
 
 void *escuchar_interfaces(void *)
 {
-    while (esperar_cliente(fd_escucha, &atender_interfaz))
-        ;
+    while (1)
+        esperar_cliente(fd_escucha, &atender_interfaz);
     return NULL;
 }
 
 void *atender_kernel(void *fd_ptr)
 {
     int32_t fd_kernel = *((int32_t *)fd_ptr);
-    free(fd_ptr);
+    // free(fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
     int32_t modulo_cliente = recibir_cliente(fd_kernel);
@@ -88,7 +88,7 @@ void *atender_kernel(void *fd_ptr)
 void *atender_cpu(void *fd_ptr)
 {
     int32_t fd_cpu = *((int32_t *)fd_ptr);
-    free(fd_ptr);
+    // free(fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
     int32_t modulo_cliente = recibir_cliente(fd_cpu);
@@ -160,7 +160,7 @@ void *atender_cpu(void *fd_ptr)
 void *atender_interfaz(void *fd_ptr)
 {
     int32_t fd_es = *((int32_t *)fd_ptr);
-    free(fd_ptr);
+    // free(fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
     int32_t modulo_cliente = recibir_cliente(fd_es);
