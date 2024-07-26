@@ -95,6 +95,7 @@ void destruir_estado(q_estado *estado)
    // mlist_clean(estado->lista, &destruir_proceso);
    mlist_destroy(estado->lista);
    sem_destroy(estado->hay_proceso);
+   free(estado->hay_proceso);
    pgate_destroy(estado->gate_entrada);
    pgate_destroy(estado->gate_salida);
    free(estado);

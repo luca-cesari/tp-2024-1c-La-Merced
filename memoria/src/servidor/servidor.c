@@ -34,6 +34,7 @@ void *escuchar_interfaces(void *)
 void *atender_kernel(void *fd_ptr)
 {
     int32_t fd_kernel = *((int32_t *)fd_ptr);
+    free(fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
     int32_t modulo_cliente = recibir_cliente(fd_kernel);
@@ -69,6 +70,7 @@ void *atender_kernel(void *fd_ptr)
             printf("FINALIZAR_PROCESO \n");
             // Creo que falta sacar el proceso de la memoria de instrucciones
             destruir_tabla_de_paginas_para_proceso(mem_request->pid);
+            eliminar_proceso(mem_request->pid);
             break;
 
         default:
@@ -86,6 +88,7 @@ void *atender_kernel(void *fd_ptr)
 void *atender_cpu(void *fd_ptr)
 {
     int32_t fd_cpu = *((int32_t *)fd_ptr);
+    free(fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
     int32_t modulo_cliente = recibir_cliente(fd_cpu);
@@ -157,6 +160,7 @@ void *atender_cpu(void *fd_ptr)
 void *atender_interfaz(void *fd_ptr)
 {
     int32_t fd_es = *((int32_t *)fd_ptr);
+    free(fd_ptr);
 
     // atender handsake (para saber quienes el cliente)
     int32_t modulo_cliente = recibir_cliente(fd_es);

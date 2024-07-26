@@ -36,6 +36,7 @@ void sem_mp_set(sem_mp_t *sem_mp, u_int32_t nuevo_grado)
 void sem_mp_destroy(sem_mp_t *sem_mp)
 {
    sem_destroy(sem_mp->sem);
+   free(sem_mp->sem);
    free(sem_mp);
 }
 

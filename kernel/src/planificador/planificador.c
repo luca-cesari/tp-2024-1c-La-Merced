@@ -271,7 +271,10 @@ static void liberar_recursos(t_pcb *proceso)
    // se asume que la cantidad de recursos es fija,
    // es decir, la cola de recursos siempre coincide
    // con los recursos que figuran en la configuración
-   t_list *nombres_recursos = dictionary_keys(get_recursos());
+   t_dictionary *recursos = get_recursos();
+   t_list *nombres_recursos = dictionary_keys(recursos);
+   dictionary_destroy_and_destroy_elements(recursos, &free);
+
    t_list_iterator *iterador = list_iterator_create(nombres_recursos);
 
    // es un asco el doble while,
@@ -290,7 +293,7 @@ static void liberar_recursos(t_pcb *proceso)
    }
 
    list_iterator_destroy(iterador);
-   list_clean_and_destroy_elements(nombres_recursos, &free);
+   list_destroy_and_destroy_elements(nombres_recursos, &free);
 }
 
 static void pasar_a_ready_segun_prioridad(t_pcb *proceso)

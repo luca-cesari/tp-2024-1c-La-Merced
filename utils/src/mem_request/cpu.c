@@ -135,7 +135,7 @@ t_cpu_mem_req *recibir_cpu_mem_request(int32_t fd_cpu)
       break;
    }
 
-   list_clean_and_destroy_elements(paquete, &free);
+   list_destroy_and_destroy_elements(paquete, &free);
    return mem_request;
 }
 

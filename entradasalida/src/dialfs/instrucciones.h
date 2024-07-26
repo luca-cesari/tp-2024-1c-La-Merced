@@ -7,7 +7,6 @@
 #include <sockets/sockets.h>
 #include <extended/string.h>
 #include <mem_request/entradasalida.h>
-#include <conexion/memoria.h>
 
 #include "config/config.h"
 #include "conexion/memoria.h"
@@ -17,18 +16,21 @@
 
 void inicializar_dicc_instrucciones();
 int8_t (*get_funcion_instruccion(char *instruccion))(char *, u_int32_t);
+
 /**
  * @brief Crea un archivo en el sistema de archivos
  *
  * @note Recibe como argumento el path del archivo a crear
  */
 int8_t io_fs_create(char *argumentos, u_int32_t pid);
+
 /**
  * @brief Crea un archivo en el sistema de archivos
  *
  * @note Recibe como argumento el path del archivo a eliminar
  */
 int8_t io_fs_delete(char *argumentos, u_int32_t pid);
+
 /**
  * @brief Aumenta o disminuye el tamaño de un archivo
  *
@@ -44,5 +46,7 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid);
  * @note Recibe como argumentos el path del archivo a mover
  */
 void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados);
+
+void destruir_dicc_instrucciones();
 
 #endif // DIALFS_H

@@ -10,6 +10,8 @@ void inicializar_interfaz_dialfs()
    while (1)
    {
       t_io_request *peticion_io = esperar_instruccion();
+      if (peticion_io == NULL)
+         break;
 
       usleep(get_tiempo_unidad_trabajo() * 1000);
 
@@ -28,8 +30,11 @@ void inicializar_interfaz_dialfs()
          destruir_io_request(peticion_io);
          continue;
       }
+
       log_operacion(peticion_io->pid, peticion_io->instruction);
       enviar_respuesta(EXECUTED);
       destruir_io_request(peticion_io);
    }
+
+   destruir_dicc_instrucciones();
 }

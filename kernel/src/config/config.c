@@ -66,7 +66,7 @@ t_dictionary *get_recursos(void)
       u_int32_t *valor_instancia = malloc(sizeof(u_int32_t));
       *valor_instancia = atoi(instancias[i]);
 
-      dictionary_put(recursos, strdup(nombres[i]), valor_instancia);
+      dictionary_put(recursos, nombres[i], valor_instancia); // a checkear
    }
 
    return recursos;

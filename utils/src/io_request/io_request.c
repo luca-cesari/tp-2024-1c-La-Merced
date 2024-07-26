@@ -62,6 +62,9 @@ void enviar_io_request(int32_t fd_conexion, t_io_request *io_request)
 t_io_request *recibir_io_request(int32_t fd_conexion)
 {
    t_list *paquete = recibir_paquete(fd_conexion);
+   if (paquete == NULL)
+      return NULL;
+
    t_io_request *io_request = malloc(sizeof(t_io_request));
 
    io_request->pid = *(u_int32_t *)list_get(paquete, 0);
@@ -69,7 +72,7 @@ t_io_request *recibir_io_request(int32_t fd_conexion)
    io_request->instruction = strdup(list_get(paquete, 2));
    io_request->arguments = strdup(list_get(paquete, 3));
 
-   list_clean_and_destroy_elements(paquete, free);
+   list_destroy_and_destroy_elements(paquete, free);
    return io_request;
 }
 

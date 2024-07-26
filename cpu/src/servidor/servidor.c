@@ -24,6 +24,8 @@ void iniciar_servidor()
 void *atender_kernel_dispatch(void *fd_ptr)
 {
    int32_t fd_dispatch = *((int32_t *)fd_ptr);
+   free(fd_ptr);
+
    uint32_t modulo_cliente = recibir_cliente(fd_dispatch);
    if (modulo_cliente != KERNEL)
    {
@@ -53,6 +55,8 @@ void *atender_kernel_interrupt(void *fd_ptr)
 {
 
    int32_t fd_interrupt = *((int32_t *)fd_ptr);
+   free(fd_ptr);
+
    uint32_t modulo_cliente = recibir_cliente(fd_interrupt);
    if (modulo_cliente != KERNEL)
    {

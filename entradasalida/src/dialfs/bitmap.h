@@ -11,7 +11,8 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <errno.h>
-#include <conexion/kernel.h>
+
+#include "conexion/kernel.h"
 
 typedef enum
 {
@@ -26,6 +27,7 @@ void inicializar_archivo_bitmap(void);
  * @note Se puede setear el estado en LIBRE u OCUPADO
  */
 void modificar_bitmap(u_int32_t nro_bloque, estado estado);
+
 /**
  * @brief Obtiene el indice del primer bloque libre que encuentra en el bitmap
  *
