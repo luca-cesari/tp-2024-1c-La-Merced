@@ -377,6 +377,8 @@ static void manejar_signal(t_pcb *pcb)
       pasar_a_exit(pcb, INVALID_RESOURCE);
       break;
    case RELEASED:
+      pasar_a_ready_segun_prioridad(pcb);
+
       t_pcb *proceso = desbloquear_encolado(cola_blocked_recursos, pcb->resource);
       if (proceso != NULL)
          pasar_a_ready_segun_prioridad(proceso);
