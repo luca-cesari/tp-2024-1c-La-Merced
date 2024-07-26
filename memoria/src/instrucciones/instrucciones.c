@@ -9,15 +9,13 @@ void inicializar_memoria_instrucciones()
 
 void cargar_proceso_a_memoria(int32_t pid, char *path)
 {
-    t_list *instrucciones = list_create();
-
     char *path_completo = string_new();
     char *path_base = get_path_instrucciones();
     string_append(&path_completo, path_base);
     string_append(&path_completo, path);
 
-    instrucciones = leer_instrucciones(path_completo);
-    free(path_base);
+    t_list *instrucciones = leer_instrucciones(path_completo);
+    // free(path_base);
     free(path_completo);
 
     t_proceso_instrucciones *proceso = malloc(sizeof(t_proceso_instrucciones));
