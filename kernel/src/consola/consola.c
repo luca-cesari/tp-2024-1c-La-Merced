@@ -3,7 +3,6 @@
 static void leer_script(char *);
 static void ejecutar_comando(char *, char *);
 static void imprimir_procesos();
-static void destruir_proceso(void *);
 
 static const char *comandos[] = {
     INICIAR_PLANIFICACION,
@@ -166,17 +165,11 @@ static void imprimir_procesos()
       }
       list_iterator_destroy(iterador);
 
-      list_destroy_and_destroy_elements(procesos_estado, &destruir_proceso);
+      list_destroy_and_destroy_elements(procesos_estado, &free);
       printf("\n");
    }
 
-   list_destroy_and_destroy_elements(procesos, &destruir_proceso);
-}
-
-static void destruir_proceso(void *proceso)
-{
-   t_pcb *pcb = (t_pcb *)proceso;
-   destruir_pcb(pcb);
+   list_destroy(procesos);
 }
 
 // Función para autocompletar comandos

@@ -101,7 +101,7 @@ void destruir_planificador()
    destruir_lista_procesos();
 }
 
-void iniciar_planificacion()
+void detener_planificacion()
 {
    bloquear_estado(cola_exec);
    bloquear_estado(cola_ready_prioridad);
@@ -110,7 +110,7 @@ void iniciar_planificacion()
    bloquear_colas_de_recursos(cola_blocked_recursos);
 }
 
-void detener_planificacion()
+void iniciar_planificacion()
 {
    desbloquear_colas_de_recursos(cola_blocked_recursos);
    desbloquear_colas_io(cola_blocked_interfaces);

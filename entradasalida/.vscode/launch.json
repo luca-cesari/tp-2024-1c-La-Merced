@@ -9,8 +9,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
       "args": [
-        "GENERICA",
-        "GENERICA.config"
+        "FS",
+        "FS.config"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
