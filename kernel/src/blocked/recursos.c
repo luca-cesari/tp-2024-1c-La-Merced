@@ -60,16 +60,23 @@ respuesta_solicitud liberar_recurso(q_blocked *estado, u_int32_t pid, char *nomb
    if (recurso == NULL)
       return INVALID;
 
+   t_pcb *bloqueado = remove_proceso_cola_recurso(recurso->cola_procesos, nombre_recurso, pid);
+   if (bloqueado != NULL)
+   {
+      free(bloqueado);
+      return RELEASED;
+   }
+
    int32_t index = index_of_pid(recurso, pid);
    if (index == -1)
       return INVALID;
 
+   u_int32_t *pid_previo = mlist_remove(recurso->asignados, index);
+   free(pid_previo);
+
    pthread_mutex_lock(&(recurso->mutex_instancias));
    recurso->instancias += 1;
    pthread_mutex_unlock(&(recurso->mutex_instancias));
-
-   u_int32_t *pid_previo = mlist_remove(recurso->asignados, index);
-   free(pid_previo);
 
    return RELEASED;
 }
