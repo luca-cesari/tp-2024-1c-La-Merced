@@ -223,3 +223,8 @@ void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques
     sleep(get_retraso_compactacion() / 1000);
     log_fin_compactacion(pid);
 }
+
+void destruir_dicc_instrucciones()
+{
+    dictionary_destroy_and_destroy_elements(dicc_instrucciones, free);
+}
