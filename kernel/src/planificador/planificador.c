@@ -273,7 +273,7 @@ static void liberar_recursos(t_pcb *proceso)
    // con los recursos que figuran en la configuración
    t_dictionary *recursos = get_recursos();
    t_list *nombres_recursos = dictionary_keys(recursos);
-   // dictionary_destroy_and_destroy_elements(recursos, &free);
+   dictionary_destroy_and_destroy_elements(recursos, &free);
 
    t_list_iterator *iterador = list_iterator_create(nombres_recursos);
 
