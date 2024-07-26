@@ -27,6 +27,7 @@ int8_t io_fs_create(char *argumentos, u_int32_t pid)
     modificar_bitmap(get_siguiente_bloque_libre(), OCUPADO);
     free(path_archivo);
     // enviar_respuesta(pid, FILE_CREATED); VER PARA MANDAR AL KERNEL
+    log_crear_archivo(pid, argumentos);
     return 0;
 }
 
@@ -50,6 +51,7 @@ int8_t io_fs_delete(char *argumentos, u_int32_t pid)
     }
     eliminar_archivo_metadata(path_archivo);
     free(path_archivo);
+    log_eliminar_archivo(pid, argumentos);
     return 0;
 }
 
@@ -69,7 +71,7 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 
         if (!hay_bloques_libres_contiguos(get_bloque_inicial(path_archivo) + bloques_ocupados, bloques_faltantes))
         {
-            compactar(path_archivo, tamanio_archivo, bloques_ocupados);
+            compactar(path_archivo, tamanio_archivo, bloques_ocupados, pid);
         }
 
         for (int i = 0; i < bloques_faltantes; i++)
@@ -86,19 +88,30 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
     }
 
     set_tamanio_archivo(path_archivo, nuevo_tamanio);
+    log_truncar_archivo(pid, parametros[0], nuevo_tamanio);
+
     free(path_archivo);
     string_array_destroy(parametros);
+
     return 0;
 }
 
-int8_t io_fs_write(char *argumentos, u_int32_t pid)
+int8_t io_fs_write(char *argumentos, u_int32_t pid) // salida.txt tamaño puntero_Arc 0 16 32
 {
     char **parametros = string_split(argumentos, " ");
+    char *direcciones_fisicas = string_new();
+    int i = 3;
 
-    char *direcciones_fisicas = parametros[1];
-    u_int32_t tamanio_valor = atoi(parametros[2]);
+    while (parametros[i] != NULL)
+    {
+        string_append(&direcciones_fisicas, parametros[i]);
+        string_append(&direcciones_fisicas, " ");
+        i++;
+    }
+
+    u_int32_t tamanio_valor = atoi(parametros[1]);
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
-    u_int32_t offset = atoi(parametros[3]);
+    u_int32_t offset = atoi(parametros[2]);
 
     t_io_mem_req *mem_request = crear_io_mem_request(LEER_IO, pid, direcciones_fisicas, tamanio_valor, NULL);
     enviar_mem_request(mem_request);
@@ -111,7 +124,10 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid)
         free(path_archivo);
         return -1; // Error al recibir respuesta de memoria
     }
-    pegar_bloque_datos_con_offset(respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
+
+    pegar_bloque_datos_con_offset((char *)respuesta->buffer, get_bloque_inicial(path_archivo), offset, tamanio_valor);
+
+    log_escribir_archivo(pid, parametros[0], tamanio_valor, offset);
 
     free(direcciones_fisicas);
     free(path_archivo);
@@ -125,22 +141,31 @@ int8_t io_fs_write(char *argumentos, u_int32_t pid)
 int8_t io_fs_read(char *argumentos, u_int32_t pid)
 {
     char **parametros = string_split(argumentos, " ");
+    char *direccion_escribir = string_new();
+    int i = 3;
+
+    while (parametros[i] != NULL)
+    {
+        string_append(&direccion_escribir, parametros[i]);
+        string_append(&direccion_escribir, " ");
+        i++;
+    }
 
     char *path_archivo = string_from_format("%s/%s", get_path_base_dialfs(), parametros[0]);
-    u_int32_t offset = atoi(parametros[3]);
+    u_int32_t offset = atoi(parametros[2]);
     u_int32_t bloque_inicial = get_bloque_inicial(path_archivo);
-    u_int32_t tamanio = atoi(parametros[2]);
+    u_int32_t tamanio = atoi(parametros[1]);
 
     char *buffer_archivo = malloc(tamanio);
     copiar_de_bloque_datos_con_offset(buffer_archivo, bloque_inicial, offset, tamanio);
-
-    char *direccion_escribir = parametros[1];
 
     t_io_mem_req *mem_request = crear_io_mem_request(ESCRIBIR_IO, pid, direccion_escribir, tamanio, buffer_archivo);
     enviar_mem_request(mem_request);
     destruir_io_mem_request(mem_request);
 
     t_mem_response response = recibir_valor();
+
+    log_leer_archivo(pid, parametros[0], tamanio, offset);
 
     free(path_archivo);
     free(buffer_archivo);
@@ -156,8 +181,10 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 3) Poner el archivo al final de los archivos que se movieron en el paso 2
 */
 
-void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados)
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados, u_int32_t pid)
 {
+
+    log_inicio_compactacion(pid);
 
     u_int32_t bloque_inicial = get_bloque_inicial(path);
 
@@ -194,9 +221,5 @@ void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques
     // free(path); No hay que liberarlo, se hace más adelante.
 
     sleep(get_retraso_compactacion() / 1000);
-}
-
-void destruir_dicc_instrucciones()
-{
-    dictionary_destroy_and_destroy_elements(dicc_instrucciones, &free);
+    log_fin_compactacion(pid);
 }

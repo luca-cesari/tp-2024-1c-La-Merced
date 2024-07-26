@@ -206,7 +206,7 @@ void io_fs_write(char **parametros)
 {
    char *nuevos_parametros = obtener_parametros_fs_read_write(eliminar_primer_elemento(parametros));
 
-   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_ WRITE", nuevos_parametros);
+   t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_WRITE", nuevos_parametros);
    set_io_request(pcb, io_request);
    set_motivo_desalojo(pcb, IO);
 
@@ -307,15 +307,16 @@ char *obtener_parametros_fs_read_write(char **parametros)
 {
    int32_t direccion_logica = atoi(parametros[1]);
    int32_t tamanio_dato = get_valor_registro(parametros[2]);
+   int32_t puntero_archivo = get_valor_registro(parametros[3]);
    char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_dato);
    char *parametros_nuevos = string_new();
    string_append(&parametros_nuevos, parametros[0]); // nombre archivo
    string_append(&parametros_nuevos, " ");
-   string_append(&parametros_nuevos, direcciones_fisicas);
-   string_append(&parametros_nuevos, " ");
    string_append(&parametros_nuevos, string_itoa(tamanio_dato));
    string_append(&parametros_nuevos, " ");
-   string_append(&parametros_nuevos, parametros[3]); // registro puntero archivo
+   string_append(&parametros_nuevos, string_itoa(puntero_archivo));
+   string_append(&parametros_nuevos, " ");
+   string_append(&parametros_nuevos, direcciones_fisicas); // registro puntero archivo
 
    return parametros_nuevos;
 }
