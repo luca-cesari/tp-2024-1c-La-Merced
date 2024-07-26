@@ -4,7 +4,6 @@ static resource_queue *crear_recurso(char *nombre_recurso, u_int32_t instancias)
 static resource_queue *buscar_recurso(q_blocked *estado, char *nombre_recurso);
 static void _bloquear_recurso(void *ptr_recurso);
 static void _desbloquear_recurso(void *ptr_recurso);
-static int32_t index_of_pid(resource_queue *estado, u_int32_t pid);
 
 void inicializar_recursos(q_blocked *cola_recursos)
 {
@@ -24,65 +23,70 @@ void inicializar_recursos(q_blocked *cola_recursos)
 void destruir_resource_queue(void *ptr_recurso)
 {
    resource_queue *recurso = (resource_queue *)ptr_recurso;
+
    free(recurso->nombre_recurso);
-   mlist_clean(recurso->asignados, &free);
-   mlist_destroy(recurso->asignados);
+   pthread_mutex_destroy(&(recurso->mutex_recurso));
    destruir_estado(recurso->cola_procesos);
    free(recurso);
 }
 
-respuesta_solicitud consumir_recurso(q_blocked *estado, u_int32_t pid, char *nombre_recurso)
+respuesta_solicitud consumir_recurso(q_blocked *estado, char *nombre_recurso, t_pcb *proceso)
 {
    resource_queue *recurso = buscar_recurso(estado, nombre_recurso);
-
    if (recurso == NULL)
       return INVALID;
 
    // La consigna indica una verificacion de menor estricto
    // pero deberia menor o igual
+   pthread_mutex_lock(&(recurso->mutex_recurso));
    if (recurso->instancias <= 0)
-      return ALL_RETAINED;
+   {
+      pthread_mutex_unlock(&(recurso->mutex_recurso));
+      push_proceso(recurso->cola_procesos, proceso);
+      return QUEUED;
+   }
 
-   pthread_mutex_lock(&(recurso->mutex_instancias));
    recurso->instancias -= 1;
-   pthread_mutex_unlock(&(recurso->mutex_instancias));
 
-   u_int32_t *pid_asignado = malloc(sizeof(u_int32_t));
-   *pid_asignado = pid;
-   mlist_add(recurso->asignados, pid_asignado);
+   u_int32_t *asignado = malloc(sizeof(u_int32_t));
+   *asignado = proceso->pid;
+   list_add(recurso->asignados, asignado);
+   pthread_mutex_unlock(&(recurso->mutex_recurso));
 
    return ASSIGNED;
 }
 
-respuesta_solicitud liberar_recurso(q_blocked *estado, u_int32_t pid, char *nombre_recurso)
+respuesta_solicitud liberar_recurso(q_blocked *estado, char *nombre_recurso, u_int32_t pid)
 {
    resource_queue *recurso = buscar_recurso(estado, nombre_recurso);
    if (recurso == NULL)
       return INVALID;
 
-   int32_t index = index_of_pid(recurso, pid);
-   if (index == -1)
+   int8_t _es_buscado(void *ptr_pid)
+   {
+      u_int32_t *pid_asignado = (u_int32_t *)ptr_pid;
+      return *pid_asignado == pid;
+   };
+
+   pthread_mutex_lock(&(recurso->mutex_recurso));
+   u_int32_t *pid_asignado = list_remove_by_condition(recurso->asignados, (void *)_es_buscado);
+   if (pid_asignado == NULL)
+   {
+      pthread_mutex_unlock(&(recurso->mutex_recurso));
       return INVALID;
+   }
 
-   pthread_mutex_lock(&(recurso->mutex_instancias));
    recurso->instancias += 1;
-   pthread_mutex_unlock(&(recurso->mutex_instancias));
-
-   u_int32_t *pid_previo = mlist_remove(recurso->asignados, index);
-   free(pid_previo);
+   pthread_mutex_unlock(&(recurso->mutex_recurso));
 
    return RELEASED;
 }
 
-void bloquear_para_recurso(q_blocked *estado, t_pcb *pcb)
-{
-   resource_queue *recurso = buscar_recurso(estado, pcb->resource);
-   push_proceso(recurso->cola_procesos, pcb);
-}
-
-t_pcb *desbloquear_para_recurso(q_blocked *estado, char *nombre_recurso)
+t_pcb *desbloquear_encolado(q_blocked *estado, char *nombre_recurso)
 {
    resource_queue *recurso = buscar_recurso(estado, nombre_recurso);
+   // no se hace manejo de NULL
+   // porque el recurso deberia existir (por contexto)
 
    // es necesario verificar si hay procesos en la cola
    // porque esta funcion no debe ser bloqueante.
@@ -97,11 +101,17 @@ t_pcb *desbloquear_para_recurso(q_blocked *estado, char *nombre_recurso)
    // y puede consumir la instancia
    t_pcb *pcb = pop_proceso(recurso->cola_procesos);
 
-   // No debería caer nunca en INVALID o ALL_RETAINED
-   consumir_recurso(estado, pcb->pid, nombre_recurso);
+   // No debería caer nunca en INVALID o QUEUED
+   consumir_recurso(estado, nombre_recurso, pcb);
 
    return pcb;
 }
+
+// void bloquear_para_recurso(q_blocked *estado, t_pcb *pcb)
+// {
+//    resource_queue *recurso = buscar_recurso(estado, pcb->resource);
+//    push_proceso(recurso->cola_procesos, pcb);
+// }
 
 void bloquear_colas_de_recursos(q_blocked *estado)
 {
@@ -127,9 +137,9 @@ static resource_queue *crear_recurso(char *nombre_recurso, u_int32_t instancias)
    resource_queue *recurso = malloc(sizeof(resource_queue));
    recurso->nombre_recurso = strdup(nombre_recurso);
    recurso->instancias = instancias;
-   pthread_mutex_init(&(recurso->mutex_instancias), NULL);
-   recurso->asignados = mlist_create();
    recurso->cola_procesos = crear_estado(BLOCKED);
+   recurso->asignados = list_create();
+   pthread_mutex_init(&(recurso->mutex_recurso), NULL);
 
    return recurso;
 }
@@ -156,14 +166,3 @@ void _desbloquear_recurso(void *ptr_recurso)
    resource_queue *recurso = (resource_queue *)ptr_recurso;
    desbloquear_estado(recurso->cola_procesos);
 };
-
-static int32_t index_of_pid(resource_queue *estado, u_int32_t pid)
-{
-   int32_t _es_pid(void *ptr_pid)
-   {
-      u_int32_t *pid_asignado = (u_int32_t *)ptr_pid;
-      return *pid_asignado == pid;
-   };
-
-   return mlist_index_of(estado->asignados, &_es_pid);
-}

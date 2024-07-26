@@ -170,6 +170,7 @@ void io_stdout_write(char **parametros) // clean
 
    destruir_io_request(io_request);
 }
+
 void io_fs_create(char **parametros) // clean
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_CREATE", parametros[1]);
@@ -178,6 +179,7 @@ void io_fs_create(char **parametros) // clean
 
    destruir_io_request(io_request);
 }
+
 void io_fs_delete(char **parametros) // clean
 {
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_DELETE", parametros[1]);

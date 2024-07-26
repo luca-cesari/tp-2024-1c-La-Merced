@@ -19,7 +19,8 @@
 			"limits": "c",
 			"memory": "c",
 			"new": "c",
-			"system_error": "c"
+			"system_error": "c",
+			"memory_resource": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
 	},

@@ -273,7 +273,7 @@ static void liberar_recursos(t_pcb *proceso)
    // con los recursos que figuran en la configuración
    t_dictionary *recursos = get_recursos();
    t_list *nombres_recursos = dictionary_keys(recursos);
-   dictionary_destroy_and_destroy_elements(recursos, &free);
+   // dictionary_destroy_and_destroy_elements(recursos, &free);
 
    t_list_iterator *iterador = list_iterator_create(nombres_recursos);
 
@@ -283,12 +283,11 @@ static void liberar_recursos(t_pcb *proceso)
    while (list_iterator_has_next(iterador))
    {
       char *nombre_recurso = list_iterator_next(iterador);
-      while (liberar_recurso(cola_blocked_recursos, proceso->pid, nombre_recurso) == RELEASED)
+      while (liberar_recurso(cola_blocked_recursos, nombre_recurso, proceso->pid) == RELEASED)
       {
-         t_pcb *desbloqueado = desbloquear_para_recurso(cola_blocked_recursos, nombre_recurso);
-         if (proceso == NULL)
-            continue;
-         pasar_a_ready_segun_prioridad(desbloqueado);
+         t_pcb *desbloqueado = desbloquear_encolado(cola_blocked_recursos, nombre_recurso);
+         if (desbloqueado != NULL)
+            pasar_a_ready_segun_prioridad(desbloqueado);
       }
    }
 
@@ -350,15 +349,14 @@ static void pasar_a_siguiente(t_pcb *pcb)
 
 static void manejar_wait(t_pcb *pcb)
 {
-   respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->pid, pcb->resource);
+   respuesta_solicitud respuesta = consumir_recurso(cola_blocked_recursos, pcb->resource, pcb);
 
    switch (respuesta)
    {
    case INVALID:
       pasar_a_exit(pcb, INVALID_RESOURCE);
       break;
-   case ALL_RETAINED:
-      bloquear_para_recurso(cola_blocked_recursos, pcb);
+   case QUEUED:
       log_motivo_bloqueo(pcb->pid, RECURSO, pcb->resource);
       break;
    case ASSIGNED:
@@ -371,7 +369,7 @@ static void manejar_wait(t_pcb *pcb)
 
 static void manejar_signal(t_pcb *pcb)
 {
-   respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->pid, pcb->resource);
+   respuesta_solicitud respuesta = liberar_recurso(cola_blocked_recursos, pcb->resource, pcb->pid);
 
    switch (respuesta)
    {
@@ -379,11 +377,13 @@ static void manejar_signal(t_pcb *pcb)
       pasar_a_exit(pcb, INVALID_RESOURCE);
       break;
    case RELEASED:
-      t_pcb *proceso = desbloquear_para_recurso(cola_blocked_recursos, pcb->resource);
+      pasar_a_ready_segun_prioridad(pcb);
+
+      t_pcb *proceso = desbloquear_encolado(cola_blocked_recursos, pcb->resource);
       if (proceso != NULL)
          pasar_a_ready_segun_prioridad(proceso);
       break;
-   default: // no debería llegar aca nunca (caso ASSIGNED, ALL_RETAINED)
+   default: // no debería llegar aca nunca (caso ASSIGNED, QUEUED)
       break;
    }
 }

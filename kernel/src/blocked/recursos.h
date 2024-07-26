@@ -12,14 +12,14 @@
 
 /**
  * @note `INVALID` indica que el recurso no existe o que no se puede operar sobre el.
- * @note `ALL_RETAINED` indica que no hay instancias disponibles.
+ * @note `QUEUED` indica que no hay instancias disponibles y se bloqueo el proceso.
  * @note `ASSIGNED` indica que se asigno una instancia con exito.
  * @note `RELEASED` indica que se libero una instancia con exito
  */
 typedef enum
 {
    INVALID,
-   ALL_RETAINED,
+   QUEUED,
    ASSIGNED,
    RELEASED
 } respuesta_solicitud;
@@ -28,9 +28,9 @@ typedef struct
 {
    char *nombre_recurso;
    u_int32_t instancias;
-   pthread_mutex_t mutex_instancias;
-   t_mutext_list *asignados;
    q_estado *cola_procesos;
+   t_list *asignados;
+   pthread_mutex_t mutex_recurso;
 } resource_queue;
 
 /**
@@ -59,11 +59,11 @@ void destruir_resource_queue(void *ptr_recurso);
  *        Para cualquier otro caso, simplemente responde, no opera.
  *
  * @param estado
- * @param pid
  * @param nombre_recurso
- * @return `respuesta_solicitud` : `INVALID`, `ALL_RETAINED`, `ASSIGNED` son los posibles valores.
+ * @param proceso
+ * @return `respuesta_solicitud` : `INVALID`, `QUEUED`, `ASSIGNED` son los posibles valores.
  */
-respuesta_solicitud consumir_recurso(q_blocked *estado, u_int32_t pid, char *nombre_recurso);
+respuesta_solicitud consumir_recurso(q_blocked *estado, char *nombre_recurso, t_pcb *proceso);
 
 /**
  * @brief Busca un recurso en la cola de recursos bloqueados y respode segun el caso.
@@ -71,23 +71,11 @@ respuesta_solicitud consumir_recurso(q_blocked *estado, u_int32_t pid, char *nom
  *        Si un proceso intenta liberar un recurso que no tiene asignado, se considera inválido.
  *
  * @param estado
- * @param pid
  * @param nombre_recurso
+ * @param pid
  * @return `respuesta_solicitud` : `INVALID`, `RELEASED` son los posibles valores.
  */
-respuesta_solicitud liberar_recurso(q_blocked *estado, u_int32_t pid, char *nombre_recurso);
-
-/**
- * @brief Encola un pcb en la cola de procesos bloqueados para determinado recurso.
- *        El recurso en custion es el que se encuentra en el campo `resource` del pcb.
- *
- * @param estado
- * @param pcb
- *
- * @note El pcb debe tener un recurso asignado y se asume que el recurso existe.
- * @note Se deberia usar en conjunto con `consumir_recurso`. Bloquear unicamente en caso de `ALL_RETAINED`.
- */
-void bloquear_para_recurso(q_blocked *estado, t_pcb *pcb);
+respuesta_solicitud liberar_recurso(q_blocked *estado, char *nombre_recurso, u_int32_t pid);
 
 /**
  * @brief Desencola un pcb de la cola de procesos bloqueados para determinado recurso.
@@ -100,7 +88,19 @@ void bloquear_para_recurso(q_blocked *estado, t_pcb *pcb);
  * @note Se deberia usar en conjunto con `liberar_recurso`. Desbloquear unicamente en caso de `RELEASED`.
  * @note Si no hay procesos en la cola, retorna NULL, y puede ser ignorado.
  */
-t_pcb *desbloquear_para_recurso(q_blocked *estado, char *nombre_recurso);
+t_pcb *desbloquear_encolado(q_blocked *estado, char *nombre_recurso);
+
+/**
+ * @brief Encola un pcb en la cola de procesos bloqueados para determinado recurso.
+ *        El recurso en custion es el que se encuentra en el campo `resource` del pcb.
+ *
+ * @param estado
+ * @param pcb
+ *
+ * @note El pcb debe tener un recurso asignado y se asume que el recurso existe.
+ * @note Se deberia usar en conjunto con `consumir_recurso`. Bloquear unicamente en caso de `ALL_RETAINED`.
+ */
+// void bloquear_para_recurso(q_blocked *estado, t_pcb *pcb);
 
 /**
  * @brief Bloquea todas las colas de recursos para que no puedan ser operadas.
