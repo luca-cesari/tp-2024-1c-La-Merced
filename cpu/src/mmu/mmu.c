@@ -23,12 +23,12 @@ u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
       log_tlb_miss(pid, numero_pagina);
       numero_marco = buscar_en_memoria(pid, numero_pagina);
       log_obtener_marco(pid, numero_pagina, numero_marco);
+
+      if (tlb_disponible)
+         cargar_nueva_entrada(pid, numero_pagina, numero_marco);
    }
    else
       log_tlb_hit(pid, numero_pagina);
-
-   if (tlb_disponible)
-      cargar_nueva_entrada(pid, numero_pagina, numero_marco);
 
    return (numero_marco * tamanio_pagina) + desplazamiento;
 }
