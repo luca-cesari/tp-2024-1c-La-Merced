@@ -497,11 +497,14 @@ static void *cronometrar_quantum(void *milisegundos)
    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
    u_int64_t _milisegundos = *(u_int32_t *)milisegundos;
-   for (u_int64_t i = 0; i < _milisegundos; i++)
-   {
-      usleep(1000);
-      pthread_testcancel();
-   }
+   // for (u_int64_t i = 0; i < _milisegundos; i++)
+   // {
+   //    usleep(1000);
+   //    pthread_testcancel();
+   // }
+
+   usleep(1000 * _milisegundos);
+   pthread_testcancel();
 
    enviar_interrupcion(QUANTUM_INT);
    log_envio_de_interrupcion(QUANTUM_INT);

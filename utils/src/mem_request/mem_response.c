@@ -55,7 +55,7 @@ t_mem_buffer_response *recibir_buffer_response(int32_t fd_conexion)
       const void *data = list_get(paquete, 2);
       memcpy(buffer_response->buffer, data, buffer_response->tamanio_buffer);
 
-      u_int32_t size = strlen((char *)buffer_response->buffer);
+      // u_int32_t size = strlen((char *)buffer_response->buffer);
 
       // printf("Buffer recived: %s\n", (char *)buffer_response->buffer);
       // printf("Buffer size: %d\n", buffer_response->tamanio_buffer);
