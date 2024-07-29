@@ -4,6 +4,7 @@ u_int32_t pid_count;
 u_int32_t quantum;
 
 sem_mp_t *grado_multiprogramacion;
+sem_t proceso_cola_readys;
 
 q_estado *cola_new;
 q_estado *cola_ready;
@@ -40,6 +41,7 @@ void inicializar_planificador()
    quantum = get_quantum();
 
    grado_multiprogramacion = sem_mp_create(get_grado_multiprogramacion());
+   sem_init(&proceso_cola_readys, 0, 0);
 
    cola_new = crear_estado(NEW);
    cola_ready = crear_estado(READY);
@@ -243,6 +245,7 @@ static void *admitir_proceso()
       sem_mp_wait(grado_multiprogramacion);
       pcb = remove_proceso(cola_new, pcb->pid);
       push_proceso(cola_ready, pcb);
+      sem_post(&proceso_cola_readys);
       log_ingreso_a_ready(get_pids(cola_ready), NORMAL);
    }
 
@@ -301,6 +304,7 @@ static void pasar_a_ready_segun_prioridad(t_pcb *proceso)
                          ? cola_ready
                          : cola_ready_prioridad;
    push_proceso(ready, proceso);
+   sem_post(&proceso_cola_readys);
 
    // el valor de proceso->priority coincide con el tipo_cola_ready
    // 0 implica cola ready normal, 1 implica cola ready prioridad
@@ -445,11 +449,9 @@ static void *planificar_por_vrr()
    while (1)
    {
       q_estado *ready = NULL;
+      sem_wait(&proceso_cola_readys);
 
-      while (ready == NULL)
-      {
-         ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : (hay_proceso(cola_ready) ? cola_ready : NULL);
-      }
+      ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : cola_ready;
 
       t_pcb *proceso = pop_proceso(ready);
       set_motivo_desalojo(proceso, NONE);
