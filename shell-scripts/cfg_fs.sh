@@ -28,11 +28,17 @@ echo "CANTIDAD_ENTRADAS_TLB=0" >> cpu.config
 echo "ALGORITMO_TLB=FIFO" >> cpu.config
 cd ..
 
+rm -rf dialfs/ && mkdir dialfs/
+
+cd dialfs/
+dir_dialfs=$(pwd)
+cd ..
+
 cd entradasalida/
 
 # FS
 
-echo "PATH_BASE_DIALFS=../dialfs/" >> FS.config
+echo "PATH_BASE_DIALFS=${dir_dialfs}" >> FS.config
 echo "TIPO_INTERFAZ=DIALFS" >> FS.config
 echo "TIEMPO_UNIDAD_TRABAJO=2000" >> FS.config
 echo "BLOCK_SIZE=16" >> FS.config
