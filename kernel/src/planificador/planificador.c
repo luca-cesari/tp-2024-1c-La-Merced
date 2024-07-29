@@ -444,9 +444,12 @@ static void *planificar_por_vrr()
 
    while (1)
    {
-      q_estado *ready = hay_proceso(cola_ready_prioridad)
-                            ? cola_ready_prioridad
-                            : cola_ready;
+      q_estado *ready = NULL;
+
+      while (ready == NULL)
+      {
+         ready = hay_proceso(cola_ready_prioridad) ? cola_ready_prioridad : (hay_proceso(cola_ready) ? cola_ready : NULL);
+      }
 
       t_pcb *proceso = pop_proceso(ready);
       set_motivo_desalojo(proceso, NONE);
