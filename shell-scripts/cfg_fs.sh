@@ -30,8 +30,9 @@ cd ..
 
 cd entradasalida/
 
-# GENERICA
+# FS
 
+echo "PATH_BASE_DIALFS=../dialfs/" >> FS.config
 echo "TIPO_INTERFAZ=DIALFS" >> FS.config
 echo "TIEMPO_UNIDAD_TRABAJO=2000" >> FS.config
 echo "BLOCK_SIZE=16" >> FS.config
