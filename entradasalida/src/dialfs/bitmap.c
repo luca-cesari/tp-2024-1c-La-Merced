@@ -35,7 +35,6 @@ void inicializar_archivo_bitmap()
     for (int i = 0; i < get_block_count(); i++)
         bitarray_clean_bit(bitmap, i);
 
-
     munmap(map, get_block_count() / 8);
     close(fd);
     free(path_bitmap);

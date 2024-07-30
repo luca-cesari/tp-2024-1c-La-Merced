@@ -217,6 +217,7 @@ void io_fs_write(char **parametros)
 
 void io_fs_read(char **parametros)
 {
+
    char *nuevos_parametros = obtener_parametros_fs_read_write(eliminar_primer_elemento(parametros));
 
    t_io_request *io_request = crear_io_request(pcb->pid, parametros[0], "IO_FS_READ", nuevos_parametros);
@@ -307,7 +308,7 @@ char *get_direccion_tamanio(char **parametros)
 
 char *obtener_parametros_fs_read_write(char **parametros)
 {
-   int32_t direccion_logica = atoi(parametros[1]);
+   int32_t direccion_logica = get_valor_registro(parametros[1]);
    int32_t tamanio_dato = get_valor_registro(parametros[2]);
    int32_t puntero_archivo = get_valor_registro(parametros[3]);
    char *direcciones_fisicas = obtener_direcciones_fisicas(direccion_logica, tamanio_dato);
