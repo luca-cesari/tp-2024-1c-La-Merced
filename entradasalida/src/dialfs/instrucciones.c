@@ -71,7 +71,9 @@ int8_t io_fs_truncate(char *argumentos, u_int32_t pid)
 
         if (!hay_bloques_libres_contiguos(get_bloque_inicial(path_archivo) + bloques_ocupados, bloques_faltantes))
         {
-            compactar(path_archivo, tamanio_archivo, bloques_ocupados, pid);
+            log_inicio_compactacion(pid);
+            compactar(path_archivo, tamanio_archivo, bloques_ocupados + bloques_faltantes);
+            log_fin_compactacion(pid);
         }
 
         for (int i = 0; i < bloques_faltantes; i++)
@@ -181,47 +183,44 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 3) Poner el archivo al final de los archivos que se movieron en el paso 2
 */
 
-void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados, u_int32_t pid)
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t bloques_totales)
 {
-
-    log_inicio_compactacion(pid);
-
-    u_int32_t bloque_inicial = get_bloque_inicial(path);
 
     char *buffer = malloc(tamanio_archivo);
     copiar_de_bloque_datos(buffer, bloque_inicial, tamanio_archivo); // Se copia en un buffer el archivo a truncar
 
-    u_int32_t bloque_inicial_con_desplazamiento = bloque_inicial;
-
-    // Quiero obtener el indice de el archivo
-    u_int32_t indice_primer_archivo_desplazar = obtener_indice_archivo(path) + 1;
-
-    for (int i = indice_primer_archivo_desplazar; i < obtener_tamanio_lista_archivos(); i++)
+    u_int32_t ultimo_hueco = get_siguiente_bloque_libre();
+    for (int i = 0; i < obtener_tamanio_lista_archivos(); i++)
     {
-        desplazar_archivo_en_bloques(get_path_archivo_por_indice(i), bloque_inicial_con_desplazamiento);
-        actualizar_archivo_metadata(get_path_archivo_por_indice(i), bloque_inicial_con_desplazamiento);
-        bloque_inicial_con_desplazamiento += get_cantidad_bloques_ocupados(get_path_archivo_por_indice(i));
+        char *path_archivo = get_path_archivo_por_indice(i);
+
+        // ignora el archivo a truncar, es decir que los bloques son sobreescritos
+        if (strcmp(path_archivo, path) != 0)
+        {
+            desplazar_archivo_en_bloques(path_archivo, ultimo_hueco);
+            actualizar_archivo_metadata(path_archivo, ultimo_hueco);
+        }
+
+        ultimo_hueco = ultimo_hueco + get_cantidad_bloques_ocupados(path_archivo) + 1;
+        free(path_archivo);
     }
 
-    pegar_bloque_datos(buffer, bloque_inicial_con_desplazamiento, tamanio_archivo); // Se pega el archivo a truncar al final de los archivos desplazados
-    actualizar_archivo_metadata(path, bloque_inicial_con_desplazamiento);
-    bloque_inicial_con_desplazamiento += cantidad_bloques_ocupados;
+    pegar_bloque_datos(buffer, ultimo_hueco, tamanio_archivo); // Se pega el archivo a truncar al final de los archivos desplazados
+    actualizar_archivo_metadata(path, ultimo_hueco);
+    ultimo_hueco = ultimo_hueco + bloques_totales + 1;
 
     ordenar_lista_archivos(obtener_indice_archivo(path));
     // Ver si meter lo de abajo en una funcion
 
-    for (int i = bloque_inicial; i < bloque_inicial_con_desplazamiento; i++)
-    {
+    for (int i = 0; i < ultimo_hueco; i++)
         modificar_bitmap(i, OCUPADO);
-    }
 
-    liberar_bitmap_a_partir_de(bloque_inicial_con_desplazamiento);
+    liberar_bitmap_a_partir_de(ultimo_hueco);
 
     // free(buffer); Lo comento porque tira exepción. Seguramente se libera en otra parte
     // free(path); No hay que liberarlo, se hace más adelante.
 
     sleep(get_retraso_compactacion() / 1000);
-    log_fin_compactacion(pid);
 }
 
 void destruir_dicc_instrucciones()

@@ -46,7 +46,7 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid);
  *
  * @note Recibe como argumentos el path del archivo a mover
  */
-void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados, u_int32_t pid);
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t cantidad_bloques_ocupados);
 
 void destruir_dicc_instrucciones();
 
