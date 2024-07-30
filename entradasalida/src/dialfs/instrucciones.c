@@ -183,13 +183,13 @@ int8_t io_fs_read(char *argumentos, u_int32_t pid)
 3) Poner el archivo al final de los archivos que se movieron en el paso 2
 */
 
-void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t bloques_totales)
+void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t bloques_totales_ultimo_archivo)
 {
 
     char *buffer = malloc(tamanio_archivo);
-    copiar_de_bloque_datos(buffer, bloque_inicial, tamanio_archivo); // Se copia en un buffer el archivo a truncar
+    copiar_de_bloque_datos(buffer, get_bloque_inicial(path), tamanio_archivo); // Se copia en un buffer el archivo a truncar
 
-    u_int32_t ultimo_hueco = get_siguiente_bloque_libre();
+    u_int32_t ultimo_hueco = 0;
     for (int i = 0; i < obtener_tamanio_lista_archivos(); i++)
     {
         char *path_archivo = get_path_archivo_por_indice(i);
@@ -199,15 +199,15 @@ void compactar(char *path, u_int32_t tamanio_archivo, u_int32_t bloques_totales)
         {
             desplazar_archivo_en_bloques(path_archivo, ultimo_hueco);
             actualizar_archivo_metadata(path_archivo, ultimo_hueco);
+            ultimo_hueco = ultimo_hueco + get_cantidad_bloques_ocupados(path_archivo);
         }
 
-        ultimo_hueco = ultimo_hueco + get_cantidad_bloques_ocupados(path_archivo) + 1;
         free(path_archivo);
     }
 
     pegar_bloque_datos(buffer, ultimo_hueco, tamanio_archivo); // Se pega el archivo a truncar al final de los archivos desplazados
     actualizar_archivo_metadata(path, ultimo_hueco);
-    ultimo_hueco = ultimo_hueco + bloques_totales + 1;
+    ultimo_hueco = ultimo_hueco + bloques_totales_ultimo_archivo;
 
     ordenar_lista_archivos(obtener_indice_archivo(path));
     // Ver si meter lo de abajo en una funcion
