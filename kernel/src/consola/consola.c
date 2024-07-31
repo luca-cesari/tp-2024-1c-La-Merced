@@ -144,7 +144,7 @@ static void ejecutar_comando(char *operacion, char *argumento)
 static void imprimir_procesos()
 {
    t_list *procesos = obtener_procesos();
-   char *estados[5] = {"NEW", "READY", "EXECUTING", "BLOCKED", "EXIT"};
+   char *estados[5] = {"NEW", "READY", "BLOCKED", "EXECUTING", "EXIT"};
 
    for (int i = 0; i < 5; i++)
    {
