@@ -9,7 +9,7 @@ cd ..
 # Kernel
 cd kernel/
 echo "ALGORITMO_PLANIFICACION=VRR" >> kernel.config
-echo "QUANTUM=5000" >> kernel.config
+echo "QUANTUM=500" >> kernel.config
 echo "RECURSOS=[RA, RB, RC, RD]" >> kernel.config
 echo "INSTANCIAS_RECURSOS=[1,1,1,1]" >> kernel.config
 echo "GRADO_MULTIPROGRAMACION=3" >> kernel.config

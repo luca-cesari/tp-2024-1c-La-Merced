@@ -165,7 +165,7 @@ static void imprimir_procesos()
       }
       list_iterator_destroy(iterador);
 
-      list_destroy_and_destroy_elements(procesos_estado, &free);
+      list_destroy(procesos_estado);
       printf("\n");
    }
 
