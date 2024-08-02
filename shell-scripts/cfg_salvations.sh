@@ -3,7 +3,7 @@
 bash config-setup/_kernel_setup.sh
 bash config-setup/_memoria_setup.sh
 bash config-setup/_cpu_setup.sh
-bash config-setup/_entradasalida_setup.sh FS TECLADO MONITOR
+bash config-setup/_entradasalida_setup.sh SLP1 GENERICA ESPERA TECLADO MONITOR
 cd ..
 
 # Kernel
