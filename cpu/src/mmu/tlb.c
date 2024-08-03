@@ -59,7 +59,7 @@ int32_t get_marco(u_int32_t pid, u_int32_t numero_pagina)
       break;
    }
 
-   debug_tlb("hit: \n");
+   // debug_tlb("hit: \n");
    return entrada.marco; // TLB hit
 }
 
