@@ -44,4 +44,6 @@ int32_t get_marco(u_int32_t pid, u_int32_t numero_pagina);
  */
 void destruir_tlb(void);
 
+void debug_tlb(char *msj);
+
 #endif // TLB_H

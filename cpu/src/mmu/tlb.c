@@ -55,9 +55,11 @@ int32_t get_marco(u_int32_t pid, u_int32_t numero_pagina)
       // se supone que tras un remove_entrada,
       // hay por lo menos una entrada libre
       tlb[primera_entrada_libre] = entrada;
+      primera_entrada_libre++;
       break;
    }
 
+   debug_tlb("hit: \n");
    return entrada.marco; // TLB hit
 }
 
@@ -102,4 +104,11 @@ static entrada_tlb remove_entrada(u_int32_t index)
    tlb[ultimo_indice] = crear_entrada_tlb(0, 0, 0);
    primera_entrada_libre--;
    return a_remover;
+}
+
+void debug_tlb(char *msj)
+{
+   printf("%s", msj);
+   for (int i = 0; i < cantidad_entradas; i++)
+      printf("pid: %d,  pagina: %d \n", tlb[i].pid, tlb[i].pagina);
 }
